@@ -1,0 +1,17 @@
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  image: golang:alpine
+  timeout: 15m
+  script:
+    - go vet ./...
+    - go test ./...
+
+build:
+  stage: build
+  image: docker:cli
+  script:
+    - docker build -t ratingd .

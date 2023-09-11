@@ -1,0 +1,61 @@
+package carrier
+
+import (
+	"errors"
+	"time"
+)
+
+type CreateCarrierRequest struct {
+	Name            string `json:"name"`
+	Code            string `json:"code"`
+	Country         string `json:"country"`
+	VATNumber       string `json:"vat_number"`
+	PaymentTermDays int    `json:"payment_term_days"`
+}
+
+type CarrierResponse struct {
+	ID              int64         `json:"id"`
+	Name            string        `json:"name"`
+	Code            string        `json:"code"`
+	Country         string        `json:"country"`
+	VATNumber       string        `json:"vat_number"`
+	PaymentTermDays int           `json:"payment_term_days"`
+	Status          CarrierStatus `json:"status"`
+	ApprovedAt      *time.Time    `json:"approved_at"`
+	SuspendedAt     *time.Time    `json:"suspended_at"`
+	CreatedAt       time.Time     `json:"created_at"`
+	UpdatedAt       time.Time     `json:"updated_at"`
+}
+
+// Validate checks the request before it reaches the service.
+func (r *CreateCarrierRequest) Validate() error {
+	if r.Name == "" {
+		return errors.New("name is required")
+	}
+	if r.Country == "" {
+		return errors.New("country is required")
+	}
+	if r.VATNumber == "" {
+		return errors.New("vat number is required")
+	}
+	if r.PaymentTermDays < 0 {
+		return errors.New("payment term days must not be negative")
+	}
+	return nil
+}
+
+func toCarrierResponse(carrier *Carrier) CarrierResponse {
+	return CarrierResponse{
+		ID:              carrier.ID,
+		Name:            carrier.Name,
+		Code:            carrier.Code,
+		Country:         carrier.Country,
+		VATNumber:       carrier.VATNumber,
+		PaymentTermDays: carrier.PaymentTermDays,
+		Status:          carrier.Status,
+		ApprovedAt:      carrier.ApprovedAt,
+		SuspendedAt:     carrier.SuspendedAt,
+		CreatedAt:       carrier.CreatedAt,
+		UpdatedAt:       carrier.UpdatedAt,
+	}
+}

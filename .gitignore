@@ -1,0 +1,5 @@
+/ratingd
+*.out
+.env
+.idea/
+.vscode/

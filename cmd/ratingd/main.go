@@ -1,0 +1,44 @@
+package ratingd
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"git.tarven.internal/billing/ratingd/internal/carrier"
+	"git.tarven.internal/billing/ratingd/internal/customer"
+	"git.tarven.internal/billing/ratingd/internal/platform/audit"
+	"git.tarven.internal/billing/ratingd/internal/platform/clock"
+	"git.tarven.internal/billing/ratingd/internal/platform/database"
+	"git.tarven.internal/billing/ratingd/internal/platform/logging"
+)
+
+func main() {
+	logger := logging.New("ratingd")
+	db, err := database.Open(os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatalf("open database: %v", err)
+	}
+	defer db.Close()
+
+	clk := clock.System{}
+	rec := audit.NewSQLRecorder(db)
+	mux := http.NewServeMux()
+
+	customerSvc := customer.NewService(customer.NewSQLStore(db), clk, rec, logger)
+	customer.NewHandler(customerSvc).Routes(mux)
+
+	carrierSvc := carrier.NewService(carrier.NewSQLStore(db), clk, rec, logger)
+	carrier.NewHandler(carrierSvc).Routes(mux)
+
+	addr := os.Getenv("LISTEN_ADDR")
+	if addr == "" {
+		addr = ":8080"
+	}
+	logger.Info("listening", "addr", addr)
+	if err := http.ListenAndServe(addr, mux); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+}
