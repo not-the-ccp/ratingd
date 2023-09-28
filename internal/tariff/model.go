@@ -1,0 +1,51 @@
+package tariff
+
+import (
+	"time"
+)
+
+// Tariff holds the persisted state of a tariff.
+type Tariff struct {
+	ID int64 `json:"id"`
+	// Code is the code.
+	Code        string       `json:"code"`
+	Description string       `json:"description"`
+	Currency    string       `json:"currency"`
+	ValidFrom   time.Time    `json:"valid_from"`
+	ValidTo     time.Time    `json:"valid_to"`
+	Status      TariffStatus `json:"status"`
+	PublishedAt *time.Time   `json:"published_at"`
+	RetiredAt   *time.Time   `json:"retired_at"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+type TariffStatus string
+
+// Statuses a tariff moves through.
+const (
+	TariffStatusDraft     TariffStatus = "draft"
+	TariffStatusPublished TariffStatus = "published"
+	TariffStatusRetired   TariffStatus = "retired"
+)
+
+func (t *Tariff) CanPublish() bool {
+	return t.Status == TariffStatusDraft
+}
+
+func (t *Tariff) CanRetire() bool {
+	return t.Status == TariffStatusPublished
+}
+
+func (s TariffStatus) String() string {
+	return string(s)
+}
+
+func (s TariffStatus) IsFinal() bool {
+	switch s {
+	case TariffStatusRetired:
+		return true
+	default:
+		return false
+	}
+}
