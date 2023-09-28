@@ -39,12 +39,12 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 
 	now := s.clock.Now()
 	carrier := &Carrier{
+		VATNumber:       req.VATNumber,
+		Status:          CarrierStatusOnboarding,
+		PaymentTermDays: req.PaymentTermDays,
 		Name:            req.Name,
 		Code:            req.Code,
 		Country:         req.Country,
-		VATNumber:       req.VATNumber,
-		PaymentTermDays: req.PaymentTermDays,
-		Status:          CarrierStatusOnboarding,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
@@ -74,7 +74,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	}
 
 	now := s.clock.Now()
-	// status and timestamp must change together
+	// Ausnahme für Bestandskunden
 	carrier.Status = CarrierStatusApproved
 	carrier.ApprovedAt = &now
 	carrier.UpdatedAt = now

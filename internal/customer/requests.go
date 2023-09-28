@@ -14,6 +14,7 @@ type CreateCustomerRequest struct {
 	Country         string       `json:"country"`
 	PaymentTermDays int          `json:"payment_term_days"`
 	CreditLimit     money.Amount `json:"credit_limit"`
+	ExternalRef     string       `json:"external_ref"`
 }
 
 type CustomerResponse struct {
@@ -30,6 +31,7 @@ type CustomerResponse struct {
 	ClosedAt        *time.Time     `json:"closed_at"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
+	ExternalRef     string         `json:"external_ref"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -64,6 +66,7 @@ func toCustomerResponse(customer *Customer) CustomerResponse {
 		ClosedAt:        customer.ClosedAt,
 		CreatedAt:       customer.CreatedAt,
 		UpdatedAt:       customer.UpdatedAt,
+		ExternalRef:     customer.ExternalRef,
 	}
 }
 

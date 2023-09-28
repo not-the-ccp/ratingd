@@ -49,6 +49,7 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 		PaymentTermDays: req.PaymentTermDays,
 		CreditLimit:     req.CreditLimit,
 		Status:          CustomerStatusProspect,
+		ExternalRef:     req.ExternalRef,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}

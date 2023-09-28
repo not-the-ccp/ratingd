@@ -18,6 +18,7 @@ type Customer struct {
 	ActivatedAt     *time.Time     `json:"activated_at"`
 	BlockedAt       *time.Time     `json:"blocked_at"`
 	ClosedAt        *time.Time     `json:"closed_at"`
+	ExternalRef     string         `json:"external_ref"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 }
