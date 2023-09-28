@@ -11,4 +11,9 @@ type Store interface {
 	ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error)
 	InsertCustomer(ctx context.Context, customer *Customer) error
 	UpdateCustomer(ctx context.Context, customer *Customer) error
+	FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error)
+	ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error)
+	ListBillingAddressesForCustomer(ctx context.Context, customerID int64) ([]*BillingAddress, error)
+	InsertBillingAddress(ctx context.Context, address *BillingAddress) error
+	UpdateBillingAddress(ctx context.Context, address *BillingAddress) error
 }

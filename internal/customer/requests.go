@@ -66,3 +66,54 @@ func toCustomerResponse(customer *Customer) CustomerResponse {
 		UpdatedAt:       customer.UpdatedAt,
 	}
 }
+
+type CreateBillingAddressRequest struct {
+	CustomerID int64  `json:"customer_id"`
+	Street     string `json:"street"`
+	Zip        string `json:"zip"`
+	City       string `json:"city"`
+	Country    string `json:"country"`
+	Primary    bool   `json:"primary"`
+}
+
+type BillingAddressResponse struct {
+	ID         int64     `json:"id"`
+	CustomerID int64     `json:"customer_id"`
+	Street     string    `json:"street"`
+	Zip        string    `json:"zip"`
+	City       string    `json:"city"`
+	Country    string    `json:"country"`
+	Primary    bool      `json:"primary"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+func (r *CreateBillingAddressRequest) Validate() error {
+	if r.CustomerID == 0 {
+		return errors.New("customer id is required")
+	}
+	if r.Street == "" {
+		return errors.New("street is required")
+	}
+	if r.Zip == "" {
+		return errors.New("zip is required")
+	}
+	if r.Country == "" {
+		return errors.New("country is required")
+	}
+	return nil
+}
+
+func toBillingAddressResponse(billingAddress *BillingAddress) BillingAddressResponse {
+	return BillingAddressResponse{
+		ID:         billingAddress.ID,
+		CustomerID: billingAddress.CustomerID,
+		Street:     billingAddress.Street,
+		Zip:        billingAddress.Zip,
+		City:       billingAddress.City,
+		Country:    billingAddress.Country,
+		Primary:    billingAddress.Primary,
+		CreatedAt:  billingAddress.CreatedAt,
+		UpdatedAt:  billingAddress.UpdatedAt,
+	}
+}

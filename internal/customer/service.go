@@ -92,3 +92,38 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	s.log.Info("customer active", "id", customer.ID)
 	return customer, nil
 }
+
+func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
+	return s.store.FindBillingAddress(ctx, id)
+}
+
+func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAddressRequest) (*BillingAddress, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("validate request: %w", err)
+	}
+	now := s.clock.Now()
+	billingAddress := &BillingAddress{
+		CustomerID: req.CustomerID,
+		Street:     req.Street,
+		Zip:        req.Zip,
+		City:       req.City,
+		Country:    req.Country,
+		Primary:    req.Primary,
+		CreatedAt:  now,
+		UpdatedAt:  now,
+	}
+
+	if err := s.store.InsertBillingAddress(ctx, billingAddress); err != nil {
+		return nil, fmt.Errorf("insert billing address: %w", err)
+	}
+
+	if err := s.audit.Record(ctx, "billing_address.created", billingAddress.ID); err != nil {
+		s.log.Warn("audit entry failed", "action", "billing_address.created", "err", err)
+	}
+
+	return billingAddress, nil
+}
+
+func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
+	return s.store.ListBillingAddresses(ctx, limit, offset)
+}

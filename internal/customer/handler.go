@@ -22,6 +22,9 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/customer/create", h.createCustomer)
 	mux.HandleFunc("/api/v1/customers", h.listCustomers)
 	mux.HandleFunc("/api/v1/customer/activate", h.activateCustomer)
+	mux.HandleFunc("/api/v1/billing-address", h.getBillingAddress)
+	mux.HandleFunc("/api/v1/billing-address/create", h.createBillingAddress)
+	mux.HandleFunc("/api/v1/billing-addresses", h.listBillingAddresses)
 }
 
 func writeError(w http.ResponseWriter, err error) {
@@ -95,4 +98,53 @@ func (h *Handler) activateCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toCustomerResponse(customer))
+}
+
+// getBillingAddress handles requests to /api/v1/billing-address.
+func (h *Handler) getBillingAddress(w http.ResponseWriter, r *http.Request) {
+	id, err := httpx.Int64Param(r, "id")
+	if err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	address, err := h.svc.GetBillingAddress(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	httpx.JSON(w, http.StatusOK, toBillingAddressResponse(address))
+}
+
+func (h *Handler) createBillingAddress(w http.ResponseWriter, r *http.Request) {
+	var req CreateBillingAddressRequest
+	if err := httpx.Decode(r, &req); err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	address, err := h.svc.CreateBillingAddress(r.Context(), &req)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	httpx.JSON(w, http.StatusCreated, toBillingAddressResponse(address))
+}
+
+func (h *Handler) listBillingAddresses(w http.ResponseWriter, r *http.Request) {
+	limit := httpx.IntParam(r, "limit", 50)
+	offset := httpx.IntParam(r, "offset", 0)
+
+	addresses, err := h.svc.ListBillingAddresses(r.Context(), limit, offset)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	out := make([]BillingAddressResponse, 0, len(addresses))
+	for _, item := range addresses {
+		out = append(out, toBillingAddressResponse(item))
+	}
+	httpx.JSON(w, http.StatusOK, out)
 }
