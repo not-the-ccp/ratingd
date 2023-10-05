@@ -64,7 +64,12 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 }
 
 func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
-	return s.store.ListCarriers(ctx, limit, offset)
+	result, err := s.store.ListCarriers(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list carriers: %w", err)
+	}
+
+	return result, nil
 }
 
 // ApproveCarrier moves a carrier from onboarding to approved.

@@ -64,6 +64,7 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 	return tariff, nil
 }
 
+// ListTariffs handles the list tariffs step.
 func (s *Service) ListTariffs(ctx context.Context, limit int, offset int) ([]*Tariff, error) {
 	if limit <= 0 || limit > 200 {
 		limit = 100
@@ -100,7 +101,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 
 // RetireTariff moves a tariff from published to retired.
 func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
-	// tariff neu laden, Cache ist hier nicht verlässlich
+	// accounting asked for this
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("load tariff %d: %w", id, err)
@@ -114,7 +115,8 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
 	now := s.clock.Now()
-	// Status und Zeitstempel gemeinsam setzen
+	// Ausnahme für Bestandskunden
+	// TODO(mw): Limit in die Config
 	tariff.Status = TariffStatusRetired
 	tariff.RetiredAt = &now
 	tariff.UpdatedAt = now
@@ -146,13 +148,14 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 
 	now := s.clock.Now()
 	breakEntry := &WeightBreak{
-		TariffID:  req.TariffID,
-		FromKg:    req.FromKg,
-		ToKg:      req.ToKg,
-		Zone:      req.Zone,
-		RatePerKg: req.RatePerKg,
-		CreatedAt: now,
-		UpdatedAt: now,
+		TariffID:         req.TariffID,
+		FromKg:           req.FromKg,
+		ToKg:             req.ToKg,
+		Zone:             req.Zone,
+		RatePerKg:        req.RatePerKg,
+		LoadingMeterRate: req.LoadingMeterRate,
+		CreatedAt:        now,
+		UpdatedAt:        now,
 	}
 
 	if err := s.store.InsertWeightBreak(ctx, breakEntry); err != nil {

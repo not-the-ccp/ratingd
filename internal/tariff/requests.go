@@ -56,22 +56,24 @@ func toTariffResponse(tariff *Tariff) TariffResponse {
 }
 
 type CreateWeightBreakRequest struct {
-	TariffID  int64        `json:"tariff_id"`
-	FromKg    float64      `json:"from_kg"`
-	ToKg      float64      `json:"to_kg"`
-	Zone      string       `json:"zone"`
-	RatePerKg money.Amount `json:"rate_per_kg"`
+	TariffID         int64        `json:"tariff_id"`
+	FromKg           float64      `json:"from_kg"`
+	ToKg             float64      `json:"to_kg"`
+	Zone             string       `json:"zone"`
+	RatePerKg        money.Amount `json:"rate_per_kg"`
+	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
 }
 
 type WeightBreakResponse struct {
-	ID        int64        `json:"id"`
-	TariffID  int64        `json:"tariff_id"`
-	FromKg    float64      `json:"from_kg"`
-	ToKg      float64      `json:"to_kg"`
-	Zone      string       `json:"zone"`
-	RatePerKg money.Amount `json:"rate_per_kg"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	ID               int64        `json:"id"`
+	TariffID         int64        `json:"tariff_id"`
+	FromKg           float64      `json:"from_kg"`
+	ToKg             float64      `json:"to_kg"`
+	Zone             string       `json:"zone"`
+	RatePerKg        money.Amount `json:"rate_per_kg"`
+	CreatedAt        time.Time    `json:"created_at"`
+	UpdatedAt        time.Time    `json:"updated_at"`
+	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
 }
 
 func (r *CreateWeightBreakRequest) Validate() error {
@@ -95,13 +97,14 @@ func (r *CreateWeightBreakRequest) Validate() error {
 
 func toWeightBreakResponse(weightBreak *WeightBreak) WeightBreakResponse {
 	return WeightBreakResponse{
-		ID:        weightBreak.ID,
-		TariffID:  weightBreak.TariffID,
-		FromKg:    weightBreak.FromKg,
-		ToKg:      weightBreak.ToKg,
-		Zone:      weightBreak.Zone,
-		RatePerKg: weightBreak.RatePerKg,
-		CreatedAt: weightBreak.CreatedAt,
-		UpdatedAt: weightBreak.UpdatedAt,
+		ID:               weightBreak.ID,
+		TariffID:         weightBreak.TariffID,
+		FromKg:           weightBreak.FromKg,
+		ToKg:             weightBreak.ToKg,
+		Zone:             weightBreak.Zone,
+		RatePerKg:        weightBreak.RatePerKg,
+		CreatedAt:        weightBreak.CreatedAt,
+		UpdatedAt:        weightBreak.UpdatedAt,
+		LoadingMeterRate: weightBreak.LoadingMeterRate,
 	}
 }

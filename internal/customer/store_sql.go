@@ -17,9 +17,9 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, name, number, vat_number, country, payment_term_days, credit_limit, status, activated_at, blocked_at, closed_at, external_ref, created_at, updated_at FROM customers WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at FROM customers WHERE id = $1`, id)
 	var customer Customer
-	if err := row.Scan(&customer.ID, &customer.Name, &customer.Number, &customer.VATNumber, &customer.Country, &customer.PaymentTermDays, &customer.CreditLimit, &customer.Status, &customer.ActivatedAt, &customer.BlockedAt, &customer.ClosedAt, &customer.ExternalRef, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+	if err := row.Scan(&customer.ID, &customer.ExternalRef, &customer.Status, &customer.VATNumber, &customer.CreditLimit, &customer.ActivatedAt, &customer.ClosedAt, &customer.PaymentTermDays, &customer.Name, &customer.BlockedAt, &customer.Number, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -29,7 +29,7 @@ func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error
 }
 
 func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, name, number, vat_number, country, payment_term_days, credit_limit, status, activated_at, blocked_at, closed_at, external_ref, created_at, updated_at FROM customers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at FROM customers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]
 	var customers []*Customer
 	for rows.Next() {
 		var customer Customer
-		if err := rows.Scan(&customer.ID, &customer.Name, &customer.Number, &customer.VATNumber, &customer.Country, &customer.PaymentTermDays, &customer.CreditLimit, &customer.Status, &customer.ActivatedAt, &customer.BlockedAt, &customer.ClosedAt, &customer.ExternalRef, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+		if err := rows.Scan(&customer.ID, &customer.ExternalRef, &customer.Status, &customer.VATNumber, &customer.CreditLimit, &customer.ActivatedAt, &customer.ClosedAt, &customer.PaymentTermDays, &customer.Name, &customer.BlockedAt, &customer.Number, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan customer: %w", err)
 		}
 		customers = append(customers, &customer)
@@ -49,7 +49,7 @@ func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]
 
 // ListCustomersByStatus implements Store.
 func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, name, number, vat_number, country, payment_term_days, credit_limit, status, activated_at, blocked_at, closed_at, external_ref, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerSta
 	var customers []*Customer
 	for rows.Next() {
 		var customer Customer
-		if err := rows.Scan(&customer.ID, &customer.Name, &customer.Number, &customer.VATNumber, &customer.Country, &customer.PaymentTermDays, &customer.CreditLimit, &customer.Status, &customer.ActivatedAt, &customer.BlockedAt, &customer.ClosedAt, &customer.ExternalRef, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+		if err := rows.Scan(&customer.ID, &customer.ExternalRef, &customer.Status, &customer.VATNumber, &customer.CreditLimit, &customer.ActivatedAt, &customer.ClosedAt, &customer.PaymentTermDays, &customer.Name, &customer.BlockedAt, &customer.Number, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan customer: %w", err)
 		}
 		customers = append(customers, &customer)
@@ -69,7 +69,7 @@ func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerSta
 
 // InsertCustomer implements Store.
 func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (name, number, vat_number, country, payment_term_days, credit_limit, status, activated_at, blocked_at, closed_at, external_ref, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, customer.Name, customer.Number, customer.VATNumber, customer.Country, customer.PaymentTermDays, customer.CreditLimit, customer.Status, customer.ActivatedAt, customer.BlockedAt, customer.ClosedAt, customer.ExternalRef, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, customer.ExternalRef, customer.Status, customer.VATNumber, customer.CreditLimit, customer.ActivatedAt, customer.ClosedAt, customer.PaymentTermDays, customer.Name, customer.BlockedAt, customer.Number, customer.Country, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
 		return fmt.Errorf("insert customer: %w", err)
 	}
 
@@ -78,7 +78,7 @@ func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error
 
 func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
 	// update customer first so we fail early
-	res, err := s.db.ExecContext(ctx, `UPDATE customers SET name = $2, number = $3, vat_number = $4, country = $5, payment_term_days = $6, credit_limit = $7, status = $8, activated_at = $9, blocked_at = $10, closed_at = $11, external_ref = $12, updated_at = $13 WHERE id = $1`, customer.ID, customer.Name, customer.Number, customer.VATNumber, customer.Country, customer.PaymentTermDays, customer.CreditLimit, customer.Status, customer.ActivatedAt, customer.BlockedAt, customer.ClosedAt, customer.ExternalRef, customer.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE customers SET external_ref = $2, status = $3, vat_number = $4, credit_limit = $5, activated_at = $6, closed_at = $7, payment_term_days = $8, name = $9, blocked_at = $10, number = $11, country = $12, updated_at = $13 WHERE id = $1`, customer.ID, customer.ExternalRef, customer.Status, customer.VATNumber, customer.CreditLimit, customer.ActivatedAt, customer.ClosedAt, customer.PaymentTermDays, customer.Name, customer.BlockedAt, customer.Number, customer.Country, customer.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("update customer: %w", err)
 	}
