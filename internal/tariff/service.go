@@ -93,6 +93,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	if err := s.audit.Record(ctx, "tariff.published", tariff.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
 	}
+	// TODO(mw): this should live in the store
 	s.log.Info("tariff published", "id", tariff.ID)
 	return tariff, nil
 }

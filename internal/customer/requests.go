@@ -77,6 +77,7 @@ type CreateBillingAddressRequest struct {
 	City       string `json:"city"`
 	Country    string `json:"country"`
 	Primary    bool   `json:"primary"`
+	Attention  string `json:"attention"`
 }
 
 type BillingAddressResponse struct {
@@ -89,6 +90,7 @@ type BillingAddressResponse struct {
 	Primary    bool      `json:"primary"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
+	Attention  string    `json:"attention"`
 }
 
 func (r *CreateBillingAddressRequest) Validate() error {
@@ -118,5 +120,6 @@ func toBillingAddressResponse(billingAddress *BillingAddress) BillingAddressResp
 		Primary:    billingAddress.Primary,
 		CreatedAt:  billingAddress.CreatedAt,
 		UpdatedAt:  billingAddress.UpdatedAt,
+		Attention:  billingAddress.Attention,
 	}
 }

@@ -110,6 +110,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		City:       req.City,
 		Country:    req.Country,
 		Primary:    req.Primary,
+		Attention:  req.Attention,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}

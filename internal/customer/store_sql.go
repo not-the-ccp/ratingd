@@ -94,9 +94,9 @@ func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error
 }
 
 func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, created_at, updated_at FROM billing_addresses WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, attention, created_at, updated_at FROM billing_addresses WHERE id = $1`, id)
 	var address BillingAddress
-	if err := row.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.CreatedAt, &address.UpdatedAt); err != nil {
+	if err := row.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.Attention, &address.CreatedAt, &address.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -107,7 +107,7 @@ func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAd
 
 func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
 	// we need this for the checks below: list billing addresses
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, created_at, updated_at FROM billing_addresses ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, attention, created_at, updated_at FROM billing_addresses ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("list billing addresses: %w", err)
 	}
@@ -117,7 +117,7 @@ func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset i
 	var addresses []*BillingAddress
 	for rows.Next() {
 		var address BillingAddress
-		if err := rows.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.CreatedAt, &address.UpdatedAt); err != nil {
+		if err := rows.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.Attention, &address.CreatedAt, &address.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan billing address: %w", err)
 		}
 		addresses = append(addresses, &address)
@@ -127,7 +127,7 @@ func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset i
 
 // ListBillingAddressesForCustomer implements Store.
 func (s *SQLStore) ListBillingAddressesForCustomer(ctx context.Context, customerID int64) ([]*BillingAddress, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, created_at, updated_at FROM billing_addresses WHERE customer_id = $1 ORDER BY id`, customerID)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, attention, created_at, updated_at FROM billing_addresses WHERE customer_id = $1 ORDER BY id`, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("list billing addresses: %w", err)
 	}
@@ -136,7 +136,7 @@ func (s *SQLStore) ListBillingAddressesForCustomer(ctx context.Context, customer
 	var addresses []*BillingAddress
 	for rows.Next() {
 		var address BillingAddress
-		if err := rows.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.CreatedAt, &address.UpdatedAt); err != nil {
+		if err := rows.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.Attention, &address.CreatedAt, &address.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan billing address: %w", err)
 		}
 		addresses = append(addresses, &address)
@@ -146,14 +146,14 @@ func (s *SQLStore) ListBillingAddressesForCustomer(ctx context.Context, customer
 
 // InsertBillingAddress implements Store.
 func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAddress) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO billing_addresses (customer_id, street, zip, city, country, primary, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.CreatedAt, address.UpdatedAt).Scan(&address.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO billing_addresses (customer_id, street, zip, city, country, primary, attention, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.Attention, address.CreatedAt, address.UpdatedAt).Scan(&address.ID); err != nil {
 		return fmt.Errorf("insert billing address: %w", err)
 	}
 	return nil
 }
 
 func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET customer_id = $2, street = $3, zip = $4, city = $5, country = $6, primary = $7, updated_at = $8 WHERE id = $1`, address.ID, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET customer_id = $2, street = $3, zip = $4, city = $5, country = $6, primary = $7, attention = $8, updated_at = $9 WHERE id = $1`, address.ID, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.Attention, address.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("update billing address: %w", err)
 	}

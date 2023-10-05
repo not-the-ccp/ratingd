@@ -15,6 +15,7 @@ type BillingAddress struct {
 	// Country is the country.
 	Country   string    `json:"country"`
 	Primary   bool      `json:"primary"`
+	Attention string    `json:"attention"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
