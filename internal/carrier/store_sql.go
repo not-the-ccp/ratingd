@@ -12,8 +12,22 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET name = $2, code = $3, country = $4, vat_number = $5, payment_term_days = $6, status = $7, approved_at = $8, suspended_at = $9, updated_at = $10 WHERE id = $1`, carrier.ID, carrier.Name, carrier.Code, carrier.Country, carrier.VATNumber, carrier.PaymentTermDays, carrier.Status, carrier.ApprovedAt, carrier.SuspendedAt, carrier.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("update carrier: %w", err)
+	}
+
+	// rows affected, errors are passed up unchanged
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // FindCarrier implements Store.
@@ -72,20 +86,6 @@ func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
 	return nil
 }
 
-func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET name = $2, code = $3, country = $4, vat_number = $5, payment_term_days = $6, status = $7, approved_at = $8, suspended_at = $9, updated_at = $10 WHERE id = $1`, carrier.ID, carrier.Name, carrier.Code, carrier.Country, carrier.VATNumber, carrier.PaymentTermDays, carrier.Status, carrier.ApprovedAt, carrier.SuspendedAt, carrier.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("update carrier: %w", err)
-	}
-
-	// rows affected, errors are passed up unchanged
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }

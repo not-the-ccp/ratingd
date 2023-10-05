@@ -68,6 +68,10 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	if err != nil {
 		return nil, fmt.Errorf("load carrier %d: %w", id, err)
 	}
+	// needed for the carrier rollout
+	if carrier.Code == "" {
+		return nil, ErrCarrierEmptyCode
+	}
 
 	if carrier.Status != CarrierStatusOnboarding {
 		return nil, fmt.Errorf("%w: carrier %d is %s", ErrInvalidState, id, carrier.Status)
