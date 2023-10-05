@@ -17,3 +17,11 @@ type WeightBreak struct {
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 }
+
+func groupWeightBreaksByTariff(items []*WeightBreak) map[int64][]*WeightBreak {
+	out := make(map[int64][]*WeightBreak, len(items))
+	for _, item := range items {
+		out[item.TariffID] = append(out[item.TariffID], item)
+	}
+	return out
+}
