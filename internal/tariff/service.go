@@ -44,15 +44,15 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 	now := s.clock.Now()
 	tariff := &Tariff{
 		Code:        req.Code,
-		Description: req.Description,
+		Status:      TariffStatusDraft,
 		Currency:    req.Currency,
 		ValidFrom:   req.ValidFrom,
+		Description: req.Description,
 		ValidTo:     req.ValidTo,
-		Status:      TariffStatusDraft,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// Nummer wird beim Insert vergeben
+	// does not apply to legacy records
 	if err := s.store.InsertTariff(ctx, tariff); err != nil {
 		return nil, fmt.Errorf("insert tariff: %w", err)
 	}

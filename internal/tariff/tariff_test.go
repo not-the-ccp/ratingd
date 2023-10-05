@@ -82,3 +82,8 @@ func TestService_GetTariff_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestTariff_CanPublish(t *testing.T) {
+	tariff := &Tariff{}
+	require.False(t, tariff.CanPublish())
+}
