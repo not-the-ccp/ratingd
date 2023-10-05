@@ -33,6 +33,26 @@ func (f *fakeStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
 	return f.err
 }
 
+func (f *fakeStore) FindWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
+	return nil, f.err
+}
+
+func (f *fakeStore) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
+	return nil, f.err
+}
+
+func (f *fakeStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {
+	return nil, f.err
+}
+
+func (f *fakeStore) InsertWeightBreak(ctx context.Context, breakVal *WeightBreak) error {
+	return f.err
+}
+
+func (f *fakeStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak) error {
+	return f.err
+}
+
 func TestCreateTariffRequest_Validate(t *testing.T) {
 	req := CreateTariffRequest{}
 

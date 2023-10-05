@@ -127,3 +127,43 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	s.log.Info("tariff retired", "id", tariff.ID)
 	return tariff, nil
 }
+
+func (s *Service) GetWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
+	breakEntry, err := s.store.FindWeightBreak(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get weight break %d: %w", id, err)
+	}
+
+	return breakEntry, nil
+}
+
+// CreateWeightBreak validates and stores a new weight break.
+func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakRequest) (*WeightBreak, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	now := s.clock.Now()
+	breakEntry := &WeightBreak{
+		TariffID:  req.TariffID,
+		FromKg:    req.FromKg,
+		ToKg:      req.ToKg,
+		Zone:      req.Zone,
+		RatePerKg: req.RatePerKg,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	if err := s.store.InsertWeightBreak(ctx, breakEntry); err != nil {
+		return nil, fmt.Errorf("insert weight break: %w", err)
+	}
+	if err := s.audit.Record(ctx, "weight_break.created", breakEntry.ID); err != nil {
+		return nil, fmt.Errorf("record audit entry: %w", err)
+	}
+
+	return breakEntry, nil
+}
+
+func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
+	return s.store.ListWeightBreaks(ctx, limit, offset)
+}

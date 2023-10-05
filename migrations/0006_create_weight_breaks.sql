@@ -1,0 +1,10 @@
+CREATE TABLE weight_breaks (
+    id BIGSERIAL PRIMARY KEY,
+    tariff_id BIGINT NOT NULL,
+    from_kg DOUBLE PRECISION NOT NULL DEFAULT 0,
+    to_kg DOUBLE PRECISION NOT NULL DEFAULT 0,
+    zone TEXT NOT NULL DEFAULT '',
+    rate_per_kg BIGINT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
+);
