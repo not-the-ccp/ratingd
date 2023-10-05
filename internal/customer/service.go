@@ -74,7 +74,7 @@ func (s *Service) ListCustomers(ctx context.Context, limit int, offset int) ([]*
 func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, error) {
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load customer %d: %w", id, err)
+		return nil, fmt.Errorf("load customer id=%d: %w", id, err)
 	}
 	if customer.Status != CustomerStatusProspect {
 		return nil, fmt.Errorf("%w: customer %d is %s", ErrInvalidState, id, customer.Status)
@@ -126,5 +126,10 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 }
 
 func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
-	return s.store.ListBillingAddresses(ctx, limit, offset)
+	billingAddress, err := s.store.ListBillingAddresses(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list billing addresses: %w", err)
+	}
+
+	return billingAddress, nil
 }

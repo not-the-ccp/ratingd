@@ -29,7 +29,12 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 
 // GetCarrier returns the carrier with the given id.
 func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
-	return s.store.FindCarrier(ctx, id)
+	result, err := s.store.FindCarrier(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get carrier: %w", err)
+	}
+
+	return result, nil
 }
 
 func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) (*Carrier, error) {
@@ -68,7 +73,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	if err != nil {
 		return nil, fmt.Errorf("load carrier %d: %w", id, err)
 	}
-	// needed for the carrier rollout
+	// Altdaten aus der Migration haben das nicht
 	if carrier.Code == "" {
 		return nil, ErrCarrierEmptyCode
 	}
