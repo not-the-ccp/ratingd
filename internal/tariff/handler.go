@@ -26,6 +26,9 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/weight-break", h.getWeightBreak)
 	mux.HandleFunc("/api/v1/weight-break/create", h.createWeightBreak)
 	mux.HandleFunc("/api/v1/weight-breaks", h.listWeightBreaks)
+	mux.HandleFunc("/api/v1/fuel-surcharge", h.getFuelSurcharge)
+	mux.HandleFunc("/api/v1/fuel-surcharge/create", h.createFuelSurcharge)
+	mux.HandleFunc("/api/v1/fuel-surcharges", h.listFuelSurcharges)
 }
 
 func writeError(w http.ResponseWriter, err error) {
@@ -160,6 +163,54 @@ func (h *Handler) listWeightBreaks(w http.ResponseWriter, r *http.Request) {
 	out := make([]WeightBreakResponse, 0, len(weightBreaks))
 	for _, item := range weightBreaks {
 		out = append(out, toWeightBreakResponse(item))
+	}
+	httpx.JSON(w, http.StatusOK, out)
+}
+
+func (h *Handler) getFuelSurcharge(w http.ResponseWriter, r *http.Request) {
+	id, err := httpx.Int64Param(r, "id")
+	if err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	surcharge, err := h.svc.GetFuelSurcharge(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	httpx.JSON(w, http.StatusOK, toFuelSurchargeResponse(surcharge))
+}
+
+func (h *Handler) createFuelSurcharge(w http.ResponseWriter, r *http.Request) {
+	var req CreateFuelSurchargeRequest
+	if err := httpx.Decode(r, &req); err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	surcharge, err := h.svc.CreateFuelSurcharge(r.Context(), &req)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	httpx.JSON(w, http.StatusCreated, toFuelSurchargeResponse(surcharge))
+}
+
+// listFuelSurcharges handles requests to /api/v1/fuel-surcharges.
+func (h *Handler) listFuelSurcharges(w http.ResponseWriter, r *http.Request) {
+	limit := httpx.IntParam(r, "limit", 50)
+	offset := httpx.IntParam(r, "offset", 0)
+	surcharges, err := h.svc.ListFuelSurcharges(r.Context(), limit, offset)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	out := make([]FuelSurchargeResponse, 0, len(surcharges))
+	for _, item := range surcharges {
+		out = append(out, toFuelSurchargeResponse(item))
 	}
 	httpx.JSON(w, http.StatusOK, out)
 }

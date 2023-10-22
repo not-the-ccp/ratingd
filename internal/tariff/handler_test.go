@@ -17,3 +17,13 @@ func TestHandler_getTariff_InvalidID(t *testing.T) {
 
 	require.Equal(t, http.StatusBadRequest, rec.Code)
 }
+
+func TestHandler_getFuelSurcharge_InvalidID(t *testing.T) {
+	h := &Handler{}
+	rec := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/fuel-surcharge?id=abc", nil)
+
+	h.getFuelSurcharge(rec, req)
+
+	require.Equal(t, http.StatusBadRequest, rec.Code)
+}

@@ -16,4 +16,9 @@ type Store interface {
 	ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error)
 	InsertWeightBreak(ctx context.Context, breakVal *WeightBreak) error
 	UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak) error
+	FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error)
+	ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error)
+	ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error)
+	InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error
+	UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error
 }

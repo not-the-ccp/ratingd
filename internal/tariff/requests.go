@@ -108,3 +108,42 @@ func toWeightBreakResponse(weightBreak *WeightBreak) WeightBreakResponse {
 		LoadingMeterRate: weightBreak.LoadingMeterRate,
 	}
 }
+
+type CreateFuelSurchargeRequest struct {
+	TariffID    int64        `json:"tariff_id"`
+	ValidFrom   time.Time    `json:"valid_from"`
+	Percent     float64      `json:"percent"`
+	DieselPrice money.Amount `json:"diesel_price"`
+}
+
+type FuelSurchargeResponse struct {
+	ID          int64        `json:"id"`
+	TariffID    int64        `json:"tariff_id"`
+	ValidFrom   time.Time    `json:"valid_from"`
+	Percent     float64      `json:"percent"`
+	DieselPrice money.Amount `json:"diesel_price"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+func (r *CreateFuelSurchargeRequest) Validate() error {
+	if r.TariffID == 0 {
+		return errors.New("tariff id is required")
+	}
+	if r.Percent < 0 {
+		return errors.New("percent must not be negative")
+	}
+	return nil
+}
+
+func toFuelSurchargeResponse(fuelSurcharge *FuelSurcharge) FuelSurchargeResponse {
+	return FuelSurchargeResponse{
+		ID:          fuelSurcharge.ID,
+		TariffID:    fuelSurcharge.TariffID,
+		ValidFrom:   fuelSurcharge.ValidFrom,
+		Percent:     fuelSurcharge.Percent,
+		DieselPrice: fuelSurcharge.DieselPrice,
+		CreatedAt:   fuelSurcharge.CreatedAt,
+		UpdatedAt:   fuelSurcharge.UpdatedAt,
+	}
+}

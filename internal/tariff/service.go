@@ -171,3 +171,39 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
 	return s.store.ListWeightBreaks(ctx, limit, offset)
 }
+
+func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+	return s.store.FindFuelSurcharge(ctx, id)
+}
+
+func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurchargeRequest) (*FuelSurcharge, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("validate request: %w", err)
+	}
+	now := s.clock.Now()
+	surcharge := &FuelSurcharge{
+		TariffID:    req.TariffID,
+		ValidFrom:   req.ValidFrom,
+		Percent:     req.Percent,
+		DieselPrice: req.DieselPrice,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+	if err := s.store.InsertFuelSurcharge(ctx, surcharge); err != nil {
+		return nil, fmt.Errorf("insert fuel surcharge: %w", err)
+	}
+
+	if err := s.audit.Record(ctx, "fuel_surcharge.created", surcharge.ID); err != nil {
+		return nil, fmt.Errorf("record audit entry: %w", err)
+	}
+
+	return surcharge, nil
+}
+
+func (s *Service) ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 100
+	}
+
+	return s.store.ListFuelSurcharges(ctx, limit, offset)
+}

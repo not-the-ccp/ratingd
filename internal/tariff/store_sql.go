@@ -162,3 +162,75 @@ func (s *SQLStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak)
 	}
 	return nil
 }
+
+func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
+	var surcharge FuelSurcharge
+	if err := row.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query fuel surcharge %d: %w", id, err)
+	}
+	return &surcharge, nil
+}
+
+func (s *SQLStore) ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, created_at, updated_at FROM fuel_surcharges ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var fuelSurcharges []*FuelSurcharge
+	for rows.Next() {
+		var surcharge FuelSurcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan fuel surcharge: %w", err)
+		}
+		fuelSurcharges = append(fuelSurcharges, &surcharge)
+	}
+	return fuelSurcharges, rows.Err()
+}
+
+func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var surcharges []*FuelSurcharge
+	for rows.Next() {
+		var surcharge FuelSurcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan fuel surcharge: %w", err)
+		}
+		surcharges = append(surcharges, &surcharge)
+	}
+	return surcharges, rows.Err()
+}
+
+func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO fuel_surcharges (tariff_id, valid_from, percent, diesel_price, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.TariffID, surcharge.ValidFrom, surcharge.Percent, surcharge.DieselPrice, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET tariff_id = $2, valid_from = $3, percent = $4, diesel_price = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.TariffID, surcharge.ValidFrom, surcharge.Percent, surcharge.DieselPrice, surcharge.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("update fuel surcharge: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}

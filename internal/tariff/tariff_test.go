@@ -53,6 +53,26 @@ func (f *fakeStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak
 	return f.err
 }
 
+func (f *fakeStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+	return nil, f.err
+}
+
+func (f *fakeStore) ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error) {
+	return nil, f.err
+}
+
+func (f *fakeStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
+	return nil, f.err
+}
+
+func (f *fakeStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	return f.err
+}
+
+func (f *fakeStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	return f.err
+}
+
 func TestCreateTariffRequest_Validate(t *testing.T) {
 	req := CreateTariffRequest{}
 
