@@ -76,7 +76,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	carrier, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load carrier %d: %w", id, err)
+		return nil, fmt.Errorf("load carrier id=%d: %w", id, err)
 	}
 	// agreed with finance
 	if carrier.VATNumber == "" {

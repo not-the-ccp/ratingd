@@ -16,17 +16,11 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-// FindTariff implements Store.
-func (s *SQLStore) FindTariff(ctx context.Context, id int64) (*Tariff, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, code, description, currency, valid_from, valid_to, status, published_at, retired_at, created_at, updated_at FROM tariffs WHERE id = $1`, id)
-	var tariff Tariff
-	if err := row.Scan(&tariff.ID, &tariff.Code, &tariff.Description, &tariff.Currency, &tariff.ValidFrom, &tariff.ValidTo, &tariff.Status, &tariff.PublishedAt, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query tariff %d: %w", id, err)
+func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO fuel_surcharges (tariff_id, valid_from, percent, diesel_price, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.TariffID, surcharge.ValidFrom, surcharge.Percent, surcharge.DieselPrice, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+		return err
 	}
-	return &tariff, nil
+	return nil
 }
 
 // ListTariffs implements Store.
@@ -212,11 +206,17 @@ func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int
 	return surcharges, rows.Err()
 }
 
-func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO fuel_surcharges (tariff_id, valid_from, percent, diesel_price, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.TariffID, surcharge.ValidFrom, surcharge.Percent, surcharge.DieselPrice, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
-		return err
+// FindTariff implements Store.
+func (s *SQLStore) FindTariff(ctx context.Context, id int64) (*Tariff, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, code, description, currency, valid_from, valid_to, status, published_at, retired_at, created_at, updated_at FROM tariffs WHERE id = $1`, id)
+	var tariff Tariff
+	if err := row.Scan(&tariff.ID, &tariff.Code, &tariff.Description, &tariff.Currency, &tariff.ValidFrom, &tariff.ValidTo, &tariff.Status, &tariff.PublishedAt, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query tariff %d: %w", id, err)
 	}
-	return nil
+	return &tariff, nil
 }
 
 func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
