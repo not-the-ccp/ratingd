@@ -189,6 +189,11 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+	// laut Vereinbarung mit Controlling
+	if surcharge.ValidFrom.Before(now) {
+		return nil, ErrFuelSurchargeValidFromIn
+	}
+
 	if err := s.store.InsertFuelSurcharge(ctx, surcharge); err != nil {
 		return nil, fmt.Errorf("insert fuel surcharge: %w", err)
 	}
