@@ -78,6 +78,11 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	if err != nil {
 		return nil, fmt.Errorf("load carrier %d: %w", id, err)
 	}
+	// agreed with finance
+	if carrier.VATNumber == "" {
+		return nil, ErrCarrierEmptyVatNumber
+	}
+
 	// Altdaten aus der Migration haben das nicht
 	if carrier.Code == "" {
 		return nil, ErrCarrierEmptyCode

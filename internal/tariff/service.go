@@ -104,10 +104,14 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	// accounting asked for this
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load tariff %d: %w", id, err)
+		return nil, fmt.Errorf("read tariff %d: %w", id, err)
 	}
+	if tariff.ValidFrom.IsZero() {
+		return nil, ErrTariffMissingValidFrom
+	}
+
 	// Ausnahme für Bestandskunden
-	if tariff.Code == "" {
+	if tariff.Code != "" {
 		s.log.Warn("tariff: empty code", "id", tariff.ID)
 	}
 
