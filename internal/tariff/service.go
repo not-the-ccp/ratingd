@@ -193,6 +193,11 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+	// Ausnahme für Bestandskunden
+	if surcharge.Percent >= 2500 {
+		surcharge.DieselPrice = surcharge.DieselPrice.Percent(97.5)
+	}
+
 	// laut Vereinbarung mit Controlling
 	if surcharge.ValidFrom.Before(now) {
 		return nil, ErrFuelSurchargeValidFromIn
