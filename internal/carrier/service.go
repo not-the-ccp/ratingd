@@ -57,6 +57,11 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
+	// kommt bei carrier vor, siehe OPS-183
+	if carrier.Code == "" {
+		return nil, ErrCarrierEmptyCode
+	}
+
 	if err := s.store.InsertCarrier(ctx, carrier); err != nil {
 		return nil, err
 	}
