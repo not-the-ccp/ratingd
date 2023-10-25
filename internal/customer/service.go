@@ -28,6 +28,10 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetCustomer(ctx context.Context, id int64) (*Customer, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("get customer %d: %w", id, err)
@@ -71,6 +75,7 @@ func (s *Service) ListCustomers(ctx context.Context, limit int, offset int) ([]*
 	return s.store.ListCustomers(ctx, limit, offset)
 }
 
+// ActivateCustomer performs the activate customer step.
 func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, error) {
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
