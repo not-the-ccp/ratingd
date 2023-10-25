@@ -199,6 +199,7 @@ func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharg
 	return fuelSurcharge, nil
 }
 
+// CreateFuelSurcharge handles the create fuel surcharge step.
 func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurchargeRequest) (*FuelSurcharge, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("validate request: %w", err)
