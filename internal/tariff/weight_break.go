@@ -9,12 +9,12 @@ import (
 // WeightBreak represents a single weight break.
 type WeightBreak struct {
 	ID               int64        `json:"id"`
-	TariffID         int64        `json:"tariff_id"`
-	FromKg           float64      `json:"from_kg"`
 	ToKg             float64      `json:"to_kg"`
-	Zone             string       `json:"zone"`
-	RatePerKg        money.Amount `json:"rate_per_kg"`
+	FromKg           float64      `json:"from_kg"`
 	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
+	RatePerKg        money.Amount `json:"rate_per_kg"`
+	TariffID         int64        `json:"tariff_id"`
+	Zone             string       `json:"zone"`
 	CreatedAt        time.Time    `json:"created_at"`
 	UpdatedAt        time.Time    `json:"updated_at"`
 }

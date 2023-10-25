@@ -67,13 +67,32 @@ func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerSta
 	return customers, rows.Err()
 }
 
-// InsertCustomer implements Store.
-func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, customer.ExternalRef, customer.Status, customer.VATNumber, customer.CreditLimit, customer.ActivatedAt, customer.ClosedAt, customer.PaymentTermDays, customer.Name, customer.BlockedAt, customer.Number, customer.Country, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
-		return fmt.Errorf("insert customer: %w", err)
+func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET customer_id = $2, street = $3, zip = $4, city = $5, country = $6, primary = $7, attention = $8, updated_at = $9 WHERE id = $1`, address.ID, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.Attention, address.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("update billing address: %w", err)
 	}
 
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
 	return nil
+}
+
+func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, attention, created_at, updated_at FROM billing_addresses WHERE id = $1`, id)
+	var address BillingAddress
+	if err := row.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.Attention, &address.CreatedAt, &address.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query billing address %d: %w", id, err)
+	}
+	return &address, nil
 }
 
 func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
@@ -91,18 +110,6 @@ func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error
 		return ErrNotFound
 	}
 	return nil
-}
-
-func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, street, zip, city, country, primary, attention, created_at, updated_at FROM billing_addresses WHERE id = $1`, id)
-	var address BillingAddress
-	if err := row.Scan(&address.ID, &address.CustomerID, &address.Street, &address.Zip, &address.City, &address.Country, &address.Primary, &address.Attention, &address.CreatedAt, &address.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query billing address %d: %w", id, err)
-	}
-	return &address, nil
 }
 
 func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
@@ -152,18 +159,11 @@ func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAdd
 	return nil
 }
 
-func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET customer_id = $2, street = $3, zip = $4, city = $5, country = $6, primary = $7, attention = $8, updated_at = $9 WHERE id = $1`, address.ID, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.Attention, address.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("update billing address: %w", err)
+// InsertCustomer implements Store.
+func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, customer.ExternalRef, customer.Status, customer.VATNumber, customer.CreditLimit, customer.ActivatedAt, customer.ClosedAt, customer.PaymentTermDays, customer.Name, customer.BlockedAt, customer.Number, customer.Country, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
+		return fmt.Errorf("insert customer: %w", err)
 	}
 
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
 	return nil
 }

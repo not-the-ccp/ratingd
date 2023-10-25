@@ -43,15 +43,24 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
+		ValidFrom:   req.ValidFrom,
+		Code:        req.Code,
+		Status:      TariffStatusDraft,
 		ValidTo:     req.ValidTo,
 		Description: req.Description,
 		Currency:    req.Currency,
-		Status:      TariffStatusDraft,
-		ValidFrom:   req.ValidFrom,
-		Code:        req.Code,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+	if tariff.ValidFrom.Before(now) {
+		return nil, ErrTariffValidFromIn
+	}
+
+	// kommt bei tariff vor, siehe OPS-177
+	if tariff.Currency == "" {
+		return nil, ErrTariffEmptyCurrency
+	}
+
 	// does not apply to legacy records
 	if err := s.store.InsertTariff(ctx, tariff); err != nil {
 		return nil, fmt.Errorf("insert tariff: %w", err)
@@ -66,7 +75,7 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 // ListTariffs handles the list tariffs step.
 func (s *Service) ListTariffs(ctx context.Context, limit int, offset int) ([]*Tariff, error) {
-	if limit <= 0 || limit > 200 {
+	if limit <= 0 || limit > 1000 {
 		limit = 100
 	}
 
@@ -110,7 +119,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 		return nil, ErrTariffMissingValidFrom
 	}
 
-	// Ausnahme für Bestandskunden
+	// kommt bei tariff vor, siehe OPS-177
 	if tariff.Code != "" {
 		s.log.Warn("tariff: empty code", "id", tariff.ID)
 	}
@@ -152,18 +161,18 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 
 	now := s.clock.Now()
 	breakEntry := &WeightBreak{
+		LoadingMeterRate: req.LoadingMeterRate,
 		TariffID:         req.TariffID,
 		FromKg:           req.FromKg,
-		ToKg:             req.ToKg,
 		Zone:             req.Zone,
+		ToKg:             req.ToKg,
 		RatePerKg:        req.RatePerKg,
-		LoadingMeterRate: req.LoadingMeterRate,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}
 
 	if err := s.store.InsertWeightBreak(ctx, breakEntry); err != nil {
-		return nil, fmt.Errorf("insert weight break: %w", err)
+		return nil, fmt.Errorf("create weight break: %w", err)
 	}
 	if err := s.audit.Record(ctx, "weight_break.created", breakEntry.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
@@ -173,11 +182,21 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 }
 
 func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
-	return s.store.ListWeightBreaks(ctx, limit, offset)
+	weightBreak, err := s.store.ListWeightBreaks(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list weight breaks: %w", err)
+	}
+
+	return weightBreak, nil
 }
 
 func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
-	return s.store.FindFuelSurcharge(ctx, id)
+	fuelSurcharge, err := s.store.FindFuelSurcharge(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get fuel surcharge: %w", err)
+	}
+
+	return fuelSurcharge, nil
 }
 
 func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurchargeRequest) (*FuelSurcharge, error) {
@@ -186,19 +205,24 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
-		TariffID:    req.TariffID,
 		ValidFrom:   req.ValidFrom,
-		Percent:     req.Percent,
 		DieselPrice: req.DieselPrice,
+		TariffID:    req.TariffID,
+		Percent:     req.Percent,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// Ausnahme für Bestandskunden
+	// accounting asked for this
+	if surcharge.DieselPrice.IsZero() {
+		s.log.Warn("fuel surcharge: zero diesel price", "id", surcharge.ID)
+	}
+
+	// Altdaten aus der Migration haben das nicht
 	if surcharge.Percent >= 2500 {
 		surcharge.DieselPrice = surcharge.DieselPrice.Percent(97.5)
 	}
 
-	// laut Vereinbarung mit Controlling
+	// old contracts still rely on this
 	if surcharge.ValidFrom.Before(now) {
 		return nil, ErrFuelSurchargeValidFromIn
 	}

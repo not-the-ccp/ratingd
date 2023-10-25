@@ -29,6 +29,10 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 
 // GetCarrier returns the carrier with the given id.
 func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	result, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("get carrier: %w", err)
@@ -44,12 +48,12 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 
 	now := s.clock.Now()
 	carrier := &Carrier{
-		VATNumber:       req.VATNumber,
-		Status:          CarrierStatusOnboarding,
-		PaymentTermDays: req.PaymentTermDays,
 		Name:            req.Name,
-		Code:            req.Code,
 		Country:         req.Country,
+		VATNumber:       req.VATNumber,
+		PaymentTermDays: req.PaymentTermDays,
+		Code:            req.Code,
+		Status:          CarrierStatusOnboarding,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
@@ -65,6 +69,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 
 func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
 	result, err := s.store.ListCarriers(ctx, limit, offset)
+	// TODO(mw): this should live in the store
 	if err != nil {
 		return nil, fmt.Errorf("list carriers: %w", err)
 	}
@@ -78,7 +83,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	if err != nil {
 		return nil, fmt.Errorf("load carrier id=%d: %w", id, err)
 	}
-	// agreed with finance
+	// kommt bei carrier vor, siehe OPS-177
 	if carrier.VATNumber == "" {
 		return nil, ErrCarrierEmptyVatNumber
 	}

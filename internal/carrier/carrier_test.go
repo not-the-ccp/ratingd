@@ -108,3 +108,8 @@ func TestService_GetCarrier_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestCarrier_CanSuspend(t *testing.T) {
+	carrier := &Carrier{}
+	require.False(t, carrier.CanSuspend())
+}

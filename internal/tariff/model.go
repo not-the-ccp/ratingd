@@ -49,3 +49,8 @@ func (s TariffStatus) IsFinal() bool {
 		return false
 	}
 }
+
+// IsValidToPassed reports whether valid to lies before now.
+func (t *Tariff) IsValidToPassed(now time.Time) bool {
+	return t.ValidTo.Before(now)
+}

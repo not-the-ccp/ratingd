@@ -17,7 +17,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO fuel_surcharges (tariff_id, valid_from, percent, diesel_price, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.TariffID, surcharge.ValidFrom, surcharge.Percent, surcharge.DieselPrice, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO fuel_surcharges (diesel_price, tariff_id, percent, valid_from, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.DieselPrice, surcharge.TariffID, surcharge.Percent, surcharge.ValidFrom, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
 		return err
 	}
 	return nil
@@ -87,9 +87,9 @@ func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
 }
 
 func (s *SQLStore) FindWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, tariff_id, from_kg, to_kg, zone, rate_per_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, to_kg, from_kg, loading_meter_rate, rate_per_kg, tariff_id, zone, created_at, updated_at FROM weight_breaks WHERE id = $1`, id)
 	var breakEntry WeightBreak
-	if err := row.Scan(&breakEntry.ID, &breakEntry.TariffID, &breakEntry.FromKg, &breakEntry.ToKg, &breakEntry.Zone, &breakEntry.RatePerKg, &breakEntry.LoadingMeterRate, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
+	if err := row.Scan(&breakEntry.ID, &breakEntry.ToKg, &breakEntry.FromKg, &breakEntry.LoadingMeterRate, &breakEntry.RatePerKg, &breakEntry.TariffID, &breakEntry.Zone, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -99,7 +99,7 @@ func (s *SQLStore) FindWeightBreak(ctx context.Context, id int64) (*WeightBreak,
 }
 
 func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, from_kg, to_kg, zone, rate_per_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks WHERE tariff_id = $1 ORDER BY id`, tariffID)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, to_kg, from_kg, loading_meter_rate, rate_per_kg, tariff_id, zone, created_at, updated_at FROM weight_breaks WHERE tariff_id = $1 ORDER BY id`, tariffID)
 	if err != nil {
 		return nil, fmt.Errorf("list weight breaks: %w", err)
 	}
@@ -108,7 +108,7 @@ func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64
 	var breakEntries []*WeightBreak
 	for rows.Next() {
 		var weightBreak WeightBreak
-		if err := rows.Scan(&weightBreak.ID, &weightBreak.TariffID, &weightBreak.FromKg, &weightBreak.ToKg, &weightBreak.Zone, &weightBreak.RatePerKg, &weightBreak.LoadingMeterRate, &weightBreak.CreatedAt, &weightBreak.UpdatedAt); err != nil {
+		if err := rows.Scan(&weightBreak.ID, &weightBreak.ToKg, &weightBreak.FromKg, &weightBreak.LoadingMeterRate, &weightBreak.RatePerKg, &weightBreak.TariffID, &weightBreak.Zone, &weightBreak.CreatedAt, &weightBreak.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan weight break: %w", err)
 		}
 		breakEntries = append(breakEntries, &weightBreak)
@@ -117,7 +117,7 @@ func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64
 }
 
 func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, from_kg, to_kg, zone, rate_per_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, to_kg, from_kg, loading_meter_rate, rate_per_kg, tariff_id, zone, created_at, updated_at FROM weight_breaks ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("list weight breaks: %w", err)
 	}
@@ -127,7 +127,7 @@ func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) 
 	var breakEntries []*WeightBreak
 	for rows.Next() {
 		var breakEntry WeightBreak
-		if err := rows.Scan(&breakEntry.ID, &breakEntry.TariffID, &breakEntry.FromKg, &breakEntry.ToKg, &breakEntry.Zone, &breakEntry.RatePerKg, &breakEntry.LoadingMeterRate, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
+		if err := rows.Scan(&breakEntry.ID, &breakEntry.ToKg, &breakEntry.FromKg, &breakEntry.LoadingMeterRate, &breakEntry.RatePerKg, &breakEntry.TariffID, &breakEntry.Zone, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan weight break: %w", err)
 		}
 		breakEntries = append(breakEntries, &breakEntry)
@@ -136,14 +136,14 @@ func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) 
 }
 
 func (s *SQLStore) InsertWeightBreak(ctx context.Context, breakVal *WeightBreak) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO weight_breaks (tariff_id, from_kg, to_kg, zone, rate_per_kg, loading_meter_rate, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, breakVal.TariffID, breakVal.FromKg, breakVal.ToKg, breakVal.Zone, breakVal.RatePerKg, breakVal.LoadingMeterRate, breakVal.CreatedAt, breakVal.UpdatedAt).Scan(&breakVal.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO weight_breaks (to_kg, from_kg, loading_meter_rate, rate_per_kg, tariff_id, zone, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, breakVal.ToKg, breakVal.FromKg, breakVal.LoadingMeterRate, breakVal.RatePerKg, breakVal.TariffID, breakVal.Zone, breakVal.CreatedAt, breakVal.UpdatedAt).Scan(&breakVal.ID); err != nil {
 		return err
 	}
 	return nil
 }
 
 func (s *SQLStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE weight_breaks SET tariff_id = $2, from_kg = $3, to_kg = $4, zone = $5, rate_per_kg = $6, loading_meter_rate = $7, updated_at = $8 WHERE id = $1`, breakVal.ID, breakVal.TariffID, breakVal.FromKg, breakVal.ToKg, breakVal.Zone, breakVal.RatePerKg, breakVal.LoadingMeterRate, breakVal.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE weight_breaks SET to_kg = $2, from_kg = $3, loading_meter_rate = $4, rate_per_kg = $5, tariff_id = $6, zone = $7, updated_at = $8 WHERE id = $1`, breakVal.ID, breakVal.ToKg, breakVal.FromKg, breakVal.LoadingMeterRate, breakVal.RatePerKg, breakVal.TariffID, breakVal.Zone, breakVal.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("update weight break: %w", err)
 	}
@@ -158,9 +158,9 @@ func (s *SQLStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak)
 }
 
 func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, diesel_price, tariff_id, percent, valid_from, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
 	var surcharge FuelSurcharge
-	if err := row.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+	if err := row.Scan(&surcharge.ID, &surcharge.DieselPrice, &surcharge.TariffID, &surcharge.Percent, &surcharge.ValidFrom, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -170,7 +170,7 @@ func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcha
 }
 
 func (s *SQLStore) ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, created_at, updated_at FROM fuel_surcharges ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, diesel_price, tariff_id, percent, valid_from, created_at, updated_at FROM fuel_surcharges ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func (s *SQLStore) ListFuelSurcharges(ctx context.Context, limit int, offset int
 	var fuelSurcharges []*FuelSurcharge
 	for rows.Next() {
 		var surcharge FuelSurcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if err := rows.Scan(&surcharge.ID, &surcharge.DieselPrice, &surcharge.TariffID, &surcharge.Percent, &surcharge.ValidFrom, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan fuel surcharge: %w", err)
 		}
 		fuelSurcharges = append(fuelSurcharges, &surcharge)
@@ -189,7 +189,7 @@ func (s *SQLStore) ListFuelSurcharges(ctx context.Context, limit int, offset int
 }
 
 func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, diesel_price, tariff_id, percent, valid_from, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +198,7 @@ func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int
 	var surcharges []*FuelSurcharge
 	for rows.Next() {
 		var surcharge FuelSurcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if err := rows.Scan(&surcharge.ID, &surcharge.DieselPrice, &surcharge.TariffID, &surcharge.Percent, &surcharge.ValidFrom, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan fuel surcharge: %w", err)
 		}
 		surcharges = append(surcharges, &surcharge)
@@ -220,7 +220,7 @@ func (s *SQLStore) FindTariff(ctx context.Context, id int64) (*Tariff, error) {
 }
 
 func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET tariff_id = $2, valid_from = $3, percent = $4, diesel_price = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.TariffID, surcharge.ValidFrom, surcharge.Percent, surcharge.DieselPrice, surcharge.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET diesel_price = $2, tariff_id = $3, percent = $4, valid_from = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.DieselPrice, surcharge.TariffID, surcharge.Percent, surcharge.ValidFrom, surcharge.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("update fuel surcharge: %w", err)
 	}

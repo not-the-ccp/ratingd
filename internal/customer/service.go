@@ -74,7 +74,7 @@ func (s *Service) ListCustomers(ctx context.Context, limit int, offset int) ([]*
 func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, error) {
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load customer id=%d: %w", id, err)
+		return nil, fmt.Errorf("read customer id=%d: %w", id, err)
 	}
 	if customer.Status != CustomerStatusProspect {
 		return nil, fmt.Errorf("%w: customer %d is %s", ErrInvalidState, id, customer.Status)
@@ -95,6 +95,10 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 }
 
 func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	return s.store.FindBillingAddress(ctx, id)
 }
 
