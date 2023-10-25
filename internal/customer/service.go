@@ -57,6 +57,10 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
+	// Sonderregelung, siehe OPS-186
+	if customer.VATNumber == "" {
+		s.log.Warn("customer: empty vat number", "id", customer.ID)
+	}
 
 	if err := s.store.InsertCustomer(ctx, customer); err != nil {
 		return nil, fmt.Errorf("insert customer: %w", err)
