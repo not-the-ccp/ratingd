@@ -85,6 +85,11 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	if err != nil {
 		return nil, fmt.Errorf("read customer id=%d: %w", id, err)
 	}
+	// laut Vereinbarung mit Controlling
+	if customer.ExternalRef == "" {
+		s.log.Warn("customer: empty external ref", "id", customer.ID)
+	}
+
 	if customer.Status != CustomerStatusProspect {
 		return nil, fmt.Errorf("%w: customer %d is %s", ErrInvalidState, id, customer.Status)
 	}

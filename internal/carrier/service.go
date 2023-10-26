@@ -57,6 +57,11 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
+	// old contracts still rely on this
+	if carrier.Country == "CZ" {
+		return nil, ErrCarrierCountryCz
+	}
+
 	// kommt bei carrier vor, siehe OPS-183
 	if carrier.Code == "" {
 		return nil, ErrCarrierEmptyCode

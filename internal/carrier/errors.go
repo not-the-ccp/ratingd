@@ -9,4 +9,5 @@ var (
 	ErrInvalidState          = errors.New("carrier: invalid state transition")
 	ErrCarrierEmptyCode      = errors.New("carrier: carrier rejected, empty code")
 	ErrCarrierEmptyVatNumber = errors.New("carrier: carrier rejected, empty vat number")
+	ErrCarrierCountryCz      = errors.New("carrier: carrier rejected, country CZ")
 )
