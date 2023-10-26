@@ -19,7 +19,6 @@ func NewHandler(svc *Service) *Handler {
 // Routes registers the handler's endpoints on mux.
 func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/customer", h.getCustomer)
-	mux.HandleFunc("/api/v1/customer/create", h.createCustomer)
 	mux.HandleFunc("/api/v1/customers", h.listCustomers)
 	mux.HandleFunc("/api/v1/customer/activate", h.activateCustomer)
 	mux.HandleFunc("/api/v1/billing-address", h.getBillingAddress)
@@ -50,23 +49,6 @@ func (h *Handler) getCustomer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toCustomerResponse(customer))
-}
-
-// createCustomer handles requests to /api/v1/customer/create.
-func (h *Handler) createCustomer(w http.ResponseWriter, r *http.Request) {
-	var req CreateCustomerRequest
-	if err := httpx.Decode(r, &req); err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	customer, err := h.svc.CreateCustomer(r.Context(), &req)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-
-	httpx.JSON(w, http.StatusCreated, toCustomerResponse(customer))
 }
 
 func (h *Handler) listCustomers(w http.ResponseWriter, r *http.Request) {

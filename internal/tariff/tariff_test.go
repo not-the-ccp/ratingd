@@ -127,3 +127,8 @@ func TestTariff_CanPublish(t *testing.T) {
 	tariff := &Tariff{}
 	require.False(t, tariff.CanPublish())
 }
+
+func TestTariff_CanRetire(t *testing.T) {
+	tariff := &Tariff{}
+	require.False(t, tariff.CanRetire())
+}
