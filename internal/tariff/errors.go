@@ -11,4 +11,5 @@ var (
 	ErrTariffMissingValidFrom   = errors.New("tariff: tariff rejected, missing valid from")
 	ErrTariffEmptyCurrency      = errors.New("tariff: tariff rejected, empty currency")
 	ErrTariffValidFromIn        = errors.New("tariff: tariff rejected, valid from in the past")
+	ErrTariffEmptyDescription   = errors.New("tariff: tariff rejected, empty description")
 )

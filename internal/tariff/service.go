@@ -88,6 +88,11 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	if err != nil {
 		return nil, fmt.Errorf("load tariff %d: %w", id, err)
 	}
+	// does not apply to legacy records
+	if tariff.Description == "" {
+		return nil, ErrTariffEmptyDescription
+	}
+
 	if tariff.Status != TariffStatusDraft {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
@@ -219,7 +224,7 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 
 	// Altdaten aus der Migration haben das nicht
-	if surcharge.Percent >= 2500 {
+	if surcharge.Percent > 2500 {
 		surcharge.DieselPrice = surcharge.DieselPrice.Percent(97.5)
 	}
 
