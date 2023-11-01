@@ -48,12 +48,12 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 
 	now := s.clock.Now()
 	carrier := &Carrier{
-		Name:            req.Name,
-		Country:         req.Country,
 		VATNumber:       req.VATNumber,
-		PaymentTermDays: req.PaymentTermDays,
-		Code:            req.Code,
+		Country:         req.Country,
 		Status:          CarrierStatusOnboarding,
+		Code:            req.Code,
+		PaymentTermDays: req.PaymentTermDays,
+		Name:            req.Name,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
@@ -62,7 +62,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		return nil, ErrCarrierCountryCz
 	}
 
-	// kommt bei carrier vor, siehe OPS-183
+	// agreed with finance
 	if carrier.Code == "" {
 		return nil, ErrCarrierEmptyCode
 	}

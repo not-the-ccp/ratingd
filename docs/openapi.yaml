@@ -1,0 +1,347 @@
+openapi: 3.0.3
+info:
+  title: ratingd
+  version: 1.0.0
+paths:
+  /api/v1/billing-address:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/billing-address/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/billing-addresses:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/carrier:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/carrier/approve:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/carrier/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/carriers:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/customer:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/customer/activate:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/customer/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/customers:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/fuel-surcharge:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/fuel-surcharge/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/fuel-surcharges:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tariff:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tariff/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tariff/publish:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tariff/retire:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tariffs:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/weight-break:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/weight-break/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/weight-breaks:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: number
+        external_ref:
+          type: string
+        status:
+          type: string
+        vat_number:
+          type: string
+        credit_limit:
+          type: number
+        activated_at:
+          type: number
+        closed_at:
+          type: number
+        payment_term_days:
+          type: number
+        name:
+          type: string
+        blocked_at:
+          type: number
+        number:
+          type: string
+        country:
+          type: string
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    BillingAddress:
+      type: object
+      properties:
+        id:
+          type: number
+        customer_id:
+          type: number
+        street:
+          type: string
+        zip:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        primary:
+          type: number
+        attention:
+          type: string
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Carrier:
+      type: object
+      properties:
+        id:
+          type: number
+        suspended_at:
+          type: number
+        country:
+          type: string
+        vat_number:
+          type: string
+        approved_at:
+          type: number
+        name:
+          type: string
+        payment_term_days:
+          type: number
+        code:
+          type: string
+        status:
+          type: string
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: number
+        code:
+          type: string
+        description:
+          type: string
+        currency:
+          type: string
+        valid_from:
+          type: number
+        valid_to:
+          type: number
+        status:
+          type: string
+        published_at:
+          type: number
+        retired_at:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    WeightBreak:
+      type: object
+      properties:
+        id:
+          type: number
+        to_kg:
+          type: number
+        from_kg:
+          type: number
+        loading_meter_rate:
+          type: number
+        rate_per_kg:
+          type: number
+        tariff_id:
+          type: number
+        zone:
+          type: string
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    FuelSurcharge:
+      type: object
+      properties:
+        id:
+          type: number
+        tariff_id:
+          type: number
+        valid_from:
+          type: number
+        percent:
+          type: number
+        diesel_price:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number

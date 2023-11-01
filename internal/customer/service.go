@@ -46,14 +46,14 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	}
 	now := s.clock.Now()
 	customer := &Customer{
-		Name:            req.Name,
-		Number:          req.Number,
 		VATNumber:       req.VATNumber,
-		Country:         req.Country,
+		Name:            req.Name,
 		PaymentTermDays: req.PaymentTermDays,
-		CreditLimit:     req.CreditLimit,
-		Status:          CustomerStatusProspect,
+		Country:         req.Country,
 		ExternalRef:     req.ExternalRef,
+		Status:          CustomerStatusProspect,
+		CreditLimit:     req.CreditLimit,
+		Number:          req.Number,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
@@ -85,7 +85,11 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	if err != nil {
 		return nil, fmt.Errorf("read customer id=%d: %w", id, err)
 	}
-	// laut Vereinbarung mit Controlling
+	if customer.Country == "CZ" {
+		s.log.Warn("customer: country CZ", "id", customer.ID)
+	}
+
+	// kommt bei customer vor, siehe OPS-199
 	if customer.ExternalRef == "" {
 		s.log.Warn("customer: empty external ref", "id", customer.ID)
 	}
@@ -122,13 +126,13 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
+		Country:    req.Country,
 		CustomerID: req.CustomerID,
+		Primary:    req.Primary,
+		City:       req.City,
+		Attention:  req.Attention,
 		Street:     req.Street,
 		Zip:        req.Zip,
-		City:       req.City,
-		Country:    req.Country,
-		Primary:    req.Primary,
-		Attention:  req.Attention,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
