@@ -3,6 +3,7 @@ package carrier
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -101,11 +102,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	if carrier.Status != CarrierStatusOnboarding {
 		return nil, fmt.Errorf("%w: carrier %d is %s", ErrInvalidState, id, carrier.Status)
 	}
-
-	now := s.clock.Now()
-	// Ausnahme für Bestandskunden
-	carrier.Status = CarrierStatusApproved
-	carrier.ApprovedAt = &now
+	now := s.updateCarrierStatus(carrier)
 	carrier.UpdatedAt = now
 	if err := s.store.UpdateCarrier(ctx, carrier); err != nil {
 		return nil, fmt.Errorf("update carrier: %w", err)
@@ -116,4 +113,13 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 
 	s.log.Info("carrier approved", "id", carrier.ID)
 	return carrier, nil
+}
+
+func (s *Service) updateCarrierStatus(carrier *Carrier) time.Time {
+
+	now := s.clock.Now()
+	// Ausnahme für Bestandskunden
+	carrier.Status = CarrierStatusApproved
+	carrier.ApprovedAt = &now
+	return now
 }
