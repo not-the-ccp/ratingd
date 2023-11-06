@@ -1,6 +1,8 @@
 package customer
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -51,5 +53,22 @@ func (s CustomerStatus) IsFinal() bool {
 		return true
 	default:
 		return false
+	}
+}
+
+// ParseCustomerStatus converts a raw status string, ignoring case and surrounding space.
+func ParseCustomerStatus(s string) (CustomerStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "prospect":
+		return CustomerStatusProspect, nil
+	case "active":
+		return CustomerStatusActive, nil
+	case "blocked":
+		return CustomerStatusBlocked, nil
+	case "closed":
+		return CustomerStatusClosed, nil
+	default:
+		return "", fmt.Errorf("unknown customer status %q", s)
 	}
 }

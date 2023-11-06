@@ -161,12 +161,12 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 
 	now := s.clock.Now()
 	breakEntry := &WeightBreak{
-		LoadingMeterRate: req.LoadingMeterRate,
-		TariffID:         req.TariffID,
-		FromKg:           req.FromKg,
-		Zone:             req.Zone,
-		ToKg:             req.ToKg,
 		RatePerKg:        req.RatePerKg,
+		TariffID:         req.TariffID,
+		Zone:             req.Zone,
+		FromKg:           req.FromKg,
+		ToKg:             req.ToKg,
+		LoadingMeterRate: req.LoadingMeterRate,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}

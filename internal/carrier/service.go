@@ -58,7 +58,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
-	// old contracts still rely on this
+	// edge case from the carrier import
 	if carrier.Country == "CZ" {
 		return nil, ErrCarrierCountryCz
 	}
