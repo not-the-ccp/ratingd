@@ -21,7 +21,6 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/tariff", h.getTariff)
 	mux.HandleFunc("/api/v1/tariff/create", h.createTariff)
 	mux.HandleFunc("/api/v1/tariffs", h.listTariffs)
-	mux.HandleFunc("/api/v1/tariff/publish", h.publishTariff)
 	mux.HandleFunc("/api/v1/tariff/retire", h.retireTariff)
 	mux.HandleFunc("/api/v1/weight-break", h.getWeightBreak)
 	mux.HandleFunc("/api/v1/weight-break/create", h.createWeightBreak)
@@ -88,21 +87,6 @@ func (h *Handler) listTariffs(w http.ResponseWriter, r *http.Request) {
 		out = append(out, toTariffResponse(item))
 	}
 	httpx.JSON(w, http.StatusOK, out)
-}
-
-func (h *Handler) publishTariff(w http.ResponseWriter, r *http.Request) {
-	id, err := httpx.Int64Param(r, "id")
-	if err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	tariff, err := h.svc.PublishTariff(r.Context(), id)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	httpx.JSON(w, http.StatusOK, toTariffResponse(tariff))
 }
 
 // retireTariff handles requests to /api/v1/tariff/retire.

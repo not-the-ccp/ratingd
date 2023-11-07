@@ -215,10 +215,10 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
-		DieselPrice: req.DieselPrice,
-		ValidFrom:   req.ValidFrom,
 		TariffID:    req.TariffID,
+		ValidFrom:   req.ValidFrom,
 		Percent:     req.Percent,
+		DieselPrice: req.DieselPrice,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
