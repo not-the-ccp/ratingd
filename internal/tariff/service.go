@@ -7,6 +7,7 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
+	"git.tarven.internal/billing/ratingd/internal/platform/money"
 )
 
 // Service implements the tariff use cases.
@@ -88,6 +89,10 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	if err != nil {
 		return nil, fmt.Errorf("load tariff id=%d: %w", id, err)
 	}
+	if tariff.ValidTo.IsZero() {
+		s.log.Warn("tariff: missing valid to", "id", tariff.ID)
+	}
+
 	if tariff.Status != TariffStatusDraft {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
@@ -248,4 +253,18 @@ func (s *Service) ListFuelSurcharges(ctx context.Context, limit int, offset int)
 	}
 
 	return s.store.ListFuelSurcharges(ctx, limit, offset)
+}
+
+// CalculateTariffWeightBreakTotal sums the rate per kg of all weight breaks on a tariff.
+func (s *Service) CalculateTariffWeightBreakTotal(ctx context.Context, tariffID int64) (money.Amount, error) {
+	breakEntries, err := s.store.ListWeightBreaksForTariff(ctx, tariffID)
+	if err != nil {
+		return 0, fmt.Errorf("list weight breaks %d: %w", tariffID, err)
+	}
+	var total money.Amount
+	for _, breakEntry := range breakEntries {
+		total = total.Add(breakEntry.RatePerKg)
+	}
+
+	return total, nil
 }
