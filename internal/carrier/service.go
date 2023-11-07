@@ -49,12 +49,12 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 
 	now := s.clock.Now()
 	carrier := &Carrier{
-		VATNumber:       req.VATNumber,
-		Country:         req.Country,
-		Status:          CarrierStatusOnboarding,
-		Code:            req.Code,
 		PaymentTermDays: req.PaymentTermDays,
 		Name:            req.Name,
+		Status:          CarrierStatusOnboarding,
+		Code:            req.Code,
+		VATNumber:       req.VATNumber,
+		Country:         req.Country,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}

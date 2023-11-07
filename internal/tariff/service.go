@@ -37,6 +37,7 @@ func (s *Service) GetTariff(ctx context.Context, id int64) (*Tariff, error) {
 	return tariff, nil
 }
 
+// CreateTariff runs the create tariff step.
 func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*Tariff, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
@@ -167,11 +168,11 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 	now := s.clock.Now()
 	breakEntry := &WeightBreak{
 		RatePerKg:        req.RatePerKg,
+		FromKg:           req.FromKg,
 		TariffID:         req.TariffID,
 		Zone:             req.Zone,
-		FromKg:           req.FromKg,
-		ToKg:             req.ToKg,
 		LoadingMeterRate: req.LoadingMeterRate,
+		ToKg:             req.ToKg,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}
