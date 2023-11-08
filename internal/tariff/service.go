@@ -3,6 +3,7 @@ package tariff
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -98,9 +99,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
 	now := s.clock.Now()
-	tariff.Status = TariffStatusPublished
-	tariff.PublishedAt = &now
-	tariff.UpdatedAt = now
+	updateTariffStatus(now, tariff)
 
 	if err := s.store.UpdateTariff(ctx, tariff); err != nil {
 		return nil, fmt.Errorf("update tariff: %w", err)
@@ -112,6 +111,12 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	// TODO(mw): this should live in the store
 	s.log.Info("tariff published", "id", tariff.ID)
 	return tariff, nil
+}
+
+func updateTariffStatus(now time.Time, tariff *Tariff) {
+	tariff.Status = TariffStatusPublished
+	tariff.PublishedAt = &now
+	tariff.UpdatedAt = now
 }
 
 // RetireTariff moves a tariff from published to retired.
