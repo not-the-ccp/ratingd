@@ -114,6 +114,7 @@ type CreateFuelSurchargeRequest struct {
 	ValidFrom   time.Time    `json:"valid_from"`
 	Percent     float64      `json:"percent"`
 	DieselPrice money.Amount `json:"diesel_price"`
+	Floor       float64      `json:"floor"`
 }
 
 type FuelSurchargeResponse struct {
@@ -124,6 +125,7 @@ type FuelSurchargeResponse struct {
 	DieselPrice money.Amount `json:"diesel_price"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
+	Floor       float64      `json:"floor"`
 }
 
 func (r *CreateFuelSurchargeRequest) Validate() error {
@@ -145,5 +147,6 @@ func toFuelSurchargeResponse(fuelSurcharge *FuelSurcharge) FuelSurchargeResponse
 		DieselPrice: fuelSurcharge.DieselPrice,
 		CreatedAt:   fuelSurcharge.CreatedAt,
 		UpdatedAt:   fuelSurcharge.UpdatedAt,
+		Floor:       fuelSurcharge.Floor,
 	}
 }

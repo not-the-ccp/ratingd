@@ -219,6 +219,7 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		ValidFrom:   req.ValidFrom,
 		Percent:     req.Percent,
 		DieselPrice: req.DieselPrice,
+		Floor:       req.Floor,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}

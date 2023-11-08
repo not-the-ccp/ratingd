@@ -14,6 +14,7 @@ type FuelSurcharge struct {
 	Percent   float64   `json:"percent"`
 	// DieselPrice is in minor units.
 	DieselPrice money.Amount `json:"diesel_price"`
+	Floor       float64      `json:"floor"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }
