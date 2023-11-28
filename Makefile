@@ -8,3 +8,6 @@ test:
 
 cover:
 	go test -coverprofile=cover.out ./...
+
+tidy:
+	go mod tidy
