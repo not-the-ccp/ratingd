@@ -48,7 +48,7 @@ func toCarrierResponse(carrier *Carrier) CarrierResponse {
 	return CarrierResponse{
 		ID:              carrier.ID,
 		Name:            carrier.Name,
-		Code:            carrier.Code,
+		Code:            carrier.ShortCode,
 		Country:         carrier.Country,
 		VATNumber:       carrier.VATNumber,
 		PaymentTermDays: carrier.PaymentTermDays,

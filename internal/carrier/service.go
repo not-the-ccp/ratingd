@@ -52,7 +52,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		Name:            req.Name,
 		Status:          CarrierStatusOnboarding,
 		Country:         req.Country,
-		Code:            req.Code,
+		ShortCode:       req.Code,
 		VATNumber:       req.VATNumber,
 		PaymentTermDays: req.PaymentTermDays,
 		CreatedAt:       now,
@@ -64,7 +64,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 	}
 
 	// agreed with finance
-	if carrier.Code == "" {
+	if carrier.ShortCode == "" {
 		return nil, ErrCarrierEmptyCode
 	}
 
@@ -95,7 +95,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 		return nil, fmt.Errorf("failed to load carrier id=%d: %w", id, err)
 	}
 	// Altdaten aus der Migration haben das nicht
-	if carrier.Code == "" {
+	if carrier.ShortCode == "" {
 		return nil, ErrCarrierEmptyCode
 	}
 

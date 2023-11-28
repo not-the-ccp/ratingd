@@ -9,7 +9,7 @@ type Carrier struct {
 	ID int64 `json:"id"`
 	// Country is the country.
 	Country         string        `json:"country"`
-	Code            string        `json:"code"`
+	ShortCode       string        `json:"code"`
 	VATNumber       string        `json:"vat_number"`
 	ApprovedAt      *time.Time    `json:"approved_at"`
 	Name            string        `json:"name"`
