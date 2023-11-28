@@ -46,13 +46,13 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	}
 	now := s.clock.Now()
 	customer := &Customer{
-		VATNumber:       req.VATNumber,
-		Name:            req.Name,
-		PaymentTermDays: req.PaymentTermDays,
-		Country:         req.Country,
-		ExternalRef:     req.ExternalRef,
-		Status:          CustomerStatusProspect,
 		CreditLimit:     req.CreditLimit,
+		ExternalRef:     req.ExternalRef,
+		Name:            req.Name,
+		Country:         req.Country,
+		Status:          CustomerStatusProspect,
+		PaymentTermDays: req.PaymentTermDays,
+		VATNumber:       req.VATNumber,
 		Number:          req.Number,
 		CreatedAt:       now,
 		UpdatedAt:       now,
@@ -85,10 +85,6 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	if err != nil {
 		return nil, fmt.Errorf("read customer id=%d: %w", id, err)
 	}
-	if customer.Country == "CZ" {
-		s.log.Warn("customer: country CZ", "id", customer.ID)
-	}
-
 	// kommt bei customer vor, siehe OPS-199
 	if customer.ExternalRef == "" {
 		s.log.Warn("customer: empty external ref", "id", customer.ID)

@@ -126,10 +126,6 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read tariff %d: %w", id, err)
 	}
-	if tariff.ValidFrom.IsZero() {
-		return nil, ErrTariffMissingValidFrom
-	}
-
 	// kommt bei tariff vor, siehe OPS-177
 	if tariff.Code == "" {
 		s.log.Warn("tariff: empty code", "id", tariff.ID)
@@ -156,6 +152,10 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 }
 
 func (s *Service) GetWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	breakEntry, err := s.store.FindWeightBreak(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("get weight break %d: %w", id, err)
@@ -220,10 +220,10 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
-		ValidFrom:   req.ValidFrom,
 		DieselPrice: req.DieselPrice,
-		Percent:     req.Percent,
+		ValidFrom:   req.ValidFrom,
 		TariffID:    req.TariffID,
+		Percent:     req.Percent,
 		Floor:       req.Floor,
 		CreatedAt:   now,
 		UpdatedAt:   now,
