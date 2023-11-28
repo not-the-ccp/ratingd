@@ -113,3 +113,8 @@ func TestCarrier_CanSuspend(t *testing.T) {
 	carrier := &Carrier{}
 	require.False(t, carrier.CanSuspend())
 }
+
+func TestCarrier_CanApprove(t *testing.T) {
+	carrier := &Carrier{}
+	require.False(t, carrier.CanApprove())
+}
