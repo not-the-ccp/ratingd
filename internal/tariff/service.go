@@ -185,6 +185,7 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 	if err := s.store.InsertWeightBreak(ctx, breakEntry); err != nil {
 		return nil, fmt.Errorf("create weight break: %w", err)
 	}
+
 	if err := s.audit.Record(ctx, "weight_break.created", breakEntry.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
 	}

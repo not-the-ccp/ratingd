@@ -47,6 +47,22 @@ func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]
 	return customers, rows.Err()
 }
 
+func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET customer_id = $2, street = $3, zip = $4, city = $5, country = $6, primary = $7, attention = $8, updated_at = $9 WHERE id = $1`, address.ID, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.Attention, address.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("update billing address: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
 // ListCustomersByStatus implements Store.
 func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
@@ -65,22 +81,6 @@ func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerSta
 		customers = append(customers, &customer)
 	}
 	return customers, rows.Err()
-}
-
-func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET customer_id = $2, street = $3, zip = $4, city = $5, country = $6, primary = $7, attention = $8, updated_at = $9 WHERE id = $1`, address.ID, address.CustomerID, address.Street, address.Zip, address.City, address.Country, address.Primary, address.Attention, address.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("update billing address: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
 }
 
 func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {

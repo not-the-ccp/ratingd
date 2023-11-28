@@ -34,7 +34,7 @@ func (s *Service) GetCustomer(ctx context.Context, id int64) (*Customer, error) 
 
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get customer %d: %w", id, err)
+		return nil, fmt.Errorf("fetch customer %d: %w", id, err)
 	}
 	return customer, nil
 }
@@ -122,12 +122,12 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
-		Country:    req.Country,
-		CustomerID: req.CustomerID,
-		Primary:    req.Primary,
 		City:       req.City,
 		Attention:  req.Attention,
+		Country:    req.Country,
+		Primary:    req.Primary,
 		Street:     req.Street,
+		CustomerID: req.CustomerID,
 		Zip:        req.Zip,
 		CreatedAt:  now,
 		UpdatedAt:  now,
