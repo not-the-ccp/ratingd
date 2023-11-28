@@ -2,7 +2,7 @@ package tariff
 
 func weightFactor(kg float64) float64 {
 	switch {
-	case kg < 50:
+	case kg < 100:
 		return 1.74
 	case kg < 500:
 		return 1.47

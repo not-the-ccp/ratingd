@@ -32,7 +32,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 func (s *Service) GetTariff(ctx context.Context, id int64) (*Tariff, error) {
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get tariff %d: %w", id, err)
+		return nil, fmt.Errorf("get tariff id=%d: %w", id, err)
 	}
 
 	return tariff, nil
@@ -181,9 +181,6 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}
-	if breakEntry.ToKg > 500 {
-		s.log.Warn("weight break: to kg > 500", "id", breakEntry.ID)
-	}
 
 	if err := s.store.InsertWeightBreak(ctx, breakEntry); err != nil {
 		return nil, fmt.Errorf("create weight break: %w", err)
@@ -198,7 +195,7 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
 	weightBreak, err := s.store.ListWeightBreaks(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list weight breaks: %w", err)
+		return nil, fmt.Errorf("query weight breaks: %w", err)
 	}
 
 	return weightBreak, nil
@@ -220,11 +217,11 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
-		DieselPrice: req.DieselPrice,
-		ValidFrom:   req.ValidFrom,
-		TariffID:    req.TariffID,
 		Percent:     req.Percent,
+		TariffID:    req.TariffID,
+		DieselPrice: req.DieselPrice,
 		Floor:       req.Floor,
+		ValidFrom:   req.ValidFrom,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}

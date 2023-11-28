@@ -152,3 +152,21 @@ func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset in
 
 	return billingAddress, nil
 }
+
+// ProcessProspectCustomers applies activate to every prospect customer and reports how many succeeded.
+func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
+	pending, err := s.store.ListCustomersByStatus(ctx, CustomerStatusProspect)
+	if err != nil {
+		return 0, fmt.Errorf("list prospect customers: %w", err)
+	}
+	processed := 0
+	for _, customer := range pending {
+		_, err := s.ActivateCustomer(ctx, customer.ID)
+		if err != nil {
+			s.log.Error("activate customer failed", "id", customer.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}
