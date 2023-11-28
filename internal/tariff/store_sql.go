@@ -23,24 +23,22 @@ func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurch
 	return nil
 }
 
-// ListTariffs implements Store.
-func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*Tariff, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, code, description, currency, valid_from, valid_to, status, published_at, retired_at, created_at, updated_at FROM tariffs ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, floor, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
 	if err != nil {
-		return nil, fmt.Errorf("list tariffs: %w", err)
+		return nil, err
 	}
-
 	defer rows.Close()
 
-	var tariffs []*Tariff
+	var surcharges []*FuelSurcharge
 	for rows.Next() {
-		var tariff Tariff
-		if err := rows.Scan(&tariff.ID, &tariff.Code, &tariff.Description, &tariff.Currency, &tariff.ValidFrom, &tariff.ValidTo, &tariff.Status, &tariff.PublishedAt, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan tariff: %w", err)
+		var surcharge FuelSurcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.Floor, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan fuel surcharge: %w", err)
 		}
-		tariffs = append(tariffs, &tariff)
+		surcharges = append(surcharges, &surcharge)
 	}
-	return tariffs, rows.Err()
+	return surcharges, rows.Err()
 }
 
 // ListTariffsByStatus implements Store.
@@ -188,22 +186,24 @@ func (s *SQLStore) ListFuelSurcharges(ctx context.Context, limit int, offset int
 	return fuelSurcharges, rows.Err()
 }
 
-func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, tariff_id, valid_from, percent, diesel_price, floor, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
+// ListTariffs implements Store.
+func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*Tariff, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, code, description, currency, valid_from, valid_to, status, published_at, retired_at, created_at, updated_at FROM tariffs ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list tariffs: %w", err)
 	}
+
 	defer rows.Close()
 
-	var surcharges []*FuelSurcharge
+	var tariffs []*Tariff
 	for rows.Next() {
-		var surcharge FuelSurcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.TariffID, &surcharge.ValidFrom, &surcharge.Percent, &surcharge.DieselPrice, &surcharge.Floor, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan fuel surcharge: %w", err)
+		var tariff Tariff
+		if err := rows.Scan(&tariff.ID, &tariff.Code, &tariff.Description, &tariff.Currency, &tariff.ValidFrom, &tariff.ValidTo, &tariff.Status, &tariff.PublishedAt, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan tariff: %w", err)
 		}
-		surcharges = append(surcharges, &surcharge)
+		tariffs = append(tariffs, &tariff)
 	}
-	return surcharges, rows.Err()
+	return tariffs, rows.Err()
 }
 
 // FindTariff implements Store.
