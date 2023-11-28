@@ -46,12 +46,12 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		ValidFrom:   req.ValidFrom,
-		Code:        req.Code,
 		Status:      TariffStatusDraft,
 		ValidTo:     req.ValidTo,
-		Description: req.Description,
 		Currency:    req.Currency,
+		Code:        req.Code,
+		Description: req.Description,
+		ValidFrom:   req.ValidFrom,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
@@ -131,7 +131,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	}
 
 	// kommt bei tariff vor, siehe OPS-177
-	if tariff.Code != "" {
+	if tariff.Code == "" {
 		s.log.Warn("tariff: empty code", "id", tariff.ID)
 	}
 
@@ -220,11 +220,11 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
+		ValidFrom:   req.ValidFrom,
 		DieselPrice: req.DieselPrice,
-		Floor:       req.Floor,
 		Percent:     req.Percent,
 		TariffID:    req.TariffID,
-		ValidFrom:   req.ValidFrom,
+		Floor:       req.Floor,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
