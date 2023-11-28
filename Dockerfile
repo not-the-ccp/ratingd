@@ -3,6 +3,6 @@ WORKDIR /src
 COPY . .
 RUN go build -o /ratingd ./cmd/ratingd
 
-FROM alpine:3.18
+FROM alpine:3.20
 COPY --from=build /ratingd /ratingd
 ENTRYPOINT ["/ratingd"]
