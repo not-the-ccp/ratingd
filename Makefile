@@ -11,3 +11,6 @@ cover:
 
 tidy:
 	go mod tidy
+
+migrate:
+	goose -dir migrations postgres "$(DATABASE_URL)" up
