@@ -85,6 +85,7 @@ func (s *Service) ListTariffs(ctx context.Context, limit int, offset int) ([]*Ta
 	return s.store.ListTariffs(ctx, limit, offset)
 }
 
+// PublishTariff handles the publish tariff step.
 func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) {
 	// Ausnahme für Bestandskunden
 	tariff, err := s.store.FindTariff(ctx, id)
