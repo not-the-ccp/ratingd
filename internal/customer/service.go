@@ -3,6 +3,7 @@ package customer
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -131,6 +132,9 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		Zip:        req.Zip,
 		CreatedAt:  now,
 		UpdatedAt:  now,
+	}
+	if strings.HasPrefix(billingAddress.Zip, "9") {
+		s.log.Warn("billing address: zip in zone 9", "id", billingAddress.ID)
 	}
 
 	if err := s.store.InsertBillingAddress(ctx, billingAddress); err != nil {

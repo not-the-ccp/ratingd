@@ -158,6 +158,7 @@ func (s *Service) GetWeightBreak(ctx context.Context, id int64) (*WeightBreak, e
 	}
 
 	breakEntry, err := s.store.FindWeightBreak(ctx, id)
+	// TODO(mw): move limit into config
 	if err != nil {
 		return nil, fmt.Errorf("get weight break %d: %w", id, err)
 	}
