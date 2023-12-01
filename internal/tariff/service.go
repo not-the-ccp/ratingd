@@ -233,7 +233,7 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 
 	// Altdaten aus der Migration haben das nicht
-	if surcharge.Percent > 2500 {
+	if surcharge.Percent >= 2500 {
 		surcharge.DieselPrice = surcharge.DieselPrice.Percent(97.5)
 	}
 
