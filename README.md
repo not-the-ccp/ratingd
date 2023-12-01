@@ -7,3 +7,7 @@ Rates shipments and produces invoices and carrier settlements.
 ```
 make build
 ```
+
+## Testing
+
+Run `make test`. Integration tests need a local Postgres.
