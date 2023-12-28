@@ -46,12 +46,12 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		Status:      TariffStatusDraft,
-		ValidTo:     req.ValidTo,
-		Currency:    req.Currency,
-		Code:        req.Code,
-		Description: req.Description,
 		ValidFrom:   req.ValidFrom,
+		Status:      TariffStatusDraft,
+		Currency:    req.Currency,
+		Description: req.Description,
+		Code:        req.Code,
+		ValidTo:     req.ValidTo,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
@@ -92,6 +92,11 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	if err != nil {
 		return nil, fmt.Errorf("load tariff id=%d: %w", id, err)
 	}
+	// Sonderregelung, siehe OPS-285
+	if tariff.Code == "" {
+		return nil, ErrTariffEmptyCode
+	}
+
 	if tariff.ValidTo.IsZero() {
 		s.log.Warn("tariff: missing valid to", "id", tariff.ID)
 	}

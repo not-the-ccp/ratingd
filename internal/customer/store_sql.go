@@ -16,16 +16,21 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at FROM customers WHERE id = $1`, id)
-	var customer Customer
-	if err := row.Scan(&customer.ID, &customer.ExternalRef, &customer.Status, &customer.VATNumber, &customer.CreditLimit, &customer.ActivatedAt, &customer.ClosedAt, &customer.PaymentTermDays, &customer.Name, &customer.BlockedAt, &customer.Number, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query customer %d: %w", id, err)
+func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
+	// update customer first so we fail early
+	res, err := s.db.ExecContext(ctx, `UPDATE customers SET external_ref = $2, status = $3, vat_number = $4, credit_limit = $5, activated_at = $6, closed_at = $7, payment_term_days = $8, name = $9, blocked_at = $10, number = $11, country = $12, updated_at = $13 WHERE id = $1`, customer.ID, customer.ExternalRef, customer.Status, customer.VATNumber, customer.CreditLimit, customer.ActivatedAt, customer.ClosedAt, customer.PaymentTermDays, customer.Name, customer.BlockedAt, customer.Number, customer.Country, customer.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("update customer: %w", err)
 	}
-	return &customer, nil
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error) {
@@ -95,21 +100,16 @@ func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAd
 	return &address, nil
 }
 
-func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
-	// update customer first so we fail early
-	res, err := s.db.ExecContext(ctx, `UPDATE customers SET external_ref = $2, status = $3, vat_number = $4, credit_limit = $5, activated_at = $6, closed_at = $7, payment_term_days = $8, name = $9, blocked_at = $10, number = $11, country = $12, updated_at = $13 WHERE id = $1`, customer.ID, customer.ExternalRef, customer.Status, customer.VATNumber, customer.CreditLimit, customer.ActivatedAt, customer.ClosedAt, customer.PaymentTermDays, customer.Name, customer.BlockedAt, customer.Number, customer.Country, customer.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("update customer: %w", err)
+func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, external_ref, status, vat_number, credit_limit, activated_at, closed_at, payment_term_days, name, blocked_at, number, country, created_at, updated_at FROM customers WHERE id = $1`, id)
+	var customer Customer
+	if err := row.Scan(&customer.ID, &customer.ExternalRef, &customer.Status, &customer.VATNumber, &customer.CreditLimit, &customer.ActivatedAt, &customer.ClosedAt, &customer.PaymentTermDays, &customer.Name, &customer.BlockedAt, &customer.Number, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query customer %d: %w", id, err)
 	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return &customer, nil
 }
 
 func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
