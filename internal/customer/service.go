@@ -47,14 +47,14 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	}
 	now := s.clock.Now()
 	customer := &Customer{
-		CreditLimit:     req.CreditLimit,
-		ExternalRef:     req.ExternalRef,
 		Name:            req.Name,
-		Country:         req.Country,
-		Status:          CustomerStatusProspect,
-		PaymentTermDays: req.PaymentTermDays,
-		VATNumber:       req.VATNumber,
 		Number:          req.Number,
+		Status:          CustomerStatusProspect,
+		VATNumber:       req.VATNumber,
+		CreditLimit:     req.CreditLimit,
+		Country:         req.Country,
+		ExternalRef:     req.ExternalRef,
+		PaymentTermDays: req.PaymentTermDays,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}

@@ -29,7 +29,12 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 
 // GetContract returns the contract with the given id.
 func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) {
-	return s.store.FindContract(ctx, id)
+	result, err := s.store.FindContract(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get contract: %w", err)
+	}
+
+	return result, nil
 }
 
 func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest) (*Contract, error) {

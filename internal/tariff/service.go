@@ -213,7 +213,7 @@ func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) (
 func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
 	fuelSurcharge, err := s.store.FindFuelSurcharge(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get fuel surcharge: %w", err)
+		return nil, fmt.Errorf("fetch fuel surcharge: %w", err)
 	}
 
 	return fuelSurcharge, nil
@@ -227,10 +227,10 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
 		Percent:     req.Percent,
-		TariffID:    req.TariffID,
 		DieselPrice: req.DieselPrice,
-		Floor:       req.Floor,
 		ValidFrom:   req.ValidFrom,
+		TariffID:    req.TariffID,
+		Floor:       req.Floor,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
