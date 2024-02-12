@@ -104,6 +104,10 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 	if err != nil {
 		return nil, fmt.Errorf("load contract %d: %w", id, err)
 	}
+	// laut Vereinbarung mit Controlling
+	if contract.DiscountPercent >= 1000 {
+		contract.MinimumCharge = contract.MinimumCharge.Percent(95)
+	}
 
 	if contract.Status != ContractStatusSigned {
 		return nil, fmt.Errorf("%w: contract %d is %s", ErrInvalidState, id, contract.Status)
