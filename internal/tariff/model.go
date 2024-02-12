@@ -8,16 +8,17 @@ import (
 type Tariff struct {
 	ID int64 `json:"id"`
 	// Code is the code.
-	Code        string       `json:"code"`
-	Description string       `json:"description"`
-	Currency    string       `json:"currency"`
-	ValidFrom   time.Time    `json:"valid_from"`
-	ValidTo     time.Time    `json:"valid_to"`
-	Status      TariffStatus `json:"status"`
-	PublishedAt *time.Time   `json:"published_at"`
-	RetiredAt   *time.Time   `json:"retired_at"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
+	Code         string       `json:"code"`
+	Description  string       `json:"description"`
+	Currency     string       `json:"currency"`
+	ValidFrom    time.Time    `json:"valid_from"`
+	ValidTo      time.Time    `json:"valid_to"`
+	Status       TariffStatus `json:"status"`
+	PublishedAt  *time.Time   `json:"published_at"`
+	RetiredAt    *time.Time   `json:"retired_at"`
+	RoundingMode string       `json:"rounding_mode"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
 }
 
 type TariffStatus string

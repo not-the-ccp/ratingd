@@ -1,0 +1,1 @@
+ALTER TABLE tariffs ADD COLUMN rounding_mode TEXT NOT NULL DEFAULT '';

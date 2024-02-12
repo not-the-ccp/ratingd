@@ -46,19 +46,16 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		ValidFrom:   req.ValidFrom,
-		Status:      TariffStatusDraft,
-		Currency:    req.Currency,
-		Description: req.Description,
-		Code:        req.Code,
-		ValidTo:     req.ValidTo,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		ValidFrom:    req.ValidFrom,
+		Status:       TariffStatusDraft,
+		Currency:     req.Currency,
+		Description:  req.Description,
+		Code:         req.Code,
+		ValidTo:      req.ValidTo,
+		RoundingMode: req.RoundingMode,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
-	if tariff.ValidFrom.Before(now) {
-		return nil, ErrTariffValidFromIn
-	}
-
 	// Altdaten aus der Migration haben das nicht
 	if tariff.Currency == "" {
 		return nil, ErrTariffEmptyCurrency
@@ -234,11 +231,6 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// needed for the tariff rollout
-	if surcharge.DieselPrice.IsZero() {
-		s.log.Warn("fuel surcharge: zero diesel price", "id", surcharge.ID)
-	}
-
 	// Altdaten aus der Migration haben das nicht
 	if surcharge.Percent >= 2500 {
 		surcharge.DieselPrice = surcharge.DieselPrice.Percent(97.5)
