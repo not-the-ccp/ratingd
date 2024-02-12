@@ -66,6 +66,51 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/contract:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/contract/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/contract/sign:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/contract/terminate:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/contracts:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/customer:
     post:
       responses:
@@ -262,21 +307,21 @@ components:
       properties:
         id:
           type: number
+        approved_at:
+          type: number
         country:
           type: string
         code:
           type: string
-        vat_number:
-          type: string
-        approved_at:
-          type: number
         name:
           type: string
+        vat_number:
+          type: string
+        suspended_at:
+          type: number
         status:
           type: string
         payment_term_days:
-          type: number
-        suspended_at:
           type: number
         created_at:
           type: number
@@ -303,6 +348,8 @@ components:
           type: number
         retired_at:
           type: number
+        rounding_mode:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -342,6 +389,35 @@ components:
         tariff_id:
           type: number
         percent:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Contract:
+      type: object
+      properties:
+        id:
+          type: number
+        customer_id:
+          type: number
+        tariff_id:
+          type: number
+        reference:
+          type: string
+        valid_from:
+          type: number
+        valid_to:
+          type: number
+        discount_percent:
+          type: number
+        minimum_charge:
+          type: number
+        status:
+          type: string
+        signed_at:
+          type: number
+        terminated_at:
           type: number
         created_at:
           type: number
