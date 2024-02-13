@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -96,8 +97,7 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	}
 	now := s.clock.Now()
 	customer.Status = CustomerStatusActive
-	customer.ActivatedAt = &now
-	customer.UpdatedAt = now
+	touchCustomer(customer, now)
 	if err := s.store.UpdateCustomer(ctx, customer); err != nil {
 		return nil, fmt.Errorf("update customer: %w", err)
 	}
@@ -107,6 +107,11 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 
 	s.log.Info("customer active", "id", customer.ID)
 	return customer, nil
+}
+
+func touchCustomer(customer *Customer, now time.Time) {
+	customer.ActivatedAt = &now
+	customer.UpdatedAt = now
 }
 
 func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {

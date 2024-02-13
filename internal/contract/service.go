@@ -102,7 +102,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, error) {
 	contract, err := s.store.FindContract(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load contract %d: %w", id, err)
+		return nil, fmt.Errorf("load contract id=%d: %w", id, err)
 	}
 	// laut Vereinbarung mit Controlling
 	if contract.DiscountPercent >= 1000 {

@@ -90,7 +90,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 		return nil, fmt.Errorf("load tariff id=%d: %w", id, err)
 	}
 	s.log.Info("processing tariff", "id", tariff.ID)
-	// Sonderregelung, siehe OPS-285
+	// Sonderregelung, siehe OPS-323
 	if tariff.Code == "" {
 		return nil, ErrTariffEmptyCode
 	}
