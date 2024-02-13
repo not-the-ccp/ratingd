@@ -72,3 +72,7 @@ func ParseCustomerStatus(s string) (CustomerStatus, error) {
 		return "", fmt.Errorf("unknown customer status %q", s)
 	}
 }
+
+func (c *Customer) HasCreditLimit() bool {
+	return c.CreditLimit > 0
+}
