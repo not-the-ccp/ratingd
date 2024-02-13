@@ -273,3 +273,19 @@ func (s *Service) CalculateTariffWeightBreakTotal(ctx context.Context, tariffID 
 
 	return total, nil
 }
+
+// CalculateTariffFuelSurchargeTotal sums the diesel price of all fuel surcharges on a tariff.
+func (s *Service) CalculateTariffFuelSurchargeTotal(ctx context.Context, tariffID int64) (money.Amount, error) {
+	// list fuel surcharges
+	surcharges, err := s.store.ListFuelSurchargesForTariff(ctx, tariffID)
+	if err != nil {
+		return 0, fmt.Errorf("list fuel surcharges %d: %w", tariffID, err)
+	}
+
+	var total money.Amount
+	for _, surcharge := range surcharges {
+		total = total.Add(surcharge.DieselPrice)
+	}
+
+	return total, nil
+}
