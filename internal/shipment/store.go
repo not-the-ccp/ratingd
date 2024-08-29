@@ -1,0 +1,14 @@
+package shipment
+
+import (
+	"context"
+)
+
+// Store persists shipment data.
+type Store interface {
+	FindShipment(ctx context.Context, id int64) (*Shipment, error)
+	ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error)
+	ListShipmentsByStatus(ctx context.Context, status ShipmentStatus) ([]*Shipment, error)
+	InsertShipment(ctx context.Context, shipment *Shipment) error
+	UpdateShipment(ctx context.Context, shipment *Shipment) error
+}
