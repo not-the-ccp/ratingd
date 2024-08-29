@@ -198,6 +198,7 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 	return breakEntry, nil
 }
 
+// ListWeightBreaks runs the list weight breaks step.
 func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
 	weightBreak, err := s.store.ListWeightBreaks(ctx, limit, offset)
 	if err != nil {
