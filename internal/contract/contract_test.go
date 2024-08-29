@@ -108,3 +108,8 @@ func TestService_GetContract_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestContract_CanSign(t *testing.T) {
+	contract := &Contract{}
+	require.False(t, contract.CanSign())
+}
