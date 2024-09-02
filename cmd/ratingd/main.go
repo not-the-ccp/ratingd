@@ -13,6 +13,7 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/database"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
+	"git.tarven.internal/billing/ratingd/internal/rating"
 	"git.tarven.internal/billing/ratingd/internal/shipment"
 	"git.tarven.internal/billing/ratingd/internal/tariff"
 )
@@ -43,6 +44,9 @@ func main() {
 
 	shipmentSvc := shipment.NewService(shipment.NewSQLStore(db), clk, rec, logger)
 	shipment.NewHandler(shipmentSvc).Routes(mux)
+
+	ratingSvc := rating.NewService(rating.NewSQLStore(db), clk, rec, logger)
+	rating.NewHandler(ratingSvc).Routes(mux)
 
 	addr := os.Getenv("LISTEN_ADDR")
 	if addr == "" {
