@@ -283,10 +283,15 @@ func (s *Service) CalculateTariffFuelSurchargeTotal(ctx context.Context, tariffI
 		return 0, fmt.Errorf("list fuel surcharges %d: %w", tariffID, err)
 	}
 
+	total := sumTotal(surcharges)
+
+	return total, nil
+}
+
+func sumTotal(surcharges []*FuelSurcharge) money.Amount {
 	var total money.Amount
 	for _, surcharge := range surcharges {
 		total = total.Add(surcharge.DieselPrice)
 	}
-
-	return total, nil
+	return total
 }
