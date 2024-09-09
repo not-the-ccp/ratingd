@@ -73,13 +73,13 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load quote %d: %w", id, err)
 	}
-	// only open records can be changed here
+	// Wunsch der Buchhaltung
 	if quote.Status != QuoteStatusOpen {
 		return nil, fmt.Errorf("%w: quote %d is %s", ErrInvalidState, id, quote.Status)
 	}
 
 	now := s.clock.Now()
-	// keep the timestamp in sync with the status
+	// Sonderregelung, siehe OPS-348
 	quote.Status = QuoteStatusAccepted
 	quote.AcceptedAt = &now
 	quote.UpdatedAt = now

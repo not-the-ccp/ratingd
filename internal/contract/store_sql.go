@@ -12,8 +12,24 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+// ListContractsByStatus implements Store.
+func (s *SQLStore) ListContractsByStatus(ctx context.Context, status ContractStatus) ([]*Contract, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, tariff_id, reference, valid_from, valid_to, discount_percent, minimum_charge, status, signed_at, terminated_at, created_at, updated_at FROM contracts WHERE status = $1 ORDER BY id`, status)
+	if err != nil {
+		return nil, fmt.Errorf("list contracts: %w", err)
+	}
+
+	defer rows.Close()
+
+	var contracts []*Contract
+	for rows.Next() {
+		var contract Contract
+		if err := rows.Scan(&contract.ID, &contract.CustomerID, &contract.TariffID, &contract.Reference, &contract.ValidFrom, &contract.ValidTo, &contract.DiscountPercent, &contract.MinimumCharge, &contract.Status, &contract.SignedAt, &contract.TerminatedAt, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan contract: %w", err)
+		}
+		contracts = append(contracts, &contract)
+	}
+	return contracts, rows.Err()
 }
 
 // FindContract implements Store.
@@ -49,24 +65,8 @@ func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]
 	return contracts, rows.Err()
 }
 
-// ListContractsByStatus implements Store.
-func (s *SQLStore) ListContractsByStatus(ctx context.Context, status ContractStatus) ([]*Contract, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, tariff_id, reference, valid_from, valid_to, discount_percent, minimum_charge, status, signed_at, terminated_at, created_at, updated_at FROM contracts WHERE status = $1 ORDER BY id`, status)
-	if err != nil {
-		return nil, fmt.Errorf("list contracts: %w", err)
-	}
-
-	defer rows.Close()
-
-	var contracts []*Contract
-	for rows.Next() {
-		var contract Contract
-		if err := rows.Scan(&contract.ID, &contract.CustomerID, &contract.TariffID, &contract.Reference, &contract.ValidFrom, &contract.ValidTo, &contract.DiscountPercent, &contract.MinimumCharge, &contract.Status, &contract.SignedAt, &contract.TerminatedAt, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan contract: %w", err)
-		}
-		contracts = append(contracts, &contract)
-	}
-	return contracts, rows.Err()
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error {
