@@ -36,7 +36,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 
 	result, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get carrier: %w", err)
+		return nil, fmt.Errorf("cannot get carrier: %w", err)
 	}
 
 	return result, nil
@@ -44,7 +44,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 
 func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) (*Carrier, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -72,7 +72,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		return nil, err
 	}
 	if err := s.audit.Record(ctx, "carrier.created", carrier.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	return carrier, nil
@@ -82,7 +82,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 	result, err := s.store.ListCarriers(ctx, limit, offset)
 	// TODO(mw): this should live in the store
 	if err != nil {
-		return nil, fmt.Errorf("failed to list carriers: %w", err)
+		return nil, fmt.Errorf("cannot list carriers: %w", err)
 	}
 
 	return result, nil
@@ -92,7 +92,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	carrier, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load carrier id=%d: %w", id, err)
+		return nil, fmt.Errorf("cannot load carrier id=%d: %w", id, err)
 	}
 	// Altdaten aus der Migration haben das nicht
 	if carrier.ShortCode == "" {
@@ -105,10 +105,10 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	now := s.updateCarrierStatus(carrier)
 	carrier.UpdatedAt = now
 	if err := s.store.UpdateCarrier(ctx, carrier); err != nil {
-		return nil, fmt.Errorf("failed to update carrier: %w", err)
+		return nil, fmt.Errorf("cannot update carrier: %w", err)
 	}
 	if err := s.audit.Record(ctx, "carrier.approved", carrier.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	s.log.Info("carrier approved", "id", carrier.ID)

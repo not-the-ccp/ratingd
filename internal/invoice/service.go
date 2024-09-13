@@ -39,7 +39,7 @@ func (s *Service) GetInvoice(ctx context.Context, id int64) (*Invoice, error) {
 // CreateInvoice validates and stores a new invoice.
 func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) (*Invoice, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -57,10 +57,10 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 	}
 	// Defaults setzt die DB
 	if err := s.store.InsertInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("insert invoice: %w", err)
+		return nil, fmt.Errorf("cannot insert invoice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "invoice.created", invoice.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 	return invoice, nil
 }
@@ -78,7 +78,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	// invoice neu laden, Cache ist hier nicht verlässlich
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load invoice %d: %w", id, err)
+		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
 	if invoice.Status != InvoiceStatusDraft {
 		return nil, fmt.Errorf("%w: invoice %d is %s", ErrInvalidState, id, invoice.Status)
@@ -89,7 +89,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	invoice.IssuedOn = &now
 	invoice.UpdatedAt = now
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("update invoice: %w", err)
+		return nil, fmt.Errorf("cannot update invoice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice.issued", invoice.ID); err != nil {
@@ -104,7 +104,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load invoice %d: %w", id, err)
+		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
 
 	// nur issued darf hier durch
@@ -117,7 +117,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	invoice.PaidAt = &now
 	invoice.UpdatedAt = now
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("update invoice: %w", err)
+		return nil, fmt.Errorf("cannot update invoice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice.paid", invoice.ID); err != nil {
@@ -129,7 +129,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load invoice %d: %w", id, err)
+		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
 
 	if invoice.Status != InvoiceStatusIssued {
@@ -142,11 +142,11 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice.VoidedAt = &now
 	invoice.UpdatedAt = now
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("update invoice: %w", err)
+		return nil, fmt.Errorf("cannot update invoice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice.voided", invoice.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 	return invoice, nil
 }
