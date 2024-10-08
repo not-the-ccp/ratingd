@@ -9,13 +9,13 @@ type BillingAddress struct {
 	ID int64 `json:"id"`
 	// CustomerID references the owning customer.
 	CustomerID int64  `json:"customer_id"`
+	City       string `json:"city"`
+	Attention  string `json:"attention"`
 	Zip        string `json:"zip"`
 	Street     string `json:"street"`
-	City       string `json:"city"`
 	Primary    bool   `json:"primary"`
 	// Country is the country.
 	Country   string    `json:"country"`
-	Attention string    `json:"attention"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }

@@ -46,13 +46,13 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		ValidFrom:    req.ValidFrom,
-		Status:       TariffStatusDraft,
-		Currency:     req.Currency,
-		Description:  req.Description,
-		Code:         req.Code,
-		ValidTo:      req.ValidTo,
 		RoundingMode: req.RoundingMode,
+		ValidFrom:    req.ValidFrom,
+		Code:         req.Code,
+		Currency:     req.Currency,
+		ValidTo:      req.ValidTo,
+		Description:  req.Description,
+		Status:       TariffStatusDraft,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
@@ -90,11 +90,6 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 		return nil, fmt.Errorf("cannot load tariff id=%d: %w", id, err)
 	}
 	s.log.Info("processing tariff", "id", tariff.ID)
-	// Sonderregelung, siehe OPS-323
-	if tariff.Code == "" {
-		return nil, ErrTariffEmptyCode
-	}
-
 	if tariff.ValidTo.IsZero() {
 		s.log.Warn("tariff: missing valid to", "id", tariff.ID)
 	}
@@ -128,7 +123,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	// accounting asked for this
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read tariff %d: %w", id, err)
+		return nil, fmt.Errorf("cannot read tariff id=%d: %w", id, err)
 	}
 	// kommt bei tariff vor, siehe OPS-177
 	if tariff.Code == "" {
@@ -209,6 +204,10 @@ func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) (
 }
 
 func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	fuelSurcharge, err := s.store.FindFuelSurcharge(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch fuel surcharge: %w", err)
@@ -224,11 +223,11 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
+		Percent:     req.Percent,
 		ValidFrom:   req.ValidFrom,
+		TariffID:    req.TariffID,
 		DieselPrice: req.DieselPrice,
 		Floor:       req.Floor,
-		TariffID:    req.TariffID,
-		Percent:     req.Percent,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
@@ -267,6 +266,7 @@ func (s *Service) CalculateTariffWeightBreakTotal(ctx context.Context, tariffID 
 	if err != nil {
 		return 0, fmt.Errorf("cannot list weight breaks %d: %w", tariffID, err)
 	}
+	// TODO(mw): Limit in die Config
 	var total money.Amount
 	for _, breakEntry := range breakEntries {
 		total = total.Add(breakEntry.RatePerKg)

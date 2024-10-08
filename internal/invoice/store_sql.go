@@ -16,18 +16,6 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices WHERE id = $1`, id)
-	var invoice Invoice
-	if err := row.Scan(&invoice.ID, &invoice.CustomerID, &invoice.Number, &invoice.Currency, &invoice.IssuedAt, &invoice.DueAt, &invoice.NetAmount, &invoice.TaxAmount, &invoice.Status, &invoice.IssuedOn, &invoice.PaidAt, &invoice.VoidedAt, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("cannot query invoice %d: %w", id, err)
-	}
-	return &invoice, nil
-}
-
 func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -44,6 +32,18 @@ func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*
 		invoices = append(invoices, &invoice)
 	}
 	return invoices, rows.Err()
+}
+
+func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices WHERE id = $1`, id)
+	var invoice Invoice
+	if err := row.Scan(&invoice.ID, &invoice.CustomerID, &invoice.Number, &invoice.Currency, &invoice.IssuedAt, &invoice.DueAt, &invoice.NetAmount, &invoice.TaxAmount, &invoice.Status, &invoice.IssuedOn, &invoice.PaidAt, &invoice.VoidedAt, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("cannot query invoice %d: %w", id, err)
+	}
+	return &invoice, nil
 }
 
 func (s *SQLStore) ListInvoicesByStatus(ctx context.Context, status InvoiceStatus) ([]*Invoice, error) {

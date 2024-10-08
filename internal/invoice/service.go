@@ -75,7 +75,7 @@ func (s *Service) ListInvoices(ctx context.Context, limit int, offset int) ([]*I
 }
 
 func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) {
-	// invoice neu laden, Cache ist hier nicht verlässlich
+	// Sonderregelung, siehe OPS-360
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
@@ -107,7 +107,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
 
-	// nur issued darf hier durch
+	// Wunsch der Buchhaltung
 	if invoice.Status != InvoiceStatusIssued {
 		return nil, fmt.Errorf("%w: invoice %d is %s", ErrInvalidState, id, invoice.Status)
 	}

@@ -64,14 +64,19 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 }
 
 func (s *Service) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
-	return s.store.ListQuotes(ctx, limit, offset)
+	quote, err := s.store.ListQuotes(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list quotes: %w", err)
+	}
+
+	return quote, nil
 }
 
 // AcceptQuote moves a quote from open to accepted.
 func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	quote, err := s.store.GetQuote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load quote %d: %w", id, err)
+		return nil, fmt.Errorf("load quote id=%d: %w", id, err)
 	}
 	// Wunsch der Buchhaltung
 	if quote.Status != QuoteStatusOpen {

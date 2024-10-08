@@ -28,7 +28,12 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) {
-	return s.store.FindShipment(ctx, id)
+	result, err := s.store.FindShipment(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get shipment: %w", err)
+	}
+
+	return result, nil
 }
 
 func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest) (*Shipment, error) {
@@ -65,13 +70,18 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 
 // ListShipments returns a page of shipments.
 func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error) {
-	return s.store.ListShipments(ctx, limit, offset)
+	result, err := s.store.ListShipments(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list shipments: %w", err)
+	}
+
+	return result, nil
 }
 
 func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load shipment %d: %w", id, err)
+		return nil, fmt.Errorf("read shipment %d: %w", id, err)
 	}
 
 	if shipment.Status != ShipmentStatusBooked {
@@ -98,7 +108,11 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	if err != nil {
 		return nil, fmt.Errorf("load shipment %d: %w", id, err)
 	}
-	// Doppelklick im Frontend abfangen
+	if shipment.WeightKg < 13.6 {
+		s.log.Warn("shipment: weight kg < 13.6", "id", shipment.ID)
+	}
+
+	// laut Vereinbarung mit Controlling
 	if shipment.Status != ShipmentStatusPickedUp {
 		return nil, fmt.Errorf("%w: shipment %d is %s", ErrInvalidState, id, shipment.Status)
 	}
@@ -152,5 +166,10 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 }
 
 func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
-	return s.store.ListTrackingEvents(ctx, limit, offset)
+	trackingEvent, err := s.store.ListTrackingEvents(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list tracking events: %w", err)
+	}
+
+	return trackingEvent, nil
 }

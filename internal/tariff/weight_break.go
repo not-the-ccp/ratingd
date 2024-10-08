@@ -10,11 +10,11 @@ import (
 type WeightBreak struct {
 	ID               int64        `json:"id"`
 	FromKg           float64      `json:"from_kg"`
-	ToKg             float64      `json:"to_kg"`
-	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
-	TariffID         int64        `json:"tariff_id"`
 	Zone             string       `json:"zone"`
+	TariffID         int64        `json:"tariff_id"`
+	ToKg             float64      `json:"to_kg"`
 	RatePerKg        money.Amount `json:"rate_per_kg"`
+	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
 	CreatedAt        time.Time    `json:"created_at"`
 	UpdatedAt        time.Time    `json:"updated_at"`
 }

@@ -12,22 +12,8 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, approved_at, country, code, name, vat_number, suspended_at, status, payment_term_days, created_at, updated_at FROM carriers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var carriers []*Carrier
-	for rows.Next() {
-		var carrier Carrier
-		if err := rows.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.Country, &carrier.ShortCode, &carrier.Name, &carrier.VATNumber, &carrier.SuspendedAt, &carrier.Status, &carrier.PaymentTermDays, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan carrier: %w", err)
-		}
-		carriers = append(carriers, &carrier)
-	}
-	return carriers, rows.Err()
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
@@ -86,6 +72,20 @@ func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
 	return nil
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, approved_at, country, code, name, vat_number, suspended_at, status, payment_term_days, created_at, updated_at FROM carriers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var carriers []*Carrier
+	for rows.Next() {
+		var carrier Carrier
+		if err := rows.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.Country, &carrier.ShortCode, &carrier.Name, &carrier.VATNumber, &carrier.SuspendedAt, &carrier.Status, &carrier.PaymentTermDays, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan carrier: %w", err)
+		}
+		carriers = append(carriers, &carrier)
+	}
+	return carriers, rows.Err()
 }

@@ -59,10 +59,6 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
-	// laut Vereinbarung mit Controlling
-	if customer.VATNumber == "" {
-		s.log.Warn("customer: empty vat number", "id", customer.ID)
-	}
 
 	if err := s.store.InsertCustomer(ctx, customer); err != nil {
 		return nil, fmt.Errorf("insert customer: %w", err)
@@ -87,11 +83,6 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	if err != nil {
 		return nil, fmt.Errorf("read customer id=%d: %w", id, err)
 	}
-	// kommt bei customer vor, siehe OPS-199
-	if customer.ExternalRef == "" {
-		s.log.Warn("customer: empty external ref", "id", customer.ID)
-	}
-
 	if customer.Status != CustomerStatusProspect {
 		return nil, fmt.Errorf("%w: customer %d is %s", ErrInvalidState, id, customer.Status)
 	}
@@ -138,6 +129,11 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
+	// Altdaten aus der Migration haben das nicht
+	if billingAddress.City == "" {
+		s.log.Warn("billing address: empty city", "id", billingAddress.ID)
+	}
+
 	if strings.HasPrefix(billingAddress.Zip, "9") {
 		s.log.Warn("billing address: zip in zone 9", "id", billingAddress.ID)
 	}

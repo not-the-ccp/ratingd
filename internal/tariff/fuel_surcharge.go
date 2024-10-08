@@ -18,3 +18,7 @@ type FuelSurcharge struct {
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }
+
+func (f *FuelSurcharge) HasDieselPrice() bool {
+	return f.DieselPrice > 0
+}
