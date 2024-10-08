@@ -82,3 +82,42 @@ func toShipmentResponse(shipment *Shipment) ShipmentResponse {
 		UpdatedAt:      shipment.UpdatedAt,
 	}
 }
+
+type CreateTrackingEventRequest struct {
+	ShipmentID int64     `json:"shipment_id"`
+	Code       string    `json:"code"`
+	Location   string    `json:"location"`
+	OccurredAt time.Time `json:"occurred_at"`
+}
+
+type TrackingEventResponse struct {
+	ID         int64     `json:"id"`
+	ShipmentID int64     `json:"shipment_id"`
+	Code       string    `json:"code"`
+	Location   string    `json:"location"`
+	OccurredAt time.Time `json:"occurred_at"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+func (r *CreateTrackingEventRequest) Validate() error {
+	if r.ShipmentID == 0 {
+		return errors.New("shipment id is required")
+	}
+	if r.Code == "" {
+		return errors.New("code is required")
+	}
+	return nil
+}
+
+func toTrackingEventResponse(trackingEvent *TrackingEvent) TrackingEventResponse {
+	return TrackingEventResponse{
+		ID:         trackingEvent.ID,
+		ShipmentID: trackingEvent.ShipmentID,
+		Code:       trackingEvent.Code,
+		Location:   trackingEvent.Location,
+		OccurredAt: trackingEvent.OccurredAt,
+		CreatedAt:  trackingEvent.CreatedAt,
+		UpdatedAt:  trackingEvent.UpdatedAt,
+	}
+}

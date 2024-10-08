@@ -23,6 +23,9 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/shipments", h.listShipments)
 	mux.HandleFunc("/api/v1/shipment/pickup", h.pickupShipment)
 	mux.HandleFunc("/api/v1/shipment/deliver", h.deliverShipment)
+	mux.HandleFunc("/api/v1/tracking-event", h.getTrackingEvent)
+	mux.HandleFunc("/api/v1/tracking-event/create", h.createTrackingEvent)
+	mux.HandleFunc("/api/v1/tracking-events", h.listTrackingEvents)
 }
 
 func writeError(w http.ResponseWriter, err error) {
@@ -109,4 +112,48 @@ func (h *Handler) deliverShipment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toShipmentResponse(shipment))
+}
+
+func (h *Handler) getTrackingEvent(w http.ResponseWriter, r *http.Request) {
+	id, err := httpx.Int64Param(r, "id")
+	if err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	event, err := h.svc.GetTrackingEvent(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	httpx.JSON(w, http.StatusOK, toTrackingEventResponse(event))
+}
+
+func (h *Handler) createTrackingEvent(w http.ResponseWriter, r *http.Request) {
+	var req CreateTrackingEventRequest
+	if err := httpx.Decode(r, &req); err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	event, err := h.svc.CreateTrackingEvent(r.Context(), &req)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	httpx.JSON(w, http.StatusCreated, toTrackingEventResponse(event))
+}
+
+func (h *Handler) listTrackingEvents(w http.ResponseWriter, r *http.Request) {
+	limit := httpx.IntParam(r, "limit", 50)
+	offset := httpx.IntParam(r, "offset", 0)
+	events, err := h.svc.ListTrackingEvents(r.Context(), limit, offset)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	out := make([]TrackingEventResponse, 0, len(events))
+	for _, item := range events {
+		out = append(out, toTrackingEventResponse(item))
+	}
+	httpx.JSON(w, http.StatusOK, out)
 }

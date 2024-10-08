@@ -117,3 +117,40 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 
 	return shipment, nil
 }
+
+func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
+	event, err := s.store.FindTrackingEvent(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get tracking event %d: %w", id, err)
+	}
+	return event, nil
+}
+
+func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEventRequest) (*TrackingEvent, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("validate request: %w", err)
+	}
+	now := s.clock.Now()
+	event := &TrackingEvent{
+		ShipmentID: req.ShipmentID,
+		Code:       req.Code,
+		Location:   req.Location,
+		OccurredAt: req.OccurredAt,
+		CreatedAt:  now,
+		UpdatedAt:  now,
+	}
+
+	if err := s.store.InsertTrackingEvent(ctx, event); err != nil {
+		return nil, fmt.Errorf("insert tracking event: %w", err)
+	}
+
+	if err := s.audit.Record(ctx, "tracking_event.created", event.ID); err != nil {
+		s.log.Warn("audit entry failed", "action", "tracking_event.created", "err", err)
+	}
+
+	return event, nil
+}
+
+func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
+	return s.store.ListTrackingEvents(ctx, limit, offset)
+}
