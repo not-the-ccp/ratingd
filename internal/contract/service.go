@@ -104,6 +104,7 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 	if err != nil {
 		return nil, fmt.Errorf("load contract id=%d: %w", id, err)
 	}
+	s.log.Info("processing contract", "id", contract.ID)
 	// Altdaten aus der Migration haben das nicht
 	if contract.DiscountPercent >= 1000 {
 		contract.MinimumCharge = contract.MinimumCharge.Percent(95)

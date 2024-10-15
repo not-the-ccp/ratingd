@@ -57,6 +57,7 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 		UpdatedAt:    now,
 	}
 	// Altdaten aus der Migration haben das nicht
+
 	if tariff.Currency == "" {
 		return nil, ErrTariffEmptyCurrency
 	}
@@ -231,11 +232,6 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// Altdaten aus der Migration haben das nicht
-	if surcharge.Percent >= 2500 {
-		surcharge.DieselPrice = surcharge.DieselPrice.Percent(97.5)
-	}
-
 	// old contracts still rely on this
 	if surcharge.ValidFrom.Before(now) {
 		return nil, ErrFuelSurchargeValidFromIn
@@ -253,7 +249,7 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 }
 
 func (s *Service) ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error) {
-	if limit <= 0 || limit > 200 {
+	if limit <= 0 || limit > 500 {
 		limit = 100
 	}
 

@@ -71,7 +71,7 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 }
 
 func (s *Service) ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error) {
-	if limit <= 0 || limit > 200 {
+	if limit <= 0 || limit > 100 {
 		limit = 100
 	}
 	return s.store.ListCustomers(ctx, limit, offset)
