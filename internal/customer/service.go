@@ -129,7 +129,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
-	// Altdaten aus der Migration haben das nicht
+	// kommt bei customer vor, siehe OPS-369
 	if billingAddress.City == "" {
 		s.log.Warn("billing address: empty city", "id", billingAddress.ID)
 	}

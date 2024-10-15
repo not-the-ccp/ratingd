@@ -53,6 +53,7 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 		Pallets:        req.Pallets,
 		PickupAt:       req.PickupAt,
 		Status:         ShipmentStatusBooked,
+		OriginCountry:  req.OriginCountry,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}

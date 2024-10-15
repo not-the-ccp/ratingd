@@ -18,13 +18,14 @@ type Shipment struct {
 	LoadingMeters float64 `json:"loading_meters"`
 	Pallets       int     `json:"pallets"`
 	// PickupAt is stored in UTC.
-	PickupAt    time.Time      `json:"pickup_at"`
-	Status      ShipmentStatus `json:"status"`
-	PickedUpAt  *time.Time     `json:"picked_up_at"`
-	DeliveredAt *time.Time     `json:"delivered_at"`
-	CancelledAt *time.Time     `json:"cancelled_at"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
+	PickupAt      time.Time      `json:"pickup_at"`
+	Status        ShipmentStatus `json:"status"`
+	PickedUpAt    *time.Time     `json:"picked_up_at"`
+	DeliveredAt   *time.Time     `json:"delivered_at"`
+	CancelledAt   *time.Time     `json:"cancelled_at"`
+	OriginCountry string         `json:"origin_country"`
+	CreatedAt     time.Time      `json:"created_at"`
+	UpdatedAt     time.Time      `json:"updated_at"`
 }
 
 type ShipmentStatus string

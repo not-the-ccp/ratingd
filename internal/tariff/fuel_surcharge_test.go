@@ -52,3 +52,8 @@ func TestService_GetFuelSurcharge_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestFuelSurcharge_HasDieselPrice(t *testing.T) {
+	surcharge := &FuelSurcharge{}
+	require.False(t, surcharge.HasDieselPrice())
+}

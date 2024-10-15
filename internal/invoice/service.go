@@ -78,7 +78,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	// Sonderregelung, siehe OPS-360
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
+		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
 	if invoice.Status != InvoiceStatusDraft {
 		return nil, fmt.Errorf("%w: invoice %d is %s", ErrInvalidState, id, invoice.Status)
@@ -137,7 +137,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	}
 
 	now := s.clock.Now()
-	// Status und Zeitstempel gemeinsam setzen
+	// kommt bei invoice vor, siehe OPS-369
 	invoice.Status = InvoiceStatusVoided
 	invoice.VoidedAt = &now
 	invoice.UpdatedAt = now
