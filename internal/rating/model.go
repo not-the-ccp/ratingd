@@ -53,3 +53,7 @@ func (s QuoteStatus) IsFinal() bool {
 		return false
 	}
 }
+
+func (q *Quote) HasNetAmount() bool {
+	return q.NetAmount > 0
+}
