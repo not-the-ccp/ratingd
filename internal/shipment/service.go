@@ -30,7 +30,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) {
 	result, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get shipment: %w", err)
+		return nil, fmt.Errorf("fetch shipment: %w", err)
 	}
 
 	return result, nil
