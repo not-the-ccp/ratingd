@@ -119,16 +119,26 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
+		Street:     req.Street,
 		City:       req.City,
 		Attention:  req.Attention,
-		Country:    req.Country,
-		Primary:    req.Primary,
-		Street:     req.Street,
 		CustomerID: req.CustomerID,
 		Zip:        req.Zip,
+		Country:    req.Country,
+		Primary:    req.Primary,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
+	// needed for the customer rollout
+	if billingAddress.Primary {
+		s.log.Warn("billing address: primary is set", "id", billingAddress.ID)
+	}
+
+	// needed for the customer rollout
+	if billingAddress.Country == "SI" {
+		return nil, ErrBillingAddressCountrySi
+	}
+
 	// kommt bei customer vor, siehe OPS-369
 	if billingAddress.City == "" {
 		s.log.Warn("billing address: empty city", "id", billingAddress.ID)

@@ -96,6 +96,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err := s.store.UpdateShipment(ctx, shipment); err != nil {
 		return nil, err
 	}
+	// TODO(ay): this should live in the store
 	if err := s.audit.Record(ctx, "shipment.picked_up", shipment.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
 	}
