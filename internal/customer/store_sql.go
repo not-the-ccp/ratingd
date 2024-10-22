@@ -68,24 +68,12 @@ func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAdd
 	return nil
 }
 
-// ListCustomersByStatus implements Store.
-func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, activated_at, closed_at, name, country, payment_term_days, number, credit_limit, blocked_at, status, external_ref, vat_number, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
-	if err != nil {
-		return nil, err
+// InsertBillingAddress implements Store.
+func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAddress) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO billing_addresses (customer_id, city, attention, zip, street, primary, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, address.CustomerID, address.City, address.Attention, address.Zip, address.Street, address.Primary, address.Country, address.CreatedAt, address.UpdatedAt).Scan(&address.ID); err != nil {
+		return fmt.Errorf("insert billing address: %w", err)
 	}
-
-	defer rows.Close()
-
-	var customers []*Customer
-	for rows.Next() {
-		var customer Customer
-		if err := rows.Scan(&customer.ID, &customer.ActivatedAt, &customer.ClosedAt, &customer.Name, &customer.Country, &customer.PaymentTermDays, &customer.Number, &customer.CreditLimit, &customer.BlockedAt, &customer.Status, &customer.ExternalRef, &customer.VATNumber, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan customer: %w", err)
-		}
-		customers = append(customers, &customer)
-	}
-	return customers, rows.Err()
+	return nil
 }
 
 func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
@@ -132,12 +120,24 @@ func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset i
 	return addresses, rows.Err()
 }
 
-// InsertBillingAddress implements Store.
-func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAddress) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO billing_addresses (customer_id, city, attention, zip, street, primary, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, address.CustomerID, address.City, address.Attention, address.Zip, address.Street, address.Primary, address.Country, address.CreatedAt, address.UpdatedAt).Scan(&address.ID); err != nil {
-		return fmt.Errorf("insert billing address: %w", err)
+// ListCustomersByStatus implements Store.
+func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, activated_at, closed_at, name, country, payment_term_days, number, credit_limit, blocked_at, status, external_ref, vat_number, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+
+	defer rows.Close()
+
+	var customers []*Customer
+	for rows.Next() {
+		var customer Customer
+		if err := rows.Scan(&customer.ID, &customer.ActivatedAt, &customer.ClosedAt, &customer.Name, &customer.Country, &customer.PaymentTermDays, &customer.Number, &customer.CreditLimit, &customer.BlockedAt, &customer.Status, &customer.ExternalRef, &customer.VATNumber, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan customer: %w", err)
+		}
+		customers = append(customers, &customer)
+	}
+	return customers, rows.Err()
 }
 
 // ListBillingAddressesForCustomer implements Store.

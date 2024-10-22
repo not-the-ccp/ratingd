@@ -16,8 +16,8 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) ListInvoicesByStatus(ctx context.Context, status InvoiceStatus) ([]*Invoice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list invoices: %w", err)
 	}
@@ -50,8 +50,8 @@ func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
 	return nil
 }
 
-func (s *SQLStore) ListInvoicesByStatus(ctx context.Context, status InvoiceStatus) ([]*Invoice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices WHERE status = $1 ORDER BY id`, status)
+func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, number, currency, issued_at, due_at, net_amount, tax_amount, status, issued_on, paid_at, voided_at, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list invoices: %w", err)
 	}

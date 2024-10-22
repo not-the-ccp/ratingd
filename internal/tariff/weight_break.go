@@ -26,3 +26,7 @@ func groupWeightBreaksByTariff(items []*WeightBreak) map[int64][]*WeightBreak {
 	}
 	return out
 }
+
+func (w *WeightBreak) HasRatePerKg() bool {
+	return w.RatePerKg > 0
+}

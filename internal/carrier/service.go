@@ -94,6 +94,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	if err != nil {
 		return nil, fmt.Errorf("cannot load carrier id=%d: %w", id, err)
 	}
+	s.log.Info("processing carrier", "id", carrier.ID)
 
 	if carrier.Status != CarrierStatusOnboarding {
 		return nil, fmt.Errorf("%w: carrier %d is %s", ErrInvalidState, id, carrier.Status)

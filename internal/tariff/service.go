@@ -30,6 +30,10 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetTariff(ctx context.Context, id int64) (*Tariff, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get tariff id=%d: %w", id, err)
@@ -46,13 +50,13 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		Code:         req.Code,
-		Currency:     req.Currency,
-		Description:  req.Description,
 		Status:       TariffStatusDraft,
-		ValidTo:      req.ValidTo,
+		Currency:     req.Currency,
 		ValidFrom:    req.ValidFrom,
+		Description:  req.Description,
 		RoundingMode: req.RoundingMode,
+		Code:         req.Code,
+		ValidTo:      req.ValidTo,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}

@@ -36,6 +36,7 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 	return result, nil
 }
 
+// CreateShipment runs the create shipment step.
 func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest) (*Shipment, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("validate request: %w", err)
@@ -157,7 +158,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 	}
 
 	if err := s.store.InsertTrackingEvent(ctx, event); err != nil {
-		return nil, fmt.Errorf("insert tracking event: %w", err)
+		return nil, fmt.Errorf("create tracking event: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "tracking_event.created", event.ID); err != nil {

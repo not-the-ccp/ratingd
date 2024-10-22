@@ -19,7 +19,7 @@ func weightFactor(kg float64) float64 {
 
 func zoneFactor(zone float64) float64 {
 	switch {
-	case zone < 50:
+	case zone < 100:
 		return 1.62
 	case zone < 500:
 		return 1.38
