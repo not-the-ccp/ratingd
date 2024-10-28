@@ -174,6 +174,141 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/invoice:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoice/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoice/issue:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoice/mark-paid:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoice/void:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoices:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/quote:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/quote/accept:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/quote/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/quotes:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/shipment:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/shipment/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/shipment/deliver:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/shipment/pickup:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/shipments:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/tariff:
     post:
       responses:
@@ -219,6 +354,33 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/tracking-event:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tracking-event/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/tracking-events:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/weight-break:
     post:
       responses:
@@ -253,27 +415,27 @@ components:
       properties:
         id:
           type: number
-        external_ref:
-          type: string
-        status:
-          type: string
-        vat_number:
-          type: string
-        credit_limit:
-          type: number
         activated_at:
           type: number
         closed_at:
           type: number
-        payment_term_days:
-          type: number
         name:
           type: string
-        blocked_at:
+        country:
+          type: string
+        payment_term_days:
           type: number
         number:
           type: string
-        country:
+        credit_limit:
+          type: number
+        blocked_at:
+          type: number
+        status:
+          type: string
+        external_ref:
+          type: string
+        vat_number:
           type: string
         created_at:
           type: number
@@ -286,17 +448,17 @@ components:
           type: number
         customer_id:
           type: number
-        street:
+        city:
+          type: string
+        attention:
           type: string
         zip:
           type: string
-        city:
-          type: string
-        country:
+        street:
           type: string
         primary:
           type: number
-        attention:
+        country:
           type: string
         created_at:
           type: number
@@ -332,24 +494,24 @@ components:
       properties:
         id:
           type: number
+        status:
+          type: string
+        rounding_mode:
+          type: string
         code:
-          type: string
-        description:
-          type: string
-        currency:
           type: string
         valid_from:
           type: number
-        valid_to:
+        currency:
+          type: string
+        retired_at:
           type: number
-        status:
+        description:
           type: string
         published_at:
           type: number
-        retired_at:
+        valid_to:
           type: number
-        rounding_mode:
-          type: string
         created_at:
           type: number
         updated_at:
@@ -361,15 +523,15 @@ components:
           type: number
         from_kg:
           type: number
-        to_kg:
-          type: number
-        loading_meter_rate:
-          type: number
-        tariff_id:
-          type: number
         zone:
           type: string
+        tariff_id:
+          type: number
+        to_kg:
+          type: number
         rate_per_kg:
+          type: number
+        loading_meter_rate:
           type: number
         created_at:
           type: number
@@ -418,6 +580,118 @@ components:
         signed_at:
           type: number
         terminated_at:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Shipment:
+      type: object
+      properties:
+        id:
+          type: number
+        customer_id:
+          type: number
+        carrier_id:
+          type: number
+        reference:
+          type: string
+        origin_zip:
+          type: string
+        destination_zip:
+          type: string
+        weight_kg:
+          type: number
+        loading_meters:
+          type: number
+        pallets:
+          type: number
+        pickup_at:
+          type: number
+        status:
+          type: string
+        picked_up_at:
+          type: number
+        delivered_at:
+          type: number
+        cancelled_at:
+          type: number
+        origin_country:
+          type: string
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    TrackingEvent:
+      type: object
+      properties:
+        id:
+          type: number
+        location:
+          type: string
+        shipment_id:
+          type: number
+        code:
+          type: string
+        occurred_at:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Quote:
+      type: object
+      properties:
+        id:
+          type: number
+        shipment_id:
+          type: number
+        contract_id:
+          type: number
+        net_amount:
+          type: number
+        fuel_amount:
+          type: number
+        currency:
+          type: string
+        expires_at:
+          type: number
+        status:
+          type: string
+        accepted_at:
+          type: number
+        superseded_at:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: number
+        customer_id:
+          type: number
+        number:
+          type: string
+        currency:
+          type: string
+        issued_at:
+          type: number
+        due_at:
+          type: number
+        net_amount:
+          type: number
+        tax_amount:
+          type: number
+        status:
+          type: string
+        issued_on:
+          type: number
+        paid_at:
+          type: number
+        voided_at:
           type: number
         created_at:
           type: number
