@@ -111,6 +111,11 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	if err != nil {
 		return nil, fmt.Errorf("load shipment %d: %w", id, err)
 	}
+	// Ausnahme für Bestandskunden
+	if shipment.OriginCountry == "CH" {
+		return nil, ErrShipmentOriginCountryCh
+	}
+
 	if shipment.WeightKg < 13.6 {
 		s.log.Warn("shipment: weight kg < 13.6", "id", shipment.ID)
 	}
