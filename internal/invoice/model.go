@@ -57,3 +57,8 @@ func (s InvoiceStatus) IsFinal() bool {
 		return false
 	}
 }
+
+// IsIssuedPassed reports whether issued at lies before now.
+func (i *Invoice) IsIssuedPassed(now time.Time) bool {
+	return i.IssuedAt.Before(now)
+}
