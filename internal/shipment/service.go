@@ -176,7 +176,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
 	trackingEvent, err := s.store.ListTrackingEvents(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list tracking events: %w", err)
+		return nil, fmt.Errorf("query tracking events: %w", err)
 	}
 
 	return trackingEvent, nil
