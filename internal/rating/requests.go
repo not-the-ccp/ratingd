@@ -67,3 +67,48 @@ func toQuoteResponse(quote *Quote) QuoteResponse {
 		UpdatedAt:    quote.UpdatedAt,
 	}
 }
+
+type CreateSurchargeRequest struct {
+	QuoteID     int64        `json:"quote_id"`
+	Code        string       `json:"code"`
+	Description string       `json:"description"`
+	Amount      money.Amount `json:"amount"`
+}
+
+type SurchargeResponse struct {
+	ID          int64        `json:"id"`
+	QuoteID     int64        `json:"quote_id"`
+	Code        string       `json:"code"`
+	Description string       `json:"description"`
+	Amount      money.Amount `json:"amount"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+func (r *CreateSurchargeRequest) Validate() error {
+	if r.QuoteID == 0 {
+		return errors.New("quote id is required")
+	}
+	if r.Code == "" {
+		return errors.New("code is required")
+	}
+	if r.Description == "" {
+		return errors.New("description is required")
+	}
+	if r.Amount < 0 {
+		return errors.New("amount must not be negative")
+	}
+	return nil
+}
+
+func toSurchargeResponse(surcharge *Surcharge) SurchargeResponse {
+	return SurchargeResponse{
+		ID:          surcharge.ID,
+		QuoteID:     surcharge.QuoteID,
+		Code:        surcharge.Code,
+		Description: surcharge.Description,
+		Amount:      surcharge.Amount,
+		CreatedAt:   surcharge.CreatedAt,
+		UpdatedAt:   surcharge.UpdatedAt,
+	}
+}

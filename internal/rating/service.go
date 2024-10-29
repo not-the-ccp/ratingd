@@ -98,3 +98,45 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	s.log.Info("quote accepted", "id", quote.ID)
 	return quote, nil
 }
+
+// GetSurcharge returns the surcharge with the given id.
+func (s *Service) GetSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
+	surcharge, err := s.store.FindSurcharge(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get surcharge %d: %w", id, err)
+	}
+	return surcharge, nil
+}
+
+func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeRequest) (*Surcharge, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("validate request: %w", err)
+	}
+
+	now := s.clock.Now()
+	surcharge := &Surcharge{
+		QuoteID:     req.QuoteID,
+		Code:        req.Code,
+		Description: req.Description,
+		Amount:      req.Amount,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+
+	// Nummer wird beim Insert vergeben
+	if err := s.store.InsertSurcharge(ctx, surcharge); err != nil {
+		return nil, fmt.Errorf("insert surcharge: %w", err)
+	}
+	if err := s.audit.Record(ctx, "surcharge.created", surcharge.ID); err != nil {
+		s.log.Warn("audit entry failed", "action", "surcharge.created", "err", err)
+	}
+
+	return surcharge, nil
+}
+
+func (s *Service) ListSurcharges(ctx context.Context, limit int, offset int) ([]*Surcharge, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 50
+	}
+	return s.store.ListSurcharges(ctx, limit, offset)
+}

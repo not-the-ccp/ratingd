@@ -88,3 +88,76 @@ func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
 	}
 	return nil
 }
+
+// FindSurcharge implements Store.
+func (s *SQLStore) FindSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, quote_id, code, description, amount, created_at, updated_at FROM surcharges WHERE id = $1`, id)
+	var surcharge Surcharge
+	if err := row.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Code, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query surcharge %d: %w", id, err)
+	}
+	return &surcharge, nil
+}
+
+func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([]*Surcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, quote_id, code, description, amount, created_at, updated_at FROM surcharges ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list surcharges: %w", err)
+	}
+	defer rows.Close()
+	var surcharges []*Surcharge
+	for rows.Next() {
+		var surcharge Surcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Code, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan surcharge: %w", err)
+		}
+		surcharges = append(surcharges, &surcharge)
+	}
+	return surcharges, rows.Err()
+}
+
+// ListSurchargesForQuote implements Store.
+func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([]*Surcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, quote_id, code, description, amount, created_at, updated_at FROM surcharges WHERE quote_id = $1 ORDER BY id`, quoteID)
+	if err != nil {
+		return nil, fmt.Errorf("list surcharges: %w", err)
+	}
+	defer rows.Close()
+
+	var surcharges []*Surcharge
+	for rows.Next() {
+		var surcharge Surcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Code, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan surcharge: %w", err)
+		}
+		surcharges = append(surcharges, &surcharge)
+	}
+	return surcharges, rows.Err()
+}
+
+func (s *SQLStore) InsertSurcharge(ctx context.Context, surcharge *Surcharge) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (quote_id, code, description, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.QuoteID, surcharge.Code, surcharge.Description, surcharge.Amount, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+		return fmt.Errorf("insert surcharge: %w", err)
+	}
+	return nil
+}
+
+func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET quote_id = $2, code = $3, description = $4, amount = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.QuoteID, surcharge.Code, surcharge.Description, surcharge.Amount, surcharge.UpdatedAt)
+	if err != nil {
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}

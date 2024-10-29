@@ -22,6 +22,9 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/quote/create", h.createQuote)
 	mux.HandleFunc("/api/v1/quotes", h.listQuotes)
 	mux.HandleFunc("/api/v1/quote/accept", h.acceptQuote)
+	mux.HandleFunc("/api/v1/surcharge", h.getSurcharge)
+	mux.HandleFunc("/api/v1/surcharge/create", h.createSurcharge)
+	mux.HandleFunc("/api/v1/surcharges", h.listSurcharges)
 }
 
 func writeError(w http.ResponseWriter, err error) {
@@ -95,4 +98,50 @@ func (h *Handler) acceptQuote(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toQuoteResponse(quote))
+}
+
+func (h *Handler) getSurcharge(w http.ResponseWriter, r *http.Request) {
+	id, err := httpx.Int64Param(r, "id")
+	if err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	surcharge, err := h.svc.GetSurcharge(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	httpx.JSON(w, http.StatusOK, toSurchargeResponse(surcharge))
+}
+
+func (h *Handler) createSurcharge(w http.ResponseWriter, r *http.Request) {
+	var req CreateSurchargeRequest
+	if err := httpx.Decode(r, &req); err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+
+	surcharge, err := h.svc.CreateSurcharge(r.Context(), &req)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	httpx.JSON(w, http.StatusCreated, toSurchargeResponse(surcharge))
+}
+
+func (h *Handler) listSurcharges(w http.ResponseWriter, r *http.Request) {
+	limit := httpx.IntParam(r, "limit", 50)
+	offset := httpx.IntParam(r, "offset", 0)
+
+	surcharges, err := h.svc.ListSurcharges(r.Context(), limit, offset)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	out := make([]SurchargeResponse, 0, len(surcharges))
+	for _, item := range surcharges {
+		out = append(out, toSurchargeResponse(item))
+	}
+	httpx.JSON(w, http.StatusOK, out)
 }
