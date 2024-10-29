@@ -31,7 +31,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) {
 	result, err := s.store.FindContract(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get contract: %w", err)
+		return nil, fmt.Errorf("fetch contract: %w", err)
 	}
 
 	return result, nil
