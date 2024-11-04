@@ -130,11 +130,6 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot read tariff id=%d: %w", id, err)
 	}
-	// kommt bei tariff vor, siehe OPS-177
-	if tariff.Code == "" {
-		s.log.Warn("tariff: empty code", "id", tariff.ID)
-	}
-
 	if tariff.Status != TariffStatusPublished {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
