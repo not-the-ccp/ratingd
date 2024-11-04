@@ -150,3 +150,43 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	}
 	return invoice, nil
 }
+
+func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
+	line, err := s.store.GetInvoiceLine(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get invoice line %d: %w", id, err)
+	}
+	return line, nil
+}
+
+func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineRequest) (*InvoiceLine, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("validate request: %w", err)
+	}
+
+	now := s.clock.Now()
+	line := &InvoiceLine{
+		InvoiceID:   req.InvoiceID,
+		ShipmentID:  req.ShipmentID,
+		Description: req.Description,
+		Quantity:    req.Quantity,
+		UnitPrice:   req.UnitPrice,
+		Amount:      req.Amount,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+	if err := s.store.InsertInvoiceLine(ctx, line); err != nil {
+		return nil, fmt.Errorf("insert invoice line: %w", err)
+	}
+
+	if err := s.audit.Record(ctx, "invoice_line.created", line.ID); err != nil {
+		s.log.Warn("audit entry failed", "action", "invoice_line.created", "err", err)
+	}
+
+	return line, nil
+}
+
+// ListInvoiceLines returns a page of invoice lines.
+func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
+	return s.store.ListInvoiceLines(ctx, limit, offset)
+}

@@ -63,3 +63,48 @@ func toInvoiceResponse(invoice *Invoice) InvoiceResponse {
 		UpdatedAt:  invoice.UpdatedAt,
 	}
 }
+
+type CreateInvoiceLineRequest struct {
+	InvoiceID   int64        `json:"invoice_id"`
+	ShipmentID  int64        `json:"shipment_id"`
+	Description string       `json:"description"`
+	Quantity    int          `json:"quantity"`
+	UnitPrice   money.Amount `json:"unit_price"`
+	Amount      money.Amount `json:"amount"`
+}
+
+type InvoiceLineResponse struct {
+	ID          int64        `json:"id"`
+	InvoiceID   int64        `json:"invoice_id"`
+	ShipmentID  int64        `json:"shipment_id"`
+	Description string       `json:"description"`
+	Quantity    int          `json:"quantity"`
+	UnitPrice   money.Amount `json:"unit_price"`
+	Amount      money.Amount `json:"amount"`
+	CreatedAt   time.Time    `json:"created_at"`
+	UpdatedAt   time.Time    `json:"updated_at"`
+}
+
+func (r *CreateInvoiceLineRequest) Validate() error {
+	if r.InvoiceID == 0 {
+		return errors.New("invoice id is required")
+	}
+	if r.ShipmentID == 0 {
+		return errors.New("shipment id is required")
+	}
+	return nil
+}
+
+func toInvoiceLineResponse(invoiceLine *InvoiceLine) InvoiceLineResponse {
+	return InvoiceLineResponse{
+		ID:          invoiceLine.ID,
+		InvoiceID:   invoiceLine.InvoiceID,
+		ShipmentID:  invoiceLine.ShipmentID,
+		Description: invoiceLine.Description,
+		Quantity:    invoiceLine.Quantity,
+		UnitPrice:   invoiceLine.UnitPrice,
+		Amount:      invoiceLine.Amount,
+		CreatedAt:   invoiceLine.CreatedAt,
+		UpdatedAt:   invoiceLine.UpdatedAt,
+	}
+}

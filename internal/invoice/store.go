@@ -11,4 +11,9 @@ type Store interface {
 	ListInvoicesByStatus(ctx context.Context, status InvoiceStatus) ([]*Invoice, error)
 	InsertInvoice(ctx context.Context, invoice *Invoice) error
 	UpdateInvoice(ctx context.Context, invoice *Invoice) error
+	GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error)
+	ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error)
+	ListInvoiceLinesForInvoice(ctx context.Context, invoiceID int64) ([]*InvoiceLine, error)
+	InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error
+	UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error
 }

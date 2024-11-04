@@ -87,3 +87,80 @@ func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	}
 	return &invoice, nil
 }
+
+// GetInvoiceLine implements Store.
+func (s *SQLStore) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, invoice_id, shipment_id, description, quantity, unit_price, amount, created_at, updated_at FROM invoice_lines WHERE id = $1`, id)
+	var line InvoiceLine
+	if err := row.Scan(&line.ID, &line.InvoiceID, &line.ShipmentID, &line.Description, &line.Quantity, &line.UnitPrice, &line.Amount, &line.CreatedAt, &line.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query invoice line %d: %w", id, err)
+	}
+	return &line, nil
+}
+
+func (s *SQLStore) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
+	// list invoice lines first so we fail early
+	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, shipment_id, description, quantity, unit_price, amount, created_at, updated_at FROM invoice_lines ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list invoice lines: %w", err)
+	}
+
+	defer rows.Close()
+
+	var lines []*InvoiceLine
+	for rows.Next() {
+		var invoiceLine InvoiceLine
+		if err := rows.Scan(&invoiceLine.ID, &invoiceLine.InvoiceID, &invoiceLine.ShipmentID, &invoiceLine.Description, &invoiceLine.Quantity, &invoiceLine.UnitPrice, &invoiceLine.Amount, &invoiceLine.CreatedAt, &invoiceLine.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan invoice line: %w", err)
+		}
+		lines = append(lines, &invoiceLine)
+	}
+	return lines, rows.Err()
+}
+
+func (s *SQLStore) ListInvoiceLinesForInvoice(ctx context.Context, invoiceID int64) ([]*InvoiceLine, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, shipment_id, description, quantity, unit_price, amount, created_at, updated_at FROM invoice_lines WHERE invoice_id = $1 ORDER BY id`, invoiceID)
+	if err != nil {
+		return nil, fmt.Errorf("list invoice lines: %w", err)
+	}
+
+	defer rows.Close()
+
+	var lines []*InvoiceLine
+	for rows.Next() {
+		var line InvoiceLine
+		if err := rows.Scan(&line.ID, &line.InvoiceID, &line.ShipmentID, &line.Description, &line.Quantity, &line.UnitPrice, &line.Amount, &line.CreatedAt, &line.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan invoice line: %w", err)
+		}
+		lines = append(lines, &line)
+	}
+	return lines, rows.Err()
+}
+
+func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoice_lines (invoice_id, shipment_id, description, quantity, unit_price, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, line.InvoiceID, line.ShipmentID, line.Description, line.Quantity, line.UnitPrice, line.Amount, line.CreatedAt, line.UpdatedAt).Scan(&line.ID); err != nil {
+		return fmt.Errorf("insert invoice line: %w", err)
+	}
+
+	return nil
+}
+
+func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE invoice_lines SET invoice_id = $2, shipment_id = $3, description = $4, quantity = $5, unit_price = $6, amount = $7, updated_at = $8 WHERE id = $1`, line.ID, line.InvoiceID, line.ShipmentID, line.Description, line.Quantity, line.UnitPrice, line.Amount, line.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("update invoice line: %w", err)
+	}
+
+	// we need this for the checks below: rows affected
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
