@@ -193,5 +193,10 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 
 // ListInvoiceLines returns a page of invoice lines.
 func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
-	return s.store.ListInvoiceLines(ctx, limit, offset)
+	invoiceLine, err := s.store.ListInvoiceLines(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list invoice lines: %w", err)
+	}
+
+	return invoiceLine, nil
 }

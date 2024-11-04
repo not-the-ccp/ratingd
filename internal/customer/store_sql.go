@@ -100,13 +100,12 @@ func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error
 	return &customer, nil
 }
 
-func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
-	// we need this for the checks below: list billing addresses
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, city, attention, zip, street, primary, country, created_at, updated_at FROM billing_addresses ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+// ListBillingAddressesForCustomer implements Store.
+func (s *SQLStore) ListBillingAddressesForCustomer(ctx context.Context, customerID int64) ([]*BillingAddress, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, city, attention, zip, street, primary, country, created_at, updated_at FROM billing_addresses WHERE customer_id = $1 ORDER BY id`, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("list billing addresses: %w", err)
 	}
-
 	defer rows.Close()
 
 	var addresses []*BillingAddress
@@ -140,12 +139,13 @@ func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerSta
 	return customers, rows.Err()
 }
 
-// ListBillingAddressesForCustomer implements Store.
-func (s *SQLStore) ListBillingAddressesForCustomer(ctx context.Context, customerID int64) ([]*BillingAddress, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, city, attention, zip, street, primary, country, created_at, updated_at FROM billing_addresses WHERE customer_id = $1 ORDER BY id`, customerID)
+func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
+	// we need this for the checks below: list billing addresses
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, city, attention, zip, street, primary, country, created_at, updated_at FROM billing_addresses ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("list billing addresses: %w", err)
 	}
+
 	defer rows.Close()
 
 	var addresses []*BillingAddress

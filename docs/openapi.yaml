@@ -183,6 +183,33 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/invoice-line:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoice-line/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/invoice-lines:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/invoice/create:
     post:
       responses:
@@ -301,6 +328,33 @@ paths:
         "404":
           description: Not found
   /api/v1/shipments:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/surcharge:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/surcharge/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/surcharges:
     post:
       responses:
         "200":
@@ -666,6 +720,23 @@ components:
           type: number
         updated_at:
           type: number
+    Surcharge:
+      type: object
+      properties:
+        id:
+          type: number
+        description:
+          type: string
+        quote_id:
+          type: number
+        code:
+          type: string
+        amount:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
     Invoice:
       type: object
       properties:
@@ -692,6 +763,27 @@ components:
         paid_at:
           type: number
         voided_at:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    InvoiceLine:
+      type: object
+      properties:
+        id:
+          type: number
+        invoice_id:
+          type: number
+        shipment_id:
+          type: number
+        description:
+          type: string
+        quantity:
+          type: number
+        unit_price:
+          type: number
+        amount:
           type: number
         created_at:
           type: number
