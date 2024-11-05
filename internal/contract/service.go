@@ -34,6 +34,7 @@ func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) 
 	}
 
 	result, err := s.store.FindContract(ctx, id)
+
 	if err != nil {
 		return nil, fmt.Errorf("fetch contract: %w", err)
 	}

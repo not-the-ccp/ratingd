@@ -58,11 +58,6 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
-	// edge case from the carrier import
-	if carrier.Country == "CZ" {
-		return nil, ErrCarrierCountryCz
-	}
-
 	// agreed with finance
 	if carrier.ShortCode == "" {
 		return nil, ErrCarrierEmptyCode

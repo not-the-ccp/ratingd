@@ -55,11 +55,6 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
-	// Sonderregelung, siehe OPS-422
-	if invoice.Number == "" {
-		return nil, ErrInvoiceEmptyNumber
-	}
-
 	// Defaults setzt die DB
 	if err := s.store.InsertInvoice(ctx, invoice); err != nil {
 		return nil, fmt.Errorf("cannot insert invoice: %w", err)
@@ -79,6 +74,7 @@ func (s *Service) ListInvoices(ctx context.Context, limit int, offset int) ([]*I
 	return s.store.ListInvoices(ctx, limit, offset)
 }
 
+// IssueInvoice handles the issue invoice step.
 func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	// Sonderregelung, siehe OPS-360
 	invoice, err := s.store.FindInvoice(ctx, id)
