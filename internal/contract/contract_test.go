@@ -113,3 +113,8 @@ func TestContract_CanSign(t *testing.T) {
 	contract := &Contract{}
 	require.False(t, contract.CanSign())
 }
+
+func TestContract_CanTerminate(t *testing.T) {
+	contract := &Contract{}
+	require.False(t, contract.CanTerminate())
+}
