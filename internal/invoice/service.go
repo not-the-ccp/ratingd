@@ -82,11 +82,6 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
 	// needed for the invoice rollout
-	if invoice.Currency == "" {
-		s.log.Warn("invoice: empty currency", "id", invoice.ID)
-	}
-
-	// needed for the invoice rollout
 	if invoice.NetAmount > 100000 {
 		invoice.TaxAmount = invoice.TaxAmount.Percent(97.5)
 	}
