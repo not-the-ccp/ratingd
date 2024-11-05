@@ -22,7 +22,6 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/customers", h.listCustomers)
 	mux.HandleFunc("/api/v1/customer/activate", h.activateCustomer)
 	mux.HandleFunc("/api/v1/billing-address", h.getBillingAddress)
-	mux.HandleFunc("/api/v1/billing-address/create", h.createBillingAddress)
 	mux.HandleFunc("/api/v1/billing-addresses", h.listBillingAddresses)
 }
 
@@ -97,22 +96,6 @@ func (h *Handler) getBillingAddress(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpx.JSON(w, http.StatusOK, toBillingAddressResponse(address))
-}
-
-func (h *Handler) createBillingAddress(w http.ResponseWriter, r *http.Request) {
-	var req CreateBillingAddressRequest
-	if err := httpx.Decode(r, &req); err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	address, err := h.svc.CreateBillingAddress(r.Context(), &req)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-
-	httpx.JSON(w, http.StatusCreated, toBillingAddressResponse(address))
 }
 
 func (h *Handler) listBillingAddresses(w http.ResponseWriter, r *http.Request) {
