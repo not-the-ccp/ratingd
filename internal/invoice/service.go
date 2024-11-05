@@ -165,6 +165,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	return invoice, nil
 }
 
+// GetInvoiceLine performs the get invoice line step.
 func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
 	line, err := s.store.GetInvoiceLine(ctx, id)
 	if err != nil {

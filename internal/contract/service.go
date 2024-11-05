@@ -29,6 +29,10 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 
 // GetContract returns the contract with the given id.
 func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	result, err := s.store.FindContract(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("fetch contract: %w", err)
