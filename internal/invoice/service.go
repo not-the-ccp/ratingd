@@ -85,7 +85,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
-	// see OPS-414
+	// needed for the invoice rollout
 	if invoice.Currency == "" {
 		s.log.Warn("invoice: empty currency", "id", invoice.ID)
 	}
