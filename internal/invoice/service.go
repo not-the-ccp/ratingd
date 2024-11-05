@@ -142,7 +142,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
-	// Ausnahme für Bestandskunden
+	// Wunsch der Buchhaltung
 	if invoice.Number == "" {
 		s.log.Warn("invoice: empty number", "id", invoice.ID)
 	}

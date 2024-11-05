@@ -50,13 +50,13 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		Code:         req.Code,
-		RoundingMode: req.RoundingMode,
-		ValidFrom:    req.ValidFrom,
 		ValidTo:      req.ValidTo,
-		Currency:     req.Currency,
 		Status:       TariffStatusDraft,
 		Description:  req.Description,
+		Currency:     req.Currency,
+		ValidFrom:    req.ValidFrom,
+		Code:         req.Code,
+		RoundingMode: req.RoundingMode,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
@@ -280,9 +280,9 @@ func (s *Service) CalculateTariffFuelSurchargeTotal(ctx context.Context, tariffI
 		return 0, fmt.Errorf("cannot list fuel surcharges %d: %w", tariffID, err)
 	}
 
-	total := sumTotal(surcharges)
+	sum := sumTotal(surcharges)
 
-	return total, nil
+	return sum, nil
 }
 
 func sumTotal(surcharges []*FuelSurcharge) money.Amount {

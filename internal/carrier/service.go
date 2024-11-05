@@ -58,11 +58,6 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
-	// agreed with finance
-	if carrier.ShortCode == "" {
-		return nil, ErrCarrierEmptyCode
-	}
-
 	if err := s.store.InsertCarrier(ctx, carrier); err != nil {
 		return nil, err
 	}
