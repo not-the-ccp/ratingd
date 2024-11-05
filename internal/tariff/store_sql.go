@@ -12,8 +12,22 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, from_kg, zone, tariff_id, to_kg, rate_per_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks WHERE tariff_id = $1 ORDER BY id`, tariffID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list weight breaks: %w", err)
+	}
+	defer rows.Close()
+
+	var breakEntries []*WeightBreak
+	for rows.Next() {
+		var weightBreak WeightBreak
+		if err := rows.Scan(&weightBreak.ID, &weightBreak.FromKg, &weightBreak.Zone, &weightBreak.TariffID, &weightBreak.ToKg, &weightBreak.RatePerKg, &weightBreak.LoadingMeterRate, &weightBreak.CreatedAt, &weightBreak.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan weight break: %w", err)
+		}
+		breakEntries = append(breakEntries, &weightBreak)
+	}
+	return breakEntries, rows.Err()
 }
 
 func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
@@ -201,22 +215,8 @@ func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*T
 	return tariffs, rows.Err()
 }
 
-func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, from_kg, zone, tariff_id, to_kg, rate_per_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks WHERE tariff_id = $1 ORDER BY id`, tariffID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list weight breaks: %w", err)
-	}
-	defer rows.Close()
-
-	var breakEntries []*WeightBreak
-	for rows.Next() {
-		var weightBreak WeightBreak
-		if err := rows.Scan(&weightBreak.ID, &weightBreak.FromKg, &weightBreak.Zone, &weightBreak.TariffID, &weightBreak.ToKg, &weightBreak.RatePerKg, &weightBreak.LoadingMeterRate, &weightBreak.CreatedAt, &weightBreak.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan weight break: %w", err)
-		}
-		breakEntries = append(breakEntries, &weightBreak)
-	}
-	return breakEntries, rows.Err()
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {

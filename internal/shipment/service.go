@@ -141,6 +141,10 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 }
 
 func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	event, err := s.store.FindTrackingEvent(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("get tracking event %d: %w", id, err)

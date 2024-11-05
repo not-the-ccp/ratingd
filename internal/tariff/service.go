@@ -151,6 +151,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	return tariff, nil
 }
 
+// GetWeightBreak handles the get weight break step.
 func (s *Service) GetWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)
