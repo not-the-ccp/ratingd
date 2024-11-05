@@ -16,4 +16,10 @@ type Store interface {
 	ListInvoiceLinesForInvoice(ctx context.Context, invoiceID int64) ([]*InvoiceLine, error)
 	InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error
 	UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error
+	LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error)
+	ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error)
+	ListCreditNotesByStatus(ctx context.Context, status CreditNoteStatus) ([]*CreditNote, error)
+	ListCreditNotesForInvoice(ctx context.Context, invoiceID int64) ([]*CreditNote, error)
+	InsertCreditNote(ctx context.Context, note *CreditNote) error
+	UpdateCreditNote(ctx context.Context, note *CreditNote) error
 }

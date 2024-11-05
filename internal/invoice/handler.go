@@ -27,6 +27,10 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/invoice-line", h.getInvoiceLine)
 	mux.HandleFunc("/api/v1/invoice-line/create", h.createInvoiceLine)
 	mux.HandleFunc("/api/v1/invoice-lines", h.listInvoiceLines)
+	mux.HandleFunc("/api/v1/credit-note", h.getCreditNote)
+	mux.HandleFunc("/api/v1/credit-note/create", h.createCreditNote)
+	mux.HandleFunc("/api/v1/credit-notes", h.listCreditNotes)
+	mux.HandleFunc("/api/v1/credit-note/apply", h.applyCreditNote)
 }
 
 func writeError(w http.ResponseWriter, err error) {
@@ -178,4 +182,66 @@ func (h *Handler) listInvoiceLines(w http.ResponseWriter, r *http.Request) {
 		out = append(out, toInvoiceLineResponse(item))
 	}
 	httpx.JSON(w, http.StatusOK, out)
+}
+
+func (h *Handler) getCreditNote(w http.ResponseWriter, r *http.Request) {
+	id, err := httpx.Int64Param(r, "id")
+	if err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	note, err := h.svc.GetCreditNote(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	httpx.JSON(w, http.StatusOK, toCreditNoteResponse(note))
+}
+
+// createCreditNote handles requests to /api/v1/credit-note/create.
+func (h *Handler) createCreditNote(w http.ResponseWriter, r *http.Request) {
+	var req CreateCreditNoteRequest
+	if err := httpx.Decode(r, &req); err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	note, err := h.svc.CreateCreditNote(r.Context(), &req)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	httpx.JSON(w, http.StatusCreated, toCreditNoteResponse(note))
+}
+
+// listCreditNotes handles requests to /api/v1/credit-notes.
+func (h *Handler) listCreditNotes(w http.ResponseWriter, r *http.Request) {
+	limit := httpx.IntParam(r, "limit", 50)
+	offset := httpx.IntParam(r, "offset", 0)
+
+	notes, err := h.svc.ListCreditNotes(r.Context(), limit, offset)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	out := make([]CreditNoteResponse, 0, len(notes))
+	for _, item := range notes {
+		out = append(out, toCreditNoteResponse(item))
+	}
+	httpx.JSON(w, http.StatusOK, out)
+}
+
+// applyCreditNote handles requests to /api/v1/credit-note/apply.
+func (h *Handler) applyCreditNote(w http.ResponseWriter, r *http.Request) {
+	id, err := httpx.Int64Param(r, "id")
+	if err != nil {
+		httpx.Error(w, http.StatusBadRequest, err)
+		return
+	}
+	note, err := h.svc.ApplyCreditNote(r.Context(), id)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+	httpx.JSON(w, http.StatusOK, toCreditNoteResponse(note))
 }

@@ -211,3 +211,73 @@ func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) (
 
 	return invoiceLine, nil
 }
+
+// GetCreditNote returns the credit note with the given id.
+func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+	creditNote, err := s.store.LoadCreditNote(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("could not get credit note %d: %w", id, err)
+	}
+	return creditNote, nil
+}
+
+// CreateCreditNote validates and stores a new credit note.
+func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteRequest) (*CreditNote, error) {
+	if err := req.Validate(); err != nil {
+		return nil, fmt.Errorf("could not validate request: %w", err)
+	}
+	now := s.clock.Now()
+	creditNote := &CreditNote{
+		InvoiceID: req.InvoiceID,
+		Number:    req.Number,
+		Reason:    req.Reason,
+		Amount:    req.Amount,
+		Status:    CreditNoteStatusOpen,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+	if err := s.store.InsertCreditNote(ctx, creditNote); err != nil {
+		return nil, fmt.Errorf("could not insert credit note: %w", err)
+	}
+
+	if err := s.audit.Record(ctx, "credit_note.created", creditNote.ID); err != nil {
+		s.log.Warn("audit entry failed", "action", "credit_note.created", "err", err)
+	}
+	return creditNote, nil
+}
+
+// ListCreditNotes returns a page of credit notes.
+func (s *Service) ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error) {
+	if limit <= 0 || limit > 200 {
+		limit = 20
+	}
+
+	return s.store.ListCreditNotes(ctx, limit, offset)
+}
+
+// ApplyCreditNote moves a credit note from open to applied.
+func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+	note, err := s.store.LoadCreditNote(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("could not load credit note %d: %w", id, err)
+	}
+
+	if note.Status != CreditNoteStatusOpen {
+		return nil, fmt.Errorf("%w: credit note %d is %s", ErrInvalidState, id, note.Status)
+	}
+
+	now := s.clock.Now()
+	// keep the timestamp in sync with the status
+	note.Status = CreditNoteStatusApplied
+	note.AppliedAt = &now
+	note.UpdatedAt = now
+
+	if err := s.store.UpdateCreditNote(ctx, note); err != nil {
+		return nil, fmt.Errorf("could not update credit note: %w", err)
+	}
+	if err := s.audit.Record(ctx, "credit_note.applied", note.ID); err != nil {
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
+	}
+	s.log.Info("credit note applied", "id", note.ID)
+	return note, nil
+}

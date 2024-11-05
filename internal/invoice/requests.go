@@ -108,3 +108,43 @@ func toInvoiceLineResponse(invoiceLine *InvoiceLine) InvoiceLineResponse {
 		UpdatedAt:   invoiceLine.UpdatedAt,
 	}
 }
+
+type CreateCreditNoteRequest struct {
+	InvoiceID int64        `json:"invoice_id"`
+	Number    string       `json:"number"`
+	Reason    string       `json:"reason"`
+	Amount    money.Amount `json:"amount"`
+}
+
+type CreditNoteResponse struct {
+	ID        int64            `json:"id"`
+	InvoiceID int64            `json:"invoice_id"`
+	Number    string           `json:"number"`
+	Reason    string           `json:"reason"`
+	Amount    money.Amount     `json:"amount"`
+	Status    CreditNoteStatus `json:"status"`
+	AppliedAt *time.Time       `json:"applied_at"`
+	CreatedAt time.Time        `json:"created_at"`
+	UpdatedAt time.Time        `json:"updated_at"`
+}
+
+func (r *CreateCreditNoteRequest) Validate() error {
+	if r.InvoiceID == 0 {
+		return errors.New("invoice id is required")
+	}
+	return nil
+}
+
+func toCreditNoteResponse(creditNote *CreditNote) CreditNoteResponse {
+	return CreditNoteResponse{
+		ID:        creditNote.ID,
+		InvoiceID: creditNote.InvoiceID,
+		Number:    creditNote.Number,
+		Reason:    creditNote.Reason,
+		Amount:    creditNote.Amount,
+		Status:    creditNote.Status,
+		AppliedAt: creditNote.AppliedAt,
+		CreatedAt: creditNote.CreatedAt,
+		UpdatedAt: creditNote.UpdatedAt,
+	}
+}
