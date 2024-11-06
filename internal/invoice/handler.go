@@ -19,7 +19,6 @@ func NewHandler(svc *Service) *Handler {
 // Routes registers the handler's endpoints on mux.
 func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/invoice", h.getInvoice)
-	mux.HandleFunc("/api/v1/invoice/create", h.createInvoice)
 	mux.HandleFunc("/api/v1/invoices", h.listInvoices)
 	mux.HandleFunc("/api/v1/invoice/issue", h.issueInvoice)
 	mux.HandleFunc("/api/v1/invoice/mark-paid", h.markPaidInvoice)
@@ -58,22 +57,6 @@ func (h *Handler) getInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toInvoiceResponse(invoice))
-}
-
-func (h *Handler) createInvoice(w http.ResponseWriter, r *http.Request) {
-	var req CreateInvoiceRequest
-	if err := httpx.Decode(r, &req); err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	invoice, err := h.svc.CreateInvoice(r.Context(), &req)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-
-	httpx.JSON(w, http.StatusCreated, toInvoiceResponse(invoice))
 }
 
 // listInvoices handles requests to /api/v1/invoices.
