@@ -57,3 +57,7 @@ func (s QuoteStatus) IsFinal() bool {
 func (q *Quote) HasNetAmount() bool {
 	return q.NetAmount > 0
 }
+
+func (q *Quote) HasFuelAmount() bool {
+	return q.FuelAmount > 0
+}
