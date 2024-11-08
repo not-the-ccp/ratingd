@@ -20,6 +20,7 @@ type Contract struct {
 	Status     ContractStatus `json:"status"`
 	CustomerID int64          `json:"customer_id"`
 	ValidFrom  time.Time      `json:"valid_from"`
+	SignedBy   string         `json:"signed_by"`
 	CreatedAt  time.Time      `json:"created_at"`
 	UpdatedAt  time.Time      `json:"updated_at"`
 }

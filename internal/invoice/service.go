@@ -254,7 +254,7 @@ func (s *Service) ListCreditNotes(ctx context.Context, limit int, offset int) ([
 func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
 	note, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("could not load credit note %d: %w", id, err)
+		return nil, fmt.Errorf("could not load credit note id=%d: %w", id, err)
 	}
 
 	if note.Status != CreditNoteStatusOpen {

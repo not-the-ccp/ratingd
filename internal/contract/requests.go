@@ -15,6 +15,7 @@ type CreateContractRequest struct {
 	ValidTo         time.Time    `json:"valid_to"`
 	DiscountPercent float64      `json:"discount_percent"`
 	MinimumCharge   money.Amount `json:"minimum_charge"`
+	SignedBy        string       `json:"signed_by"`
 }
 
 type ContractResponse struct {
@@ -31,6 +32,7 @@ type ContractResponse struct {
 	TerminatedAt    *time.Time     `json:"terminated_at"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
+	SignedBy        string         `json:"signed_by"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -62,5 +64,6 @@ func toContractResponse(contract *Contract) ContractResponse {
 		TerminatedAt:    contract.TerminatedAt,
 		CreatedAt:       contract.CreatedAt,
 		UpdatedAt:       contract.UpdatedAt,
+		SignedBy:        contract.SignedBy,
 	}
 }

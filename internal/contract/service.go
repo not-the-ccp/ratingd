@@ -56,6 +56,7 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 		DiscountPercent: req.DiscountPercent,
 		MinimumCharge:   req.MinimumCharge,
 		Status:          ContractStatusDraft,
+		SignedBy:        req.SignedBy,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
