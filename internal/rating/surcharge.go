@@ -9,10 +9,10 @@ import (
 // Surcharge represents a single surcharge.
 type Surcharge struct {
 	ID          int64        `json:"id"`
-	Description string       `json:"description"`
 	QuoteID     int64        `json:"quote_id"`
-	Code        string       `json:"code"`
 	Amount      money.Amount `json:"amount"`
+	Code        string       `json:"code"`
+	Description string       `json:"description"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }

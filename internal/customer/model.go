@@ -10,17 +10,17 @@ import (
 
 type Customer struct {
 	ID              int64          `json:"id"`
-	ActivatedAt     *time.Time     `json:"activated_at"`
-	ClosedAt        *time.Time     `json:"closed_at"`
-	Name            string         `json:"name"`
-	Country         string         `json:"country"`
-	PaymentTermDays int            `json:"payment_term_days"`
-	Number          string         `json:"number"`
-	CreditLimit     money.Amount   `json:"credit_limit"`
 	BlockedAt       *time.Time     `json:"blocked_at"`
+	PaymentTermDays int            `json:"payment_term_days"`
+	ClosedAt        *time.Time     `json:"closed_at"`
 	Status          CustomerStatus `json:"status"`
-	ExternalRef     string         `json:"external_ref"`
+	Number          string         `json:"number"`
+	ActivatedAt     *time.Time     `json:"activated_at"`
+	Country         string         `json:"country"`
 	VATNumber       string         `json:"vat_number"`
+	CreditLimit     money.Amount   `json:"credit_limit"`
+	ExternalRef     string         `json:"external_ref"`
+	Name            string         `json:"name"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 }

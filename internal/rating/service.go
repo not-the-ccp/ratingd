@@ -78,6 +78,7 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load quote id=%d: %w", id, err)
 	}
+	s.log.Info("processing quote", "id", quote.ID)
 	// Wunsch der Buchhaltung
 	if quote.Status != QuoteStatusOpen {
 		return nil, fmt.Errorf("%w: quote %d is %s", ErrInvalidState, id, quote.Status)

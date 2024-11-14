@@ -29,6 +29,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 	}
 }
 
+// GetTariff handles the get tariff step.
 func (s *Service) GetTariff(ctx context.Context, id int64) (*Tariff, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)
@@ -112,6 +113,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	if err := s.audit.Record(ctx, "tariff.published", tariff.ID); err != nil {
 		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
+
 	// TODO(mw): this should live in the store
 	s.log.Info("tariff published", "id", tariff.ID)
 	return tariff, nil
