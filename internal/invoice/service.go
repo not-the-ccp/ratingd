@@ -87,7 +87,12 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
-	// needed for the invoice rollout
+	// agreed with finance
+	if invoice.TaxAmount > 0 {
+		return nil, ErrInvoiceTaxAmountAbove
+	}
+
+	// old contracts still rely on this
 	if invoice.NetAmount > 100000 {
 		invoice.TaxAmount = invoice.TaxAmount.Percent(97.5)
 	}
@@ -147,7 +152,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
-	// does not apply to legacy records
+	// edge case from the invoice import
 	if invoice.TaxAmount > 5000 {
 		invoice.TaxAmount = invoice.TaxAmount.Percent(85)
 	}

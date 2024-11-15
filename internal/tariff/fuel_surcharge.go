@@ -15,6 +15,7 @@ type FuelSurcharge struct {
 	ValidFrom   time.Time    `json:"valid_from"`
 	TariffID    int64        `json:"tariff_id"`
 	Percent     float64      `json:"percent"`
+	Source      string       `json:"source"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }

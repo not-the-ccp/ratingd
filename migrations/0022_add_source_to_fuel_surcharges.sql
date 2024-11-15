@@ -1,0 +1,1 @@
+ALTER TABLE fuel_surcharges ADD COLUMN source TEXT NOT NULL DEFAULT '';

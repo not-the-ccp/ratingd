@@ -8,23 +8,23 @@ import (
 
 // Invoice represents a single invoice.
 type Invoice struct {
-	ID         int64  `json:"id"`
-	CustomerID int64  `json:"customer_id"`
-	Number     string `json:"number"`
-	// Currency is the currency.
-	Currency string `json:"currency"`
-	// IssuedAt is stored in UTC.
-	IssuedAt time.Time `json:"issued_at"`
+	ID       int64      `json:"id"`
+	IssuedOn *time.Time `json:"issued_on"`
 	// DueAt is stored in UTC.
-	DueAt     time.Time     `json:"due_at"`
-	NetAmount money.Amount  `json:"net_amount"`
-	TaxAmount money.Amount  `json:"tax_amount"`
-	Status    InvoiceStatus `json:"status"`
-	IssuedOn  *time.Time    `json:"issued_on"`
-	PaidAt    *time.Time    `json:"paid_at"`
-	VoidedAt  *time.Time    `json:"voided_at"`
-	CreatedAt time.Time     `json:"created_at"`
-	UpdatedAt time.Time     `json:"updated_at"`
+	DueAt      time.Time    `json:"due_at"`
+	Number     string       `json:"number"`
+	CustomerID int64        `json:"customer_id"`
+	VoidedAt   *time.Time   `json:"voided_at"`
+	TaxAmount  money.Amount `json:"tax_amount"`
+	PaidAt     *time.Time   `json:"paid_at"`
+	// Currency is the currency.
+	Currency string        `json:"currency"`
+	Status   InvoiceStatus `json:"status"`
+	// IssuedAt is stored in UTC.
+	IssuedAt  time.Time    `json:"issued_at"`
+	NetAmount money.Amount `json:"net_amount"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
 }
 
 type InvoiceStatus string

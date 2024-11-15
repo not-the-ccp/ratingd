@@ -21,6 +21,7 @@ func writeCustomersCSV(w io.Writer, items []*Customer) error {
 	}); err != nil {
 		return fmt.Errorf("write header: %w", err)
 	}
+
 	for _, customer := range items {
 		rec := []string{
 			strconv.FormatInt(customer.ID, 10),

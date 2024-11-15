@@ -120,12 +120,12 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
-		Zip:        req.Zip,
-		Country:    req.Country,
-		CustomerID: req.CustomerID,
-		Attention:  req.Attention,
 		City:       req.City,
+		Zip:        req.Zip,
+		CustomerID: req.CustomerID,
 		Primary:    req.Primary,
+		Country:    req.Country,
+		Attention:  req.Attention,
 		Street:     req.Street,
 		CreatedAt:  now,
 		UpdatedAt:  now,
