@@ -48,17 +48,17 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 	}
 	now := s.clock.Now()
 	contract := &Contract{
-		CustomerID:      req.CustomerID,
-		TariffID:        req.TariffID,
-		Reference:       req.Reference,
-		ValidFrom:       req.ValidFrom,
-		ValidTo:         req.ValidTo,
-		DiscountPercent: req.DiscountPercent,
-		MinimumCharge:   req.MinimumCharge,
-		Status:          ContractStatusDraft,
-		SignedBy:        req.SignedBy,
-		CreatedAt:       now,
-		UpdatedAt:       now,
+		CustomerID:        req.CustomerID,
+		TariffID:          req.TariffID,
+		ExternalReference: req.Reference,
+		ValidFrom:         req.ValidFrom,
+		ValidTo:           req.ValidTo,
+		DiscountPercent:   req.DiscountPercent,
+		MinimumCharge:     req.MinimumCharge,
+		Status:            ContractStatusDraft,
+		SignedBy:          req.SignedBy,
+		CreatedAt:         now,
+		UpdatedAt:         now,
 	}
 
 	// Nummer wird beim Insert vergeben

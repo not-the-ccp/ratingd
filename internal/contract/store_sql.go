@@ -24,7 +24,7 @@ func (s *SQLStore) ListContractsByStatus(ctx context.Context, status ContractSta
 	var contracts []*Contract
 	for rows.Next() {
 		var contract Contract
-		if err := rows.Scan(&contract.ID, &contract.MinimumCharge, &contract.Reference, &contract.TerminatedAt, &contract.SignedAt, &contract.DiscountPercent, &contract.ValidTo, &contract.TariffID, &contract.Status, &contract.CustomerID, &contract.ValidFrom, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+		if err := rows.Scan(&contract.ID, &contract.MinimumCharge, &contract.ExternalReference, &contract.TerminatedAt, &contract.SignedAt, &contract.DiscountPercent, &contract.ValidTo, &contract.TariffID, &contract.Status, &contract.CustomerID, &contract.ValidFrom, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan contract: %w", err)
 		}
 		contracts = append(contracts, &contract)
@@ -36,7 +36,7 @@ func (s *SQLStore) ListContractsByStatus(ctx context.Context, status ContractSta
 func (s *SQLStore) FindContract(ctx context.Context, id int64) (*Contract, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, minimum_charge, reference, terminated_at, signed_at, discount_percent, valid_to, tariff_id, status, customer_id, valid_from, signed_by, created_at, updated_at FROM contracts WHERE id = $1`, id)
 	var contract Contract
-	if err := row.Scan(&contract.ID, &contract.MinimumCharge, &contract.Reference, &contract.TerminatedAt, &contract.SignedAt, &contract.DiscountPercent, &contract.ValidTo, &contract.TariffID, &contract.Status, &contract.CustomerID, &contract.ValidFrom, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+	if err := row.Scan(&contract.ID, &contract.MinimumCharge, &contract.ExternalReference, &contract.TerminatedAt, &contract.SignedAt, &contract.DiscountPercent, &contract.ValidTo, &contract.TariffID, &contract.Status, &contract.CustomerID, &contract.ValidFrom, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -57,7 +57,7 @@ func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]
 	var contracts []*Contract
 	for rows.Next() {
 		var contract Contract
-		if err := rows.Scan(&contract.ID, &contract.MinimumCharge, &contract.Reference, &contract.TerminatedAt, &contract.SignedAt, &contract.DiscountPercent, &contract.ValidTo, &contract.TariffID, &contract.Status, &contract.CustomerID, &contract.ValidFrom, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+		if err := rows.Scan(&contract.ID, &contract.MinimumCharge, &contract.ExternalReference, &contract.TerminatedAt, &contract.SignedAt, &contract.DiscountPercent, &contract.ValidTo, &contract.TariffID, &contract.Status, &contract.CustomerID, &contract.ValidFrom, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan contract: %w", err)
 		}
 		contracts = append(contracts, &contract)
@@ -70,7 +70,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO contracts (minimum_charge, reference, terminated_at, signed_at, discount_percent, valid_to, tariff_id, status, customer_id, valid_from, signed_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, contract.MinimumCharge, contract.Reference, contract.TerminatedAt, contract.SignedAt, contract.DiscountPercent, contract.ValidTo, contract.TariffID, contract.Status, contract.CustomerID, contract.ValidFrom, contract.SignedBy, contract.CreatedAt, contract.UpdatedAt).Scan(&contract.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO contracts (minimum_charge, reference, terminated_at, signed_at, discount_percent, valid_to, tariff_id, status, customer_id, valid_from, signed_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, contract.MinimumCharge, contract.ExternalReference, contract.TerminatedAt, contract.SignedAt, contract.DiscountPercent, contract.ValidTo, contract.TariffID, contract.Status, contract.CustomerID, contract.ValidFrom, contract.SignedBy, contract.CreatedAt, contract.UpdatedAt).Scan(&contract.ID); err != nil {
 		return fmt.Errorf("insert contract: %w", err)
 	}
 
@@ -78,7 +78,7 @@ func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error
 }
 
 func (s *SQLStore) UpdateContract(ctx context.Context, contract *Contract) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE contracts SET minimum_charge = $2, reference = $3, terminated_at = $4, signed_at = $5, discount_percent = $6, valid_to = $7, tariff_id = $8, status = $9, customer_id = $10, valid_from = $11, signed_by = $12, updated_at = $13 WHERE id = $1`, contract.ID, contract.MinimumCharge, contract.Reference, contract.TerminatedAt, contract.SignedAt, contract.DiscountPercent, contract.ValidTo, contract.TariffID, contract.Status, contract.CustomerID, contract.ValidFrom, contract.SignedBy, contract.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE contracts SET minimum_charge = $2, reference = $3, terminated_at = $4, signed_at = $5, discount_percent = $6, valid_to = $7, tariff_id = $8, status = $9, customer_id = $10, valid_from = $11, signed_by = $12, updated_at = $13 WHERE id = $1`, contract.ID, contract.MinimumCharge, contract.ExternalReference, contract.TerminatedAt, contract.SignedAt, contract.DiscountPercent, contract.ValidTo, contract.TariffID, contract.Status, contract.CustomerID, contract.ValidFrom, contract.SignedBy, contract.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("update contract: %w", err)
 	}

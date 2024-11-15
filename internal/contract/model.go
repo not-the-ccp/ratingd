@@ -8,12 +8,12 @@ import (
 
 // Contract is a contract record.
 type Contract struct {
-	ID              int64        `json:"id"`
-	MinimumCharge   money.Amount `json:"minimum_charge"`
-	Reference       string       `json:"reference"`
-	TerminatedAt    *time.Time   `json:"terminated_at"`
-	SignedAt        *time.Time   `json:"signed_at"`
-	DiscountPercent float64      `json:"discount_percent"`
+	ID                int64        `json:"id"`
+	MinimumCharge     money.Amount `json:"minimum_charge"`
+	ExternalReference string       `json:"reference"`
+	TerminatedAt      *time.Time   `json:"terminated_at"`
+	SignedAt          *time.Time   `json:"signed_at"`
+	DiscountPercent   float64      `json:"discount_percent"`
 	// ValidTo is stored in UTC.
 	ValidTo    time.Time      `json:"valid_to"`
 	TariffID   int64          `json:"tariff_id"`

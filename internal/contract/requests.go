@@ -54,7 +54,7 @@ func toContractResponse(contract *Contract) ContractResponse {
 		ID:              contract.ID,
 		CustomerID:      contract.CustomerID,
 		TariffID:        contract.TariffID,
-		Reference:       contract.Reference,
+		Reference:       contract.ExternalReference,
 		ValidFrom:       contract.ValidFrom,
 		ValidTo:         contract.ValidTo,
 		DiscountPercent: contract.DiscountPercent,
