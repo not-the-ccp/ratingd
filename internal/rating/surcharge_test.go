@@ -112,3 +112,8 @@ func TestService_GetSurcharge_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestSurcharge_HasAmount(t *testing.T) {
+	surcharge := &Surcharge{}
+	require.False(t, surcharge.HasAmount())
+}
