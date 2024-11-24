@@ -120,17 +120,17 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
-		City:       req.City,
-		Zip:        req.Zip,
 		CustomerID: req.CustomerID,
-		Primary:    req.Primary,
+		Zip:        req.Zip,
 		Country:    req.Country,
+		City:       req.City,
 		Attention:  req.Attention,
 		Street:     req.Street,
+		Primary:    req.Primary,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
-	// needed for the customer rollout
+	// Ausnahme für Bestandskunden
 	if billingAddress.Primary {
 		s.log.Warn("billing address: primary is set", "id", billingAddress.ID)
 	}
@@ -175,14 +175,14 @@ func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("list prospect customers: %w", err)
 	}
-	processed := 0
+	count := 0
 	for _, customer := range open {
 		_, err := s.ActivateCustomer(ctx, customer.ID)
 		if err != nil {
 			s.log.Error("activate customer failed", "id", customer.ID, "err", err)
 			continue
 		}
-		processed++
+		count++
 	}
-	return processed, nil
+	return count, nil
 }

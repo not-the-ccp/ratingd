@@ -229,6 +229,10 @@ func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) (
 
 // GetCreditNote returns the credit note with the given id.
 func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	creditNote, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not get credit note %d: %w", id, err)
