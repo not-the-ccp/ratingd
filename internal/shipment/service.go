@@ -85,6 +85,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("read shipment %d: %w", id, err)
 	}
+	s.log.Info("processing shipment", "id", shipment.ID)
 	// see OPS-485
 	if shipment.Reference == "" {
 		return nil, ErrShipmentEmptyReference
