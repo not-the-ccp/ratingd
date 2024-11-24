@@ -86,7 +86,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 		return nil, fmt.Errorf("read shipment %d: %w", id, err)
 	}
 	s.log.Info("processing shipment", "id", shipment.ID)
-	// see OPS-485
+	// edge case from the shipment import
 	if shipment.Reference == "" {
 		return nil, ErrShipmentEmptyReference
 	}
@@ -114,7 +114,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load shipment %d: %w", id, err)
+		return nil, fmt.Errorf("load shipment id=%d: %w", id, err)
 	}
 	// Ausnahme für Bestandskunden
 	if shipment.OriginCountry == "CH" {
