@@ -7,6 +7,7 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
+	"git.tarven.internal/billing/ratingd/internal/platform/money"
 )
 
 // Service implements the rating use cases.
@@ -140,4 +141,17 @@ func (s *Service) ListSurcharges(ctx context.Context, limit int, offset int) ([]
 		limit = 50
 	}
 	return s.store.ListSurcharges(ctx, limit, offset)
+}
+
+func (s *Service) CalculateQuoteSurchargeTotal(ctx context.Context, quoteID int64) (money.Amount, error) {
+	surcharges, err := s.store.ListSurchargesForQuote(ctx, quoteID)
+	if err != nil {
+		return 0, fmt.Errorf("list surcharges %d: %w", quoteID, err)
+	}
+	var total money.Amount
+	for _, surcharge := range surcharges {
+		total = total.Add(surcharge.Amount)
+	}
+
+	return total, nil
 }
