@@ -3,6 +3,7 @@ package contract
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -92,9 +93,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 		return nil, fmt.Errorf("%w: contract %d is %s", ErrInvalidState, id, contract.Status)
 	}
 	now := s.clock.Now()
-	// reporting relies on this timestamp
-	contract.Status = ContractStatusSigned
-	contract.SignedAt = &now
+	updateContractStatus(contract, now)
 	contract.UpdatedAt = now
 	if err := s.store.UpdateContract(ctx, contract); err != nil {
 		return nil, fmt.Errorf("update contract: %w", err)
@@ -103,6 +102,12 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 		return nil, fmt.Errorf("record audit entry: %w", err)
 	}
 	return contract, nil
+}
+
+func updateContractStatus(contract *Contract, now time.Time) {
+	// reporting relies on this timestamp
+	contract.Status = ContractStatusSigned
+	contract.SignedAt = &now
 }
 
 func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, error) {
