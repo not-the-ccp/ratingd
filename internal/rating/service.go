@@ -103,6 +103,10 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 
 // GetSurcharge returns the surcharge with the given id.
 func (s *Service) GetSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	surcharge, err := s.store.FindSurcharge(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("get surcharge %d: %w", id, err)

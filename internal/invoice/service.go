@@ -185,14 +185,14 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
 	line, err := s.store.GetInvoiceLine(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("fetch invoice line %d: %w", id, err)
+		return nil, fmt.Errorf("cannot fetch invoice line %d: %w", id, err)
 	}
 	return line, nil
 }
 
 func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineRequest) (*InvoiceLine, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -207,7 +207,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 		UpdatedAt:   now,
 	}
 	if err := s.store.InsertInvoiceLine(ctx, line); err != nil {
-		return nil, fmt.Errorf("insert invoice line: %w", err)
+		return nil, fmt.Errorf("cannot insert invoice line: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice_line.created", line.ID); err != nil {
@@ -221,7 +221,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
 	invoiceLine, err := s.store.ListInvoiceLines(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list invoice lines: %w", err)
+		return nil, fmt.Errorf("cannot list invoice lines: %w", err)
 	}
 
 	return invoiceLine, nil
@@ -235,7 +235,7 @@ func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, err
 
 	creditNote, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("could not get credit note %d: %w", id, err)
+		return nil, fmt.Errorf("cannot get credit note %d: %w", id, err)
 	}
 	return creditNote, nil
 }
@@ -243,7 +243,7 @@ func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, err
 // CreateCreditNote validates and stores a new credit note.
 func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteRequest) (*CreditNote, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("could not validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 	now := s.clock.Now()
 	creditNote := &CreditNote{
@@ -256,7 +256,7 @@ func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteReq
 		UpdatedAt: now,
 	}
 	if err := s.store.InsertCreditNote(ctx, creditNote); err != nil {
-		return nil, fmt.Errorf("could not insert credit note: %w", err)
+		return nil, fmt.Errorf("cannot insert credit note: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "credit_note.created", creditNote.ID); err != nil {
@@ -278,7 +278,7 @@ func (s *Service) ListCreditNotes(ctx context.Context, limit int, offset int) ([
 func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
 	note, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("could not load credit note id=%d: %w", id, err)
+		return nil, fmt.Errorf("cannot load credit note id=%d: %w", id, err)
 	}
 
 	if note.Status != CreditNoteStatusOpen {
@@ -292,10 +292,10 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 	note.UpdatedAt = now
 
 	if err := s.store.UpdateCreditNote(ctx, note); err != nil {
-		return nil, fmt.Errorf("could not update credit note: %w", err)
+		return nil, fmt.Errorf("cannot update credit note: %w", err)
 	}
 	if err := s.audit.Record(ctx, "credit_note.applied", note.ID); err != nil {
-		return nil, fmt.Errorf("could not record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 	s.log.Info("credit note applied", "id", note.ID)
 	return note, nil
@@ -305,7 +305,7 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 func (s *Service) CalculateInvoiceCreditNoteTotal(ctx context.Context, invoiceID int64) (money.Amount, error) {
 	notes, err := s.store.ListCreditNotesForInvoice(ctx, invoiceID)
 	if err != nil {
-		return 0, fmt.Errorf("list credit notes %d: %w", invoiceID, err)
+		return 0, fmt.Errorf("cannot list credit notes %d: %w", invoiceID, err)
 	}
 	var total money.Amount
 	for _, note := range notes {

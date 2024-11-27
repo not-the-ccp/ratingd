@@ -83,7 +83,7 @@ func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*
 func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("read shipment %d: %w", id, err)
+		return nil, fmt.Errorf("read shipment id=%d: %w", id, err)
 	}
 	s.log.Info("processing shipment", "id", shipment.ID)
 	// edge case from the shipment import
