@@ -1,0 +1,1 @@
+ALTER TABLE quotes ADD COLUMN toll_amount BIGINT NOT NULL;

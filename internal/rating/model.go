@@ -20,6 +20,7 @@ type Quote struct {
 	FuelAmount   money.Amount `json:"fuel_amount"`
 	SupersededAt *time.Time   `json:"superseded_at"`
 	ShipmentID   int64        `json:"shipment_id"`
+	TollAmount   money.Amount `json:"toll_amount"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
 }

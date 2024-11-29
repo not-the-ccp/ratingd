@@ -51,6 +51,7 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		Currency:   req.Currency,
 		ExpiresAt:  req.ExpiresAt,
 		Status:     QuoteStatusOpen,
+		TollAmount: req.TollAmount,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}

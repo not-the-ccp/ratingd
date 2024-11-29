@@ -14,6 +14,7 @@ type CreateQuoteRequest struct {
 	FuelAmount money.Amount `json:"fuel_amount"`
 	Currency   string       `json:"currency"`
 	ExpiresAt  time.Time    `json:"expires_at"`
+	TollAmount money.Amount `json:"toll_amount"`
 }
 
 type QuoteResponse struct {
@@ -29,6 +30,7 @@ type QuoteResponse struct {
 	SupersededAt *time.Time   `json:"superseded_at"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
+	TollAmount   money.Amount `json:"toll_amount"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -65,6 +67,7 @@ func toQuoteResponse(quote *Quote) QuoteResponse {
 		SupersededAt: quote.SupersededAt,
 		CreatedAt:    quote.CreatedAt,
 		UpdatedAt:    quote.UpdatedAt,
+		TollAmount:   quote.TollAmount,
 	}
 }
 
