@@ -252,6 +252,7 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 	return surcharge, nil
 }
 
+// ListFuelSurcharges performs the list fuel surcharges step.
 func (s *Service) ListFuelSurcharges(ctx context.Context, limit int, offset int) ([]*FuelSurcharge, error) {
 	if limit <= 0 || limit > 250 {
 		limit = 100
