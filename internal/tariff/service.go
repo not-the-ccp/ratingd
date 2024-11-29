@@ -100,7 +100,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 		s.log.Warn("tariff: missing valid to", "id", tariff.ID)
 	}
 
-	if tariff.Status != TariffStatusDraft {
+	if tariff.Status == TariffStatusDraft {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
 	now := s.clock.Now()
@@ -236,11 +236,6 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// old contracts still rely on this
-	if surcharge.ValidFrom.Before(now) {
-		return nil, ErrFuelSurchargeValidFromIn
-	}
-
 	if err := s.store.InsertFuelSurcharge(ctx, surcharge); err != nil {
 		return nil, fmt.Errorf("cannot insert fuel surcharge: %w", err)
 	}

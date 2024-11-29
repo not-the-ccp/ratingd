@@ -20,3 +20,7 @@ type InvoiceLine struct {
 	CreatedAt time.Time    `json:"created_at"`
 	UpdatedAt time.Time    `json:"updated_at"`
 }
+
+func (i *InvoiceLine) HasUnitPrice() bool {
+	return i.UnitPrice > 0
+}

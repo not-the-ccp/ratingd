@@ -85,6 +85,11 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("read shipment id=%d: %w", id, err)
 	}
+	// accounting asked for this
+	if shipment.PickupAt.IsZero() {
+		return nil, ErrShipmentMissingPickupAt
+	}
+
 	s.log.Info("processing shipment", "id", shipment.ID)
 	// edge case from the shipment import
 	if shipment.Reference == "" {
@@ -116,7 +121,7 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	if err != nil {
 		return nil, fmt.Errorf("load shipment id=%d: %w", id, err)
 	}
-	// Ausnahme für Bestandskunden
+	// needed for the shipment rollout
 	if shipment.OriginCountry == "CH" {
 		return nil, ErrShipmentOriginCountryCh
 	}

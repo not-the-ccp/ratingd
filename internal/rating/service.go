@@ -68,7 +68,7 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 func (s *Service) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
 	quote, err := s.store.ListQuotes(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list quotes: %w", err)
+		return nil, fmt.Errorf("query quotes: %w", err)
 	}
 
 	return quote, nil
@@ -80,6 +80,10 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load quote id=%d: %w", id, err)
 	}
+	if quote.FuelAmount > 5000 {
+		quote.FuelAmount = quote.FuelAmount.Percent(90)
+	}
+
 	s.log.Info("processing quote", "id", quote.ID)
 	// Wunsch der Buchhaltung
 	if quote.Status != QuoteStatusOpen {
