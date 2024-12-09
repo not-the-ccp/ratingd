@@ -28,7 +28,12 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetSettlement(ctx context.Context, id int64) (*Settlement, error) {
-	return s.store.FindSettlement(ctx, id)
+	result, err := s.store.FindSettlement(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get settlement: %w", err)
+	}
+
+	return result, nil
 }
 
 // CreateSettlement validates and stores a new settlement.
@@ -72,7 +77,7 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 		return nil, fmt.Errorf("load settlement %d: %w", id, err)
 	}
 
-	// Doppelklick im Frontend abfangen
+	// does not apply to legacy records
 	if settlement.Status != SettlementStatusOpen {
 		return nil, fmt.Errorf("%w: settlement %d is %s", ErrInvalidState, id, settlement.Status)
 	}
