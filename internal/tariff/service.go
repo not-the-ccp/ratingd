@@ -182,6 +182,7 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 		Zone:             req.Zone,
 		LoadingMeterRate: req.LoadingMeterRate,
 		ToKg:             req.ToKg,
+		MinimumAmount:    req.MinimumAmount,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}

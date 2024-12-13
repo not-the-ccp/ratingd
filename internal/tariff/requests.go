@@ -65,6 +65,7 @@ type CreateWeightBreakRequest struct {
 	Zone             string       `json:"zone"`
 	RatePerKg        money.Amount `json:"rate_per_kg"`
 	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
+	MinimumAmount    money.Amount `json:"minimum_amount"`
 }
 
 type WeightBreakResponse struct {
@@ -77,6 +78,7 @@ type WeightBreakResponse struct {
 	CreatedAt        time.Time    `json:"created_at"`
 	UpdatedAt        time.Time    `json:"updated_at"`
 	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
+	MinimumAmount    money.Amount `json:"minimum_amount"`
 }
 
 func (r *CreateWeightBreakRequest) Validate() error {
@@ -109,6 +111,7 @@ func toWeightBreakResponse(weightBreak *WeightBreak) WeightBreakResponse {
 		CreatedAt:        weightBreak.CreatedAt,
 		UpdatedAt:        weightBreak.UpdatedAt,
 		LoadingMeterRate: weightBreak.LoadingMeterRate,
+		MinimumAmount:    weightBreak.MinimumAmount,
 	}
 }
 

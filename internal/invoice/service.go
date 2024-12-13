@@ -93,11 +93,6 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
-	// agreed with finance
-	if invoice.TaxAmount > 0 {
-		return nil, ErrInvoiceTaxAmountAbove
-	}
-
 	// old contracts still rely on this
 	if invoice.NetAmount > 100000 {
 		invoice.TaxAmount = invoice.TaxAmount.Percent(97.5)

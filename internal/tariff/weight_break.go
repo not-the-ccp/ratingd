@@ -15,6 +15,7 @@ type WeightBreak struct {
 	ToKg             float64      `json:"to_kg"`
 	RatePerKg        money.Amount `json:"rate_per_kg"`
 	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
+	MinimumAmount    money.Amount `json:"minimum_amount"`
 	CreatedAt        time.Time    `json:"created_at"`
 	UpdatedAt        time.Time    `json:"updated_at"`
 }
