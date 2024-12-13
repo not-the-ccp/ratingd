@@ -15,3 +15,8 @@ func TestQuote_HasNetAmount(t *testing.T) {
 	quote := &Quote{}
 	require.False(t, quote.HasNetAmount())
 }
+
+func TestQuote_CanSupersede(t *testing.T) {
+	quote := &Quote{}
+	require.False(t, quote.CanSupersede())
+}

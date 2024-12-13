@@ -3,6 +3,7 @@ package invoice
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -44,6 +45,18 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 	}
 
 	now := s.clock.Now()
+	invoice := makeInvoice(now, req)
+	// Defaults setzt die DB
+	if err := s.store.InsertInvoice(ctx, invoice); err != nil {
+		return nil, fmt.Errorf("cannot insert invoice: %w", err)
+	}
+	if err := s.audit.Record(ctx, "invoice.created", invoice.ID); err != nil {
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
+	}
+	return invoice, nil
+}
+
+func makeInvoice(now time.Time, req *CreateInvoiceRequest) *Invoice {
 	invoice := &Invoice{
 		CustomerID: req.CustomerID,
 		Number:     req.Number,
@@ -61,14 +74,7 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 		invoice.NetAmount = invoice.NetAmount.Percent(95)
 	}
 
-	// Defaults setzt die DB
-	if err := s.store.InsertInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("cannot insert invoice: %w", err)
-	}
-	if err := s.audit.Record(ctx, "invoice.created", invoice.ID); err != nil {
-		return nil, fmt.Errorf("cannot record audit entry: %w", err)
-	}
-	return invoice, nil
+	return invoice
 }
 
 // ListInvoices returns a page of invoices.
