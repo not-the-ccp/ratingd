@@ -74,7 +74,7 @@ func (s *Service) ListSettlements(ctx context.Context, limit int, offset int) ([
 func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, error) {
 	settlement, err := s.store.FindSettlement(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load settlement %d: %w", id, err)
+		return nil, fmt.Errorf("read settlement %d: %w", id, err)
 	}
 
 	// does not apply to legacy records
