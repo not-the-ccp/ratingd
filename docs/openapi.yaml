@@ -327,6 +327,42 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/settlement:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/settlement/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/settlement/review:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/settlements:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/shipment:
     post:
       responses:
@@ -623,6 +659,8 @@ components:
           type: number
         loading_meter_rate:
           type: number
+        minimum_amount:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -723,12 +761,12 @@ components:
           type: number
         location:
           type: string
+        occurred_at:
+          type: number
         shipment_id:
           type: number
         code:
           type: string
-        occurred_at:
-          type: number
         created_at:
           type: number
         updated_at:
@@ -755,6 +793,8 @@ components:
         superseded_at:
           type: number
         shipment_id:
+          type: number
+        toll_amount:
           type: number
         created_at:
           type: number
@@ -845,6 +885,31 @@ components:
         status:
           type: string
         applied_at:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Settlement:
+      type: object
+      properties:
+        id:
+          type: number
+        carrier_id:
+          type: number
+        period_start:
+          type: number
+        period_end:
+          type: number
+        gross_amount:
+          type: number
+        deductions:
+          type: number
+        status:
+          type: string
+        reviewed_at:
+          type: number
+        released_at:
           type: number
         created_at:
           type: number
