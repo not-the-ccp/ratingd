@@ -134,5 +134,10 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 }
 
 func (s *Service) ListSettlementItems(ctx context.Context, limit int, offset int) ([]*SettlementItem, error) {
-	return s.store.ListSettlementItems(ctx, limit, offset)
+	settlementItem, err := s.store.ListSettlementItems(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list settlement items: %w", err)
+	}
+
+	return settlementItem, nil
 }

@@ -100,7 +100,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 		s.log.Warn("tariff: missing valid to", "id", tariff.ID)
 	}
 
-	if tariff.Status == TariffStatusDraft {
+	if tariff.Status != TariffStatusDraft {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
 	now := s.clock.Now()
