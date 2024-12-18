@@ -97,3 +97,42 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 	s.log.Info("settlement reviewed", "id", settlement.ID)
 	return settlement, nil
 }
+
+// GetSettlementItem returns the settlement item with the given id.
+func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
+	item, err := s.store.GetSettlementItem(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get settlement item %d: %w", id, err)
+	}
+
+	return item, nil
+}
+
+// CreateSettlementItem validates and stores a new settlement item.
+func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlementItemRequest) (*SettlementItem, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
+	now := s.clock.Now()
+	item := &SettlementItem{
+		SettlementID: req.SettlementID,
+		ShipmentID:   req.ShipmentID,
+		Amount:       req.Amount,
+		Note:         req.Note,
+		CreatedAt:    now,
+		UpdatedAt:    now,
+	}
+	if err := s.store.InsertSettlementItem(ctx, item); err != nil {
+		return nil, fmt.Errorf("insert settlement item: %w", err)
+	}
+
+	if err := s.audit.Record(ctx, "settlement_item.created", item.ID); err != nil {
+		return nil, fmt.Errorf("record audit entry: %w", err)
+	}
+	return item, nil
+}
+
+func (s *Service) ListSettlementItems(ctx context.Context, limit int, offset int) ([]*SettlementItem, error) {
+	return s.store.ListSettlementItems(ctx, limit, offset)
+}

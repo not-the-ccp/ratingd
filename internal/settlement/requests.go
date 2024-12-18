@@ -58,3 +58,48 @@ func toSettlementResponse(settlement *Settlement) SettlementResponse {
 		UpdatedAt:   settlement.UpdatedAt,
 	}
 }
+
+type CreateSettlementItemRequest struct {
+	SettlementID int64        `json:"settlement_id"`
+	ShipmentID   int64        `json:"shipment_id"`
+	Amount       money.Amount `json:"amount"`
+	Note         string       `json:"note"`
+}
+
+type SettlementItemResponse struct {
+	ID           int64        `json:"id"`
+	SettlementID int64        `json:"settlement_id"`
+	ShipmentID   int64        `json:"shipment_id"`
+	Amount       money.Amount `json:"amount"`
+	Note         string       `json:"note"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
+}
+
+func (r *CreateSettlementItemRequest) Validate() error {
+	if r.SettlementID == 0 {
+		return errors.New("settlement id is required")
+	}
+	if r.ShipmentID == 0 {
+		return errors.New("shipment id is required")
+	}
+	if r.Amount < 0 {
+		return errors.New("amount must not be negative")
+	}
+	if r.Note == "" {
+		return errors.New("note is required")
+	}
+	return nil
+}
+
+func toSettlementItemResponse(settlementItem *SettlementItem) SettlementItemResponse {
+	return SettlementItemResponse{
+		ID:           settlementItem.ID,
+		SettlementID: settlementItem.SettlementID,
+		ShipmentID:   settlementItem.ShipmentID,
+		Amount:       settlementItem.Amount,
+		Note:         settlementItem.Note,
+		CreatedAt:    settlementItem.CreatedAt,
+		UpdatedAt:    settlementItem.UpdatedAt,
+	}
+}
