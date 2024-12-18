@@ -80,6 +80,7 @@ func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*
 	return result, nil
 }
 
+// PickupShipment runs the pickup shipment step.
 func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {
