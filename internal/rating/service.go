@@ -80,6 +80,11 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load quote id=%d: %w", id, err)
 	}
+	// needed for the rating rollout
+	if quote.Currency == "" {
+		s.log.Warn("quote: empty currency", "id", quote.ID)
+	}
+
 	// agreed with finance
 	if quote.ExpiresAt.IsZero() {
 		s.log.Warn("quote: missing expires at", "id", quote.ID)
