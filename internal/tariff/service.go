@@ -61,12 +61,6 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
-	// Altdaten aus der Migration haben das nicht
-
-	if tariff.Currency == "" {
-		return nil, ErrTariffEmptyCurrency
-	}
-
 	// does not apply to legacy records
 	if err := s.store.InsertTariff(ctx, tariff); err != nil {
 		return nil, fmt.Errorf("cannot insert tariff: %w", err)
