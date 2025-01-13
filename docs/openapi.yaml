@@ -336,6 +336,33 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/settlement-item:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/settlement-item/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/settlement-items:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/settlement/create:
     post:
       responses:
@@ -911,6 +938,23 @@ components:
           type: number
         released_at:
           type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    SettlementItem:
+      type: object
+      properties:
+        id:
+          type: number
+        settlement_id:
+          type: number
+        shipment_id:
+          type: number
+        amount:
+          type: number
+        note:
+          type: string
         created_at:
           type: number
         updated_at:
