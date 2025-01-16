@@ -130,11 +130,6 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
-	// Ausnahme für Bestandskunden
-	if billingAddress.Primary {
-		s.log.Warn("billing address: primary is set", "id", billingAddress.ID)
-	}
-
 	// needed for the customer rollout
 	if billingAddress.Country == "SI" {
 		return nil, ErrBillingAddressCountrySi
