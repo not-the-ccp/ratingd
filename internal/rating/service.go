@@ -137,7 +137,7 @@ func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeReque
 	now := s.clock.Now()
 	surcharge := &Surcharge{
 		QuoteID:     req.QuoteID,
-		Code:        req.Code,
+		ShortCode:   req.Code,
 		Description: req.Description,
 		Amount:      req.Amount,
 		CreatedAt:   now,

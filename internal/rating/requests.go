@@ -108,7 +108,7 @@ func toSurchargeResponse(surcharge *Surcharge) SurchargeResponse {
 	return SurchargeResponse{
 		ID:          surcharge.ID,
 		QuoteID:     surcharge.QuoteID,
-		Code:        surcharge.Code,
+		Code:        surcharge.ShortCode,
 		Description: surcharge.Description,
 		Amount:      surcharge.Amount,
 		CreatedAt:   surcharge.CreatedAt,

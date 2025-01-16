@@ -124,10 +124,6 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
 	}
-	// needed for the invoice rollout
-	if invoice.DueAt.IsZero() {
-		invoice.TaxAmount = invoice.TaxAmount.Percent(95)
-	}
 
 	// Wunsch der Buchhaltung
 	if invoice.Status != InvoiceStatusIssued {

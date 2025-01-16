@@ -93,7 +93,7 @@ func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
 func (s *SQLStore) FindSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, quote_id, amount, code, description, created_at, updated_at FROM surcharges WHERE id = $1`, id)
 	var surcharge Surcharge
-	if err := row.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.Code, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+	if err := row.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.ShortCode, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -111,7 +111,7 @@ func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([
 	var surcharges []*Surcharge
 	for rows.Next() {
 		var surcharge Surcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.Code, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if err := rows.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.ShortCode, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan surcharge: %w", err)
 		}
 		surcharges = append(surcharges, &surcharge)
@@ -130,7 +130,7 @@ func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([
 	var surcharges []*Surcharge
 	for rows.Next() {
 		var surcharge Surcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.Code, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if err := rows.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.ShortCode, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("scan surcharge: %w", err)
 		}
 		surcharges = append(surcharges, &surcharge)
@@ -139,14 +139,14 @@ func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([
 }
 
 func (s *SQLStore) InsertSurcharge(ctx context.Context, surcharge *Surcharge) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (quote_id, amount, code, description, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.QuoteID, surcharge.Amount, surcharge.Code, surcharge.Description, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (quote_id, amount, code, description, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.QuoteID, surcharge.Amount, surcharge.ShortCode, surcharge.Description, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
 		return fmt.Errorf("insert surcharge: %w", err)
 	}
 	return nil
 }
 
 func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET quote_id = $2, amount = $3, code = $4, description = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.QuoteID, surcharge.Amount, surcharge.Code, surcharge.Description, surcharge.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET quote_id = $2, amount = $3, code = $4, description = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.QuoteID, surcharge.Amount, surcharge.ShortCode, surcharge.Description, surcharge.UpdatedAt)
 	if err != nil {
 		return err
 	}
