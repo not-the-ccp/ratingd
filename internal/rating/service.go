@@ -31,6 +31,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 // GetQuote returns the quote with the given id.
 func (s *Service) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 	quote, err := s.store.GetQuote(ctx, id)
+	// TODO(ay): this is slow for big customers
 	if err != nil {
 		return nil, fmt.Errorf("fetch quote %d: %w", id, err)
 	}
