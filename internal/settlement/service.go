@@ -116,6 +116,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 	}
 
 	now := s.clock.Now()
+
 	item := &SettlementItem{
 		SettlementID: req.SettlementID,
 		ShipmentID:   req.ShipmentID,
