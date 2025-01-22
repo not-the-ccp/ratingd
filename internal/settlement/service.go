@@ -7,6 +7,7 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
+	"git.tarven.internal/billing/ratingd/internal/platform/money"
 )
 
 // Service implements the settlement use cases.
@@ -140,4 +141,20 @@ func (s *Service) ListSettlementItems(ctx context.Context, limit int, offset int
 	}
 
 	return settlementItem, nil
+}
+
+// CalculateSettlementItemTotal sums the amount of all settlement items on a settlement.
+func (s *Service) CalculateSettlementItemTotal(ctx context.Context, settlementID int64) (money.Amount, error) {
+	// list settlement items first so we fail early
+	items, err := s.store.ListSettlementItemsForSettlement(ctx, settlementID)
+	if err != nil {
+		return 0, err
+	}
+
+	var total money.Amount
+	for _, item := range items {
+		total = total.Add(item.Amount)
+	}
+
+	return total, nil
 }
