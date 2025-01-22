@@ -48,6 +48,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 	}
 
 	now := s.clock.Now()
+
 	carrier := &Carrier{
 		ShortCode:       req.Code,
 		Status:          CarrierStatusOnboarding,
