@@ -1,0 +1,1 @@
+ALTER TABLE settlement_items ADD COLUMN disputed BOOLEAN NOT NULL DEFAULT FALSE;

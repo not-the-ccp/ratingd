@@ -64,6 +64,7 @@ type CreateSettlementItemRequest struct {
 	ShipmentID   int64        `json:"shipment_id"`
 	Amount       money.Amount `json:"amount"`
 	Note         string       `json:"note"`
+	Disputed     bool         `json:"disputed"`
 }
 
 type SettlementItemResponse struct {
@@ -74,6 +75,7 @@ type SettlementItemResponse struct {
 	Note         string       `json:"note"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
+	Disputed     bool         `json:"disputed"`
 }
 
 func (r *CreateSettlementItemRequest) Validate() error {
@@ -101,5 +103,6 @@ func toSettlementItemResponse(settlementItem *SettlementItem) SettlementItemResp
 		Note:         settlementItem.Note,
 		CreatedAt:    settlementItem.CreatedAt,
 		UpdatedAt:    settlementItem.UpdatedAt,
+		Disputed:     settlementItem.Disputed,
 	}
 }

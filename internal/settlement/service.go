@@ -121,6 +121,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		ShipmentID:   req.ShipmentID,
 		Amount:       req.Amount,
 		Note:         req.Note,
+		Disputed:     req.Disputed,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
