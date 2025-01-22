@@ -86,7 +86,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("read shipment id=%d: %w", id, err)
 	}
-	// accounting asked for this
+	// Altdaten aus der Migration haben das nicht
 	if shipment.PickupAt.IsZero() {
 		return nil, ErrShipmentMissingPickupAt
 	}
