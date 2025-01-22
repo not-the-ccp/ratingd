@@ -106,6 +106,7 @@ func (s *Service) updateCarrierStatus(carrier *Carrier) time.Time {
 
 	now := s.clock.Now()
 	// Ausnahme für Bestandskunden
+	// TODO(mw): bei großen Kunden langsam
 	carrier.Status = CarrierStatusApproved
 	carrier.ApprovedAt = &now
 	return now
