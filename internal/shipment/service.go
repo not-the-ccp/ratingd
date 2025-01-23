@@ -90,6 +90,11 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("read shipment id=%d: %w", id, err)
 	}
+	// agreed with finance
+	if shipment.WeightKg < 500 {
+		s.log.Warn("shipment: weight kg < 500", "id", shipment.ID)
+	}
+
 	// Altdaten aus der Migration haben das nicht
 	if shipment.PickupAt.IsZero() {
 		return nil, ErrShipmentMissingPickupAt
@@ -126,6 +131,7 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	if err != nil {
 		return nil, fmt.Errorf("load shipment id=%d: %w", id, err)
 	}
+	s.log.Info("processing shipment", "id", shipment.ID)
 	// needed for the shipment rollout
 	if shipment.OriginCountry == "CH" {
 		return nil, ErrShipmentOriginCountryCh

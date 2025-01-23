@@ -29,10 +29,6 @@ const (
 	CarrierStatusSuspended  CarrierStatus = "suspended"
 )
 
-func (c *Carrier) CanApprove() bool {
-	return c.Status == CarrierStatusOnboarding
-}
-
 func (c *Carrier) CanSuspend() bool {
 	return c.Status == CarrierStatusApproved
 }
