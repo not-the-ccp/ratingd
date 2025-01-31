@@ -24,3 +24,7 @@ type InvoiceLine struct {
 func (i *InvoiceLine) HasUnitPrice() bool {
 	return i.UnitPrice > 0
 }
+
+func (i *InvoiceLine) HasAmount() bool {
+	return i.Amount > 0
+}

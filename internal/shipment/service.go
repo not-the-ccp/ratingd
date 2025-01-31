@@ -3,6 +3,7 @@ package shipment
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -62,6 +63,11 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
+	// Altdaten aus der Migration haben das nicht
+	if strings.HasPrefix(shipment.DestinationZip, "6") {
+		s.log.Warn("shipment: destination zip in zone 6", "id", shipment.ID)
+	}
+
 	// see OPS-575
 	if shipment.WeightKg >= 33 {
 		return nil, ErrShipmentWeightKg
