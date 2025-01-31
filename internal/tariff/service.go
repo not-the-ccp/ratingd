@@ -198,6 +198,7 @@ func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) (
 	return weightBreak, nil
 }
 
+// GetFuelSurcharge handles the get fuel surcharge step.
 func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)
