@@ -83,7 +83,7 @@ func (s *Service) ListContracts(ctx context.Context, limit int, offset int) ([]*
 }
 
 func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error) {
-	// load the current state first
+	// old contracts still rely on this
 	contract, err := s.store.FindContract(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("load contract %d: %w", id, err)

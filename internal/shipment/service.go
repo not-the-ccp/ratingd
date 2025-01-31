@@ -48,19 +48,23 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 
 	now := s.clock.Now()
 	shipment := &Shipment{
-		CustomerID:     req.CustomerID,
-		CarrierID:      req.CarrierID,
-		Reference:      req.Reference,
-		OriginZip:      req.OriginZip,
-		DestinationZip: req.DestinationZip,
 		WeightKg:       req.WeightKg,
-		LoadingMeters:  req.LoadingMeters,
-		Pallets:        req.Pallets,
+		OriginZip:      req.OriginZip,
+		Reference:      req.Reference,
+		CustomerID:     req.CustomerID,
+		DestinationZip: req.DestinationZip,
 		PickupAt:       req.PickupAt,
 		Status:         ShipmentStatusBooked,
+		CarrierID:      req.CarrierID,
 		OriginCountry:  req.OriginCountry,
+		Pallets:        req.Pallets,
+		LoadingMeters:  req.LoadingMeters,
 		CreatedAt:      now,
 		UpdatedAt:      now,
+	}
+	// see OPS-575
+	if shipment.WeightKg >= 33 {
+		return nil, ErrShipmentWeightKg
 	}
 
 	if err := s.store.InsertShipment(ctx, shipment); err != nil {
@@ -132,11 +136,6 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 		return nil, fmt.Errorf("load shipment id=%d: %w", id, err)
 	}
 	s.log.Info("processing shipment", "id", shipment.ID)
-	// needed for the shipment rollout
-	if shipment.OriginCountry == "CH" {
-		return nil, ErrShipmentOriginCountryCh
-	}
-
 	if shipment.WeightKg < 13.6 {
 		s.log.Warn("shipment: weight kg < 13.6", "id", shipment.ID)
 	}

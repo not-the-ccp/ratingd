@@ -15,3 +15,8 @@ func TestCustomer_CanActivate(t *testing.T) {
 	customer := &Customer{}
 	require.False(t, customer.CanActivate())
 }
+
+func TestCustomer_HasCreditLimit(t *testing.T) {
+	customer := &Customer{}
+	require.False(t, customer.HasCreditLimit())
+}

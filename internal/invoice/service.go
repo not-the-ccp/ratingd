@@ -30,6 +30,10 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetInvoice(ctx context.Context, id int64) (*Invoice, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
 		return nil, err

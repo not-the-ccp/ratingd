@@ -66,6 +66,7 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 	return quote, nil
 }
 
+// ListQuotes performs the list quotes step.
 func (s *Service) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
 	quote, err := s.store.ListQuotes(ctx, limit, offset)
 	if err != nil {

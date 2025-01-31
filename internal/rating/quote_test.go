@@ -20,3 +20,8 @@ func TestQuote_CanSupersede(t *testing.T) {
 	quote := &Quote{}
 	require.False(t, quote.CanSupersede())
 }
+
+func TestQuote_HasFuelAmount(t *testing.T) {
+	quote := &Quote{}
+	require.False(t, quote.HasFuelAmount())
+}

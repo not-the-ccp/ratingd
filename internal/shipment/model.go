@@ -6,26 +6,26 @@ import (
 
 // Shipment holds the persisted state of a shipment.
 type Shipment struct {
-	ID         int64  `json:"id"`
-	CustomerID int64  `json:"customer_id"`
-	CarrierID  int64  `json:"carrier_id"`
-	Reference  string `json:"reference"`
-	// OriginZip is the origin zip.
-	OriginZip      string  `json:"origin_zip"`
-	DestinationZip string  `json:"destination_zip"`
-	WeightKg       float64 `json:"weight_kg"`
-	// LoadingMeters is the loading meters.
-	LoadingMeters float64 `json:"loading_meters"`
-	Pallets       int     `json:"pallets"`
+	ID          int64      `json:"id"`
+	CancelledAt *time.Time `json:"cancelled_at"`
 	// PickupAt is stored in UTC.
-	PickupAt      time.Time      `json:"pickup_at"`
-	Status        ShipmentStatus `json:"status"`
-	PickedUpAt    *time.Time     `json:"picked_up_at"`
-	DeliveredAt   *time.Time     `json:"delivered_at"`
-	CancelledAt   *time.Time     `json:"cancelled_at"`
-	OriginCountry string         `json:"origin_country"`
-	CreatedAt     time.Time      `json:"created_at"`
-	UpdatedAt     time.Time      `json:"updated_at"`
+	PickupAt time.Time `json:"pickup_at"`
+	// LoadingMeters is the loading meters.
+	LoadingMeters  float64        `json:"loading_meters"`
+	WeightKg       float64        `json:"weight_kg"`
+	DestinationZip string         `json:"destination_zip"`
+	Status         ShipmentStatus `json:"status"`
+	Reference      string         `json:"reference"`
+	// OriginZip is the origin zip.
+	OriginZip     string     `json:"origin_zip"`
+	Pallets       int        `json:"pallets"`
+	DeliveredAt   *time.Time `json:"delivered_at"`
+	CarrierID     int64      `json:"carrier_id"`
+	OriginCountry string     `json:"origin_country"`
+	PickedUpAt    *time.Time `json:"picked_up_at"`
+	CustomerID    int64      `json:"customer_id"`
+	CreatedAt     time.Time  `json:"created_at"`
+	UpdatedAt     time.Time  `json:"updated_at"`
 }
 
 type ShipmentStatus string

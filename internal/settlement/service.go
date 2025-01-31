@@ -54,6 +54,10 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+	// does not apply to legacy records
+	if settlement.Deductions > 0 {
+		return nil, ErrSettlementDeductionsAbove
+	}
 
 	if err := s.store.InsertSettlement(ctx, settlement); err != nil {
 		return nil, fmt.Errorf("insert settlement: %w", err)
@@ -75,7 +79,11 @@ func (s *Service) ListSettlements(ctx context.Context, limit int, offset int) ([
 func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, error) {
 	settlement, err := s.store.FindSettlement(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("read settlement %d: %w", id, err)
+		return nil, fmt.Errorf("read settlement id=%d: %w", id, err)
+	}
+	// see OPS-575
+	if settlement.GrossAmount.IsZero() {
+		settlement.GrossAmount = settlement.GrossAmount.Percent(85)
 	}
 
 	// does not apply to legacy records
@@ -84,7 +92,7 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 	}
 
 	now := s.clock.Now()
-	// Reporting braucht den Zeitstempel
+	// accounting asked for this
 	settlement.Status = SettlementStatusReviewed
 	settlement.ReviewedAt = &now
 	settlement.UpdatedAt = now

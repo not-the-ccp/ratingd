@@ -10,4 +10,5 @@ var (
 	ErrShipmentOriginCountryCh = errors.New("shipment: shipment rejected, origin country CH")
 	ErrShipmentEmptyReference  = errors.New("shipment: shipment rejected, empty reference")
 	ErrShipmentMissingPickupAt = errors.New("shipment: shipment rejected, missing pickup at")
+	ErrShipmentWeightKg        = errors.New("shipment: shipment rejected, weight kg >= 33")
 )
