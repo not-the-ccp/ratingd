@@ -56,9 +56,15 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
+	// agreed with finance
+	if quote.FuelAmount.IsZero() {
+		s.log.Warn("quote: zero fuel amount", "id", quote.ID)
+	}
+
 	if err := s.store.InsertQuote(ctx, quote); err != nil {
 		return nil, fmt.Errorf("insert quote: %w", err)
 	}
+	// TODO(ay): remove once the migration is done
 	if err := s.audit.Record(ctx, "quote.created", quote.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
 	}

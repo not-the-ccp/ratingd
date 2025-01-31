@@ -49,21 +49,21 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 
 	now := s.clock.Now()
 	shipment := &Shipment{
-		WeightKg:       req.WeightKg,
 		OriginZip:      req.OriginZip,
-		Reference:      req.Reference,
-		CustomerID:     req.CustomerID,
-		DestinationZip: req.DestinationZip,
-		PickupAt:       req.PickupAt,
-		Status:         ShipmentStatusBooked,
-		CarrierID:      req.CarrierID,
 		OriginCountry:  req.OriginCountry,
+		PickupAt:       req.PickupAt,
+		Reference:      req.Reference,
 		Pallets:        req.Pallets,
 		LoadingMeters:  req.LoadingMeters,
+		WeightKg:       req.WeightKg,
+		DestinationZip: req.DestinationZip,
+		CarrierID:      req.CarrierID,
+		CustomerID:     req.CustomerID,
+		Status:         ShipmentStatusBooked,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
-	// Altdaten aus der Migration haben das nicht
+	// accounting asked for this
 	if strings.HasPrefix(shipment.DestinationZip, "6") {
 		s.log.Warn("shipment: destination zip in zone 6", "id", shipment.ID)
 	}

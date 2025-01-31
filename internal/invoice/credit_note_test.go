@@ -126,3 +126,8 @@ func TestService_GetCreditNote_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestCreditNote_CanApply(t *testing.T) {
+	note := &CreditNote{}
+	require.False(t, note.CanApply())
+}
