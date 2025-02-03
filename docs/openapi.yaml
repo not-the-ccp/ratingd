@@ -599,19 +599,19 @@ components:
       properties:
         id:
           type: number
-        customer_id:
-          type: number
-        city:
-          type: string
-        attention:
-          type: string
-        zip:
-          type: string
-        street:
-          type: string
         primary:
           type: number
         country:
+          type: string
+        customer_id:
+          type: number
+        street:
+          type: string
+        zip:
+          type: string
+        attention:
+          type: string
+        city:
           type: string
         created_at:
           type: number
@@ -674,20 +674,20 @@ components:
       properties:
         id:
           type: number
-        from_kg:
-          type: number
-        zone:
-          type: string
         tariff_id:
           type: number
         to_kg:
           type: number
-        rate_per_kg:
+        minimum_amount:
           type: number
         loading_meter_rate:
           type: number
-        minimum_amount:
+        from_kg:
           type: number
+        rate_per_kg:
+          type: number
+        zone:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -718,28 +718,28 @@ components:
       properties:
         id:
           type: number
-        minimum_charge:
-          type: number
-        reference:
-          type: string
-        terminated_at:
-          type: number
         signed_at:
           type: number
-        discount_percent:
-          type: number
-        valid_to:
-          type: number
-        tariff_id:
+        customer_id:
           type: number
         status:
           type: string
-        customer_id:
-          type: number
-        valid_from:
+        valid_to:
           type: number
         signed_by:
           type: string
+        terminated_at:
+          type: number
+        valid_from:
+          type: number
+        reference:
+          type: string
+        discount_percent:
+          type: number
+        minimum_charge:
+          type: number
+        tariff_id:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -749,34 +749,34 @@ components:
       properties:
         id:
           type: number
-        customer_id:
+        cancelled_at:
           type: number
-        carrier_id:
+        pickup_at:
           type: number
+        loading_meters:
+          type: number
+        weight_kg:
+          type: number
+        destination_zip:
+          type: string
+        status:
+          type: string
         reference:
           type: string
         origin_zip:
           type: string
-        destination_zip:
-          type: string
-        weight_kg:
-          type: number
-        loading_meters:
-          type: number
         pallets:
-          type: number
-        pickup_at:
-          type: number
-        status:
-          type: string
-        picked_up_at:
           type: number
         delivered_at:
           type: number
-        cancelled_at:
+        carrier_id:
           type: number
         origin_country:
           type: string
+        picked_up_at:
+          type: number
+        customer_id:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -805,23 +805,23 @@ components:
           type: number
         currency:
           type: string
-        net_amount:
-          type: number
-        expires_at:
+        fuel_amount:
           type: number
         status:
           type: string
-        accepted_at:
-          type: number
-        contract_id:
-          type: number
-        fuel_amount:
-          type: number
-        superseded_at:
+        expires_at:
           type: number
         shipment_id:
           type: number
         toll_amount:
+          type: number
+        superseded_at:
+          type: number
+        contract_id:
+          type: number
+        accepted_at:
+          type: number
+        net_amount:
           type: number
         created_at:
           type: number
@@ -949,12 +949,14 @@ components:
           type: number
         settlement_id:
           type: number
-        shipment_id:
-          type: number
         amount:
+          type: number
+        disputed:
           type: number
         note:
           type: string
+        shipment_id:
+          type: number
         created_at:
           type: number
         updated_at:
