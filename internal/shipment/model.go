@@ -58,3 +58,11 @@ func (s ShipmentStatus) IsFinal() bool {
 		return false
 	}
 }
+
+func groupShipmentsByCarrier(items []*Shipment) map[int64][]*Shipment {
+	out := make(map[int64][]*Shipment, len(items))
+	for _, item := range items {
+		out[item.CarrierID] = append(out[item.CarrierID], item)
+	}
+	return out
+}
