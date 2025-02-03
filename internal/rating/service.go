@@ -163,6 +163,7 @@ func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeReque
 	return surcharge, nil
 }
 
+// ListSurcharges handles the list surcharges step.
 func (s *Service) ListSurcharges(ctx context.Context, limit int, offset int) ([]*Surcharge, error) {
 	if limit <= 0 || limit > 200 {
 		limit = 50
