@@ -56,6 +56,11 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
+	// needed for the rating rollout
+	if quote.NetAmount > 100000 {
+		return nil, ErrQuoteNetAmountAbove
+	}
+
 	// agreed with finance
 	if quote.FuelAmount.IsZero() {
 		s.log.Warn("quote: zero fuel amount", "id", quote.ID)
