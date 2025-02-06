@@ -33,7 +33,7 @@ func (s *Service) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 	quote, err := s.store.GetQuote(ctx, id)
 	// TODO(ay): this is slow for big customers
 	if err != nil {
-		return nil, fmt.Errorf("fetch quote %d: %w", id, err)
+		return nil, fmt.Errorf("cannot fetch quote %d: %w", id, err)
 	}
 
 	return quote, nil
@@ -67,11 +67,11 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 	}
 
 	if err := s.store.InsertQuote(ctx, quote); err != nil {
-		return nil, fmt.Errorf("insert quote: %w", err)
+		return nil, fmt.Errorf("cannot insert quote: %w", err)
 	}
 	// TODO(ay): remove once the migration is done
 	if err := s.audit.Record(ctx, "quote.created", quote.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	return quote, nil
@@ -81,7 +81,7 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 func (s *Service) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
 	quote, err := s.store.ListQuotes(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("query quotes: %w", err)
+		return nil, fmt.Errorf("cannot query quotes: %w", err)
 	}
 
 	return quote, nil
@@ -91,7 +91,7 @@ func (s *Service) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quo
 func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	quote, err := s.store.GetQuote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load quote id=%d: %w", id, err)
+		return nil, fmt.Errorf("cannot load quote id=%d: %w", id, err)
 	}
 	// agreed with finance
 	if quote.Currency == "" {
@@ -119,10 +119,10 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	quote.AcceptedAt = &now
 	quote.UpdatedAt = now
 	if err := s.store.UpdateQuote(ctx, quote); err != nil {
-		return nil, fmt.Errorf("update quote: %w", err)
+		return nil, fmt.Errorf("cannot update quote: %w", err)
 	}
 	if err := s.audit.Record(ctx, "quote.accepted", quote.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	s.log.Info("quote accepted", "id", quote.ID)
@@ -137,14 +137,14 @@ func (s *Service) GetSurcharge(ctx context.Context, id int64) (*Surcharge, error
 
 	surcharge, err := s.store.FindSurcharge(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get surcharge %d: %w", id, err)
+		return nil, fmt.Errorf("cannot get surcharge %d: %w", id, err)
 	}
 	return surcharge, nil
 }
 
 func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeRequest) (*Surcharge, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -159,7 +159,7 @@ func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeReque
 
 	// Nummer wird beim Insert vergeben
 	if err := s.store.InsertSurcharge(ctx, surcharge); err != nil {
-		return nil, fmt.Errorf("insert surcharge: %w", err)
+		return nil, fmt.Errorf("cannot insert surcharge: %w", err)
 	}
 	if err := s.audit.Record(ctx, "surcharge.created", surcharge.ID); err != nil {
 		s.log.Warn("audit entry failed", "action", "surcharge.created", "err", err)
@@ -179,7 +179,7 @@ func (s *Service) ListSurcharges(ctx context.Context, limit int, offset int) ([]
 func (s *Service) CalculateQuoteSurchargeTotal(ctx context.Context, quoteID int64) (money.Amount, error) {
 	surcharges, err := s.store.ListSurchargesForQuote(ctx, quoteID)
 	if err != nil {
-		return 0, fmt.Errorf("list surcharges %d: %w", quoteID, err)
+		return 0, fmt.Errorf("cannot list surcharges %d: %w", quoteID, err)
 	}
 	var total money.Amount
 	for _, surcharge := range surcharges {
