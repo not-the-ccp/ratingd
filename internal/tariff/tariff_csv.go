@@ -25,7 +25,7 @@ func writeTariffsCSV(w io.Writer, items []*Tariff) error {
 			strconv.FormatInt(tariff.ID, 10),
 			string(tariff.Status),
 			tariff.RoundingMode,
-			tariff.Code,
+			tariff.ShortCode,
 			tariff.ValidFrom.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {

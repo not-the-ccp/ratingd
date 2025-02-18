@@ -130,6 +130,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	return shipment, nil
 }
 
+// DeliverShipment performs the deliver shipment step.
 func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {

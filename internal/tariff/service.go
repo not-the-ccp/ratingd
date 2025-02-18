@@ -51,7 +51,7 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		Code:         req.Code,
+		ShortCode:    req.Code,
 		Description:  req.Description,
 		ValidFrom:    req.ValidFrom,
 		RoundingMode: req.RoundingMode,

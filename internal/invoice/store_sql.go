@@ -94,23 +94,12 @@ func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNot
 	return notes, rows.Err()
 }
 
-func (s *SQLStore) ListCreditNotesForInvoice(ctx context.Context, invoiceID int64) ([]*CreditNote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, number, reason, amount, status, applied_at, created_at, updated_at FROM credit_notes WHERE invoice_id = $1 ORDER BY id`, invoiceID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list credit notes: %w", err)
+func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoice_lines (invoice_id, shipment_id, description, quantity, unit_price, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, line.InvoiceID, line.ShipmentID, line.Description, line.Quantity, line.UnitPrice, line.Amount, line.CreatedAt, line.UpdatedAt).Scan(&line.ID); err != nil {
+		return fmt.Errorf("cannot insert invoice line: %w", err)
 	}
 
-	defer rows.Close()
-
-	var creditNotes []*CreditNote
-	for rows.Next() {
-		var note CreditNote
-		if err := rows.Scan(&note.ID, &note.InvoiceID, &note.Number, &note.Reason, &note.Amount, &note.Status, &note.AppliedAt, &note.CreatedAt, &note.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan credit note: %w", err)
-		}
-		creditNotes = append(creditNotes, &note)
-	}
-	return creditNotes, rows.Err()
+	return nil
 }
 
 func (s *SQLStore) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
@@ -152,12 +141,23 @@ func (s *SQLStore) ListInvoiceLinesForInvoice(ctx context.Context, invoiceID int
 	return lines, rows.Err()
 }
 
-func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoice_lines (invoice_id, shipment_id, description, quantity, unit_price, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, line.InvoiceID, line.ShipmentID, line.Description, line.Quantity, line.UnitPrice, line.Amount, line.CreatedAt, line.UpdatedAt).Scan(&line.ID); err != nil {
-		return fmt.Errorf("cannot insert invoice line: %w", err)
+func (s *SQLStore) ListCreditNotesForInvoice(ctx context.Context, invoiceID int64) ([]*CreditNote, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, number, reason, amount, status, applied_at, created_at, updated_at FROM credit_notes WHERE invoice_id = $1 ORDER BY id`, invoiceID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list credit notes: %w", err)
 	}
 
-	return nil
+	defer rows.Close()
+
+	var creditNotes []*CreditNote
+	for rows.Next() {
+		var note CreditNote
+		if err := rows.Scan(&note.ID, &note.InvoiceID, &note.Number, &note.Reason, &note.Amount, &note.Status, &note.AppliedAt, &note.CreatedAt, &note.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan credit note: %w", err)
+		}
+		creditNotes = append(creditNotes, &note)
+	}
+	return creditNotes, rows.Err()
 }
 
 func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error {

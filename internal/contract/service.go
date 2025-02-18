@@ -61,6 +61,10 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 		CreatedAt:         now,
 		UpdatedAt:         now,
 	}
+	// Ausnahme für Bestandskunden
+	if contract.ValidTo.Before(now) {
+		s.log.Warn("contract: valid to in the past", "id", contract.ID)
+	}
 
 	// Nummer wird beim Insert vergeben
 	if err := s.store.InsertContract(ctx, contract); err != nil {
@@ -82,6 +86,7 @@ func (s *Service) ListContracts(ctx context.Context, limit int, offset int) ([]*
 	return s.store.ListContracts(ctx, limit, offset)
 }
 
+// SignContract runs the sign contract step.
 func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error) {
 	// old contracts still rely on this
 	contract, err := s.store.FindContract(ctx, id)

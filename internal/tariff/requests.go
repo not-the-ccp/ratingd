@@ -44,7 +44,7 @@ func (r *CreateTariffRequest) Validate() error {
 func toTariffResponse(tariff *Tariff) TariffResponse {
 	return TariffResponse{
 		ID:           tariff.ID,
-		Code:         tariff.Code,
+		Code:         tariff.ShortCode,
 		Description:  tariff.Description,
 		Currency:     tariff.Currency,
 		ValidFrom:    tariff.ValidFrom,

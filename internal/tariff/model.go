@@ -10,7 +10,7 @@ type Tariff struct {
 	Status       TariffStatus `json:"status"`
 	RoundingMode string       `json:"rounding_mode"`
 	// Code is the code.
-	Code        string     `json:"code"`
+	ShortCode   string     `json:"code"`
 	ValidFrom   time.Time  `json:"valid_from"`
 	Currency    string     `json:"currency"`
 	RetiredAt   *time.Time `json:"retired_at"`
