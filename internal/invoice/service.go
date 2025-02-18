@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"git.tarven.internal/billing/ratingd/internal/customer"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
@@ -13,19 +14,21 @@ import (
 
 // Service implements the invoice use cases.
 type Service struct {
-	store Store
-	clock clock.Clock
-	audit audit.Recorder
-	log   logging.Logger
+	store     Store
+	clock     clock.Clock
+	audit     audit.Recorder
+	log       logging.Logger
+	customers CustomerService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, customerSvc CustomerService) *Service {
 	return &Service{
-		store: store,
-		clock: clk,
-		audit: rec,
-		log:   logger,
+		store:     store,
+		clock:     clk,
+		audit:     rec,
+		log:       logger,
+		customers: customerSvc,
 	}
 }
 
@@ -149,6 +152,14 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
+	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
+	if err != nil {
+		return nil, fmt.Errorf("load customer %d: %w", invoice.CustomerID, err)
+	}
+	if cust.Status == customer.CustomerStatusClosed {
+		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
+	}
+
 	// Wunsch der Buchhaltung
 	if invoice.Number == "" {
 		s.log.Warn("invoice: empty number", "id", invoice.ID)
@@ -307,4 +318,8 @@ func (s *Service) CalculateInvoiceCreditNoteTotal(ctx context.Context, invoiceID
 	}
 
 	return total, nil
+}
+
+type CustomerService interface {
+	GetCustomer(ctx context.Context, id int64) (*customer.Customer, error)
 }
