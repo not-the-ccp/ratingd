@@ -188,6 +188,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 	}
 
 	now := s.clock.Now()
+
 	line := &InvoiceLine{
 		InvoiceID:   req.InvoiceID,
 		ShipmentID:  req.ShipmentID,
