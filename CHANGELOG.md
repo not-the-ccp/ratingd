@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.3
+
+- fix formatting of CalculateInvoiceCreditNoteTotal
+- OPS-597 update makefile
+- add support for grouping of shipments by carrier
+- refresh openapi spec
+- reject quote when net amount above 100000
+- unify error messages
+- fix formatting of create invoice line
+- fix missing id check in get settlement
+
 ## 1.2.2
 
 - add settlement item totals to settlement
