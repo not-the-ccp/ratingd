@@ -50,22 +50,21 @@ func (s *SQLStore) ListInvoicesByStatus(ctx context.Context, status InvoiceStatu
 	return invoices, rows.Err()
 }
 
-func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, issued_on, due_at, number, customer_id, voided_at, tax_amount, paid_at, currency, status, issued_at, net_amount, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, number, reason, amount, status, applied_at, created_at, updated_at FROM credit_notes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list invoices: %w", err)
+		return nil, fmt.Errorf("cannot list credit notes: %w", err)
 	}
 	defer rows.Close()
-
-	var invoices []*Invoice
+	var notes []*CreditNote
 	for rows.Next() {
-		var invoice Invoice
-		if err := rows.Scan(&invoice.ID, &invoice.IssuedOn, &invoice.DueAt, &invoice.Number, &invoice.CustomerID, &invoice.VoidedAt, &invoice.TaxAmount, &invoice.PaidAt, &invoice.Currency, &invoice.Status, &invoice.IssuedAt, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan invoice: %w", err)
+		var note CreditNote
+		if err := rows.Scan(&note.ID, &note.InvoiceID, &note.Number, &note.Reason, &note.Amount, &note.Status, &note.AppliedAt, &note.CreatedAt, &note.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan credit note: %w", err)
 		}
-		invoices = append(invoices, &invoice)
+		notes = append(notes, &note)
 	}
-	return invoices, rows.Err()
+	return notes, rows.Err()
 }
 
 func (s *SQLStore) InsertInvoice(ctx context.Context, invoice *Invoice) error {
@@ -190,21 +189,22 @@ func (s *SQLStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, e
 	return &creditNote, nil
 }
 
-func (s *SQLStore) ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, number, reason, amount, status, applied_at, created_at, updated_at FROM credit_notes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, issued_on, due_at, number, customer_id, voided_at, tax_amount, paid_at, currency, status, issued_at, net_amount, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list credit notes: %w", err)
+		return nil, fmt.Errorf("cannot list invoices: %w", err)
 	}
 	defer rows.Close()
-	var notes []*CreditNote
+
+	var invoices []*Invoice
 	for rows.Next() {
-		var note CreditNote
-		if err := rows.Scan(&note.ID, &note.InvoiceID, &note.Number, &note.Reason, &note.Amount, &note.Status, &note.AppliedAt, &note.CreatedAt, &note.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan credit note: %w", err)
+		var invoice Invoice
+		if err := rows.Scan(&invoice.ID, &invoice.IssuedOn, &invoice.DueAt, &invoice.Number, &invoice.CustomerID, &invoice.VoidedAt, &invoice.TaxAmount, &invoice.PaidAt, &invoice.Currency, &invoice.Status, &invoice.IssuedAt, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan invoice: %w", err)
 		}
-		notes = append(notes, &note)
+		invoices = append(invoices, &invoice)
 	}
-	return notes, rows.Err()
+	return invoices, rows.Err()
 }
 
 func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) {
