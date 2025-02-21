@@ -62,3 +62,7 @@ func (s InvoiceStatus) IsFinal() bool {
 func (i *Invoice) IsIssuedPassed(now time.Time) bool {
 	return i.IssuedAt.Before(now)
 }
+
+func (i *Invoice) IsDuePassed(now time.Time) bool {
+	return i.DueAt.Before(now)
+}

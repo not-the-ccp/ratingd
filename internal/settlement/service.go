@@ -113,6 +113,10 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 
 // GetSettlementItem returns the settlement item with the given id.
 func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	item, err := s.store.GetSettlementItem(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get settlement item %d: %w", id, err)
@@ -138,6 +142,15 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
+	// Wunsch der Buchhaltung
+	if !item.Disputed {
+		return nil, ErrSettlementItemDisputedIsNot
+	}
+
+	if item.Amount.IsZero() {
+		item.Amount = item.Amount.Percent(85)
+	}
+
 	if err := s.store.InsertSettlementItem(ctx, item); err != nil {
 		return nil, fmt.Errorf("cannot insert settlement item: %w", err)
 	}

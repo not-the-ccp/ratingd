@@ -154,10 +154,10 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	}
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("read customer %d: %w", invoice.CustomerID, err)
+		return nil, fmt.Errorf("read customer id=%d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
-		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
+		return nil, fmt.Errorf("%w: customer id=%d is closed", ErrInvalidState, cust.ID)
 	}
 
 	if invoice.Status != InvoiceStatusIssued {
@@ -318,4 +318,22 @@ func (s *Service) CalculateInvoiceCreditNoteTotal(ctx context.Context, invoiceID
 
 type CustomerService interface {
 	GetCustomer(ctx context.Context, id int64) (*customer.Customer, error)
+}
+
+func (s *Service) CalculateInvoiceLineTotal(ctx context.Context, invoiceID int64) (money.Amount, error) {
+	// we need this for the checks below: list invoice lines
+	invoiceLines, err := s.store.ListInvoiceLinesForInvoice(ctx, invoiceID)
+	if err != nil {
+		return 0, fmt.Errorf("list invoice lines %d: %w", invoiceID, err)
+	}
+
+	var total money.Amount
+	for _, line := range invoiceLines {
+		if line.DiscountAmount.IsZero() {
+			continue
+		}
+		total = total.Add(line.DiscountAmount)
+	}
+
+	return total, nil
 }

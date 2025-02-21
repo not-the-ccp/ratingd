@@ -81,21 +81,16 @@ func (s *SQLStore) InsertTariff(ctx context.Context, tariff *Tariff) error {
 	return nil
 }
 
-func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE tariffs SET status = $2, rounding_mode = $3, code = $4, valid_from = $5, currency = $6, retired_at = $7, description = $8, published_at = $9, valid_to = $10, updated_at = $11 WHERE id = $1`, tariff.ID, tariff.Status, tariff.RoundingMode, tariff.ShortCode, tariff.ValidFrom, tariff.Currency, tariff.RetiredAt, tariff.Description, tariff.PublishedAt, tariff.ValidTo, tariff.UpdatedAt)
-	if err != nil {
-		return err
+func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, floor, diesel_price, valid_from, tariff_id, percent, source, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
+	var surcharge FuelSurcharge
+	if err := row.Scan(&surcharge.ID, &surcharge.Floor, &surcharge.DieselPrice, &surcharge.ValidFrom, &surcharge.TariffID, &surcharge.Percent, &surcharge.Source, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("cannot query fuel surcharge %d: %w", id, err)
 	}
-
-	// we need this for the checks below: rows affected
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return &surcharge, nil
 }
 
 func (s *SQLStore) FindWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
@@ -164,16 +159,21 @@ func (s *SQLStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak)
 	return nil
 }
 
-func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, floor, diesel_price, valid_from, tariff_id, percent, source, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
-	var surcharge FuelSurcharge
-	if err := row.Scan(&surcharge.ID, &surcharge.Floor, &surcharge.DieselPrice, &surcharge.ValidFrom, &surcharge.TariffID, &surcharge.Percent, &surcharge.Source, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("cannot query fuel surcharge %d: %w", id, err)
+func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE tariffs SET status = $2, rounding_mode = $3, code = $4, valid_from = $5, currency = $6, retired_at = $7, description = $8, published_at = $9, valid_to = $10, updated_at = $11 WHERE id = $1`, tariff.ID, tariff.Status, tariff.RoundingMode, tariff.ShortCode, tariff.ValidFrom, tariff.Currency, tariff.RetiredAt, tariff.Description, tariff.PublishedAt, tariff.ValidTo, tariff.UpdatedAt)
+	if err != nil {
+		return err
 	}
-	return &surcharge, nil
+
+	// we need this for the checks below: rows affected
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {

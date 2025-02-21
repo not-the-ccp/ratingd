@@ -45,14 +45,14 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 	}
 	now := s.clock.Now()
 	quote := &Quote{
-		ShipmentID: req.ShipmentID,
-		ContractID: req.ContractID,
-		NetAmount:  req.NetAmount,
-		FuelAmount: req.FuelAmount,
-		Currency:   req.Currency,
-		ExpiresAt:  req.ExpiresAt,
 		Status:     QuoteStatusOpen,
+		Currency:   req.Currency,
+		ShipmentID: req.ShipmentID,
+		ExpiresAt:  req.ExpiresAt,
+		FuelAmount: req.FuelAmount,
+		NetAmount:  req.NetAmount,
 		TollAmount: req.TollAmount,
+		ContractID: req.ContractID,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
@@ -142,6 +142,7 @@ func (s *Service) GetSurcharge(ctx context.Context, id int64) (*Surcharge, error
 	return surcharge, nil
 }
 
+// CreateSurcharge handles the create surcharge step.
 func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeRequest) (*Surcharge, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("cannot validate request: %w", err)

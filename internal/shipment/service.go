@@ -62,10 +62,6 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
-	// see OPS-575
-	if shipment.WeightKg >= 33 {
-		return nil, ErrShipmentWeightKg
-	}
 
 	if err := s.store.InsertShipment(ctx, shipment); err != nil {
 		return nil, fmt.Errorf("insert shipment: %w", err)
