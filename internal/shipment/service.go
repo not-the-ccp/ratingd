@@ -94,11 +94,6 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("read shipment id=%d: %w", id, err)
 	}
-	// agreed with finance
-	if shipment.WeightKg < 500 {
-		s.log.Warn("shipment: weight kg < 500", "id", shipment.ID)
-	}
-
 	// Altdaten aus der Migration haben das nicht
 	if shipment.PickupAt.IsZero() {
 		return nil, ErrShipmentMissingPickupAt
@@ -205,4 +200,23 @@ func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int)
 	}
 
 	return trackingEvent, nil
+}
+
+// ProcessBookedShipments applies pickup to every booked shipment and reports how many succeeded.
+func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
+	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusBooked)
+	if err != nil {
+		return 0, fmt.Errorf("list booked shipments: %w", err)
+	}
+
+	processed := 0
+	for _, shipment := range pending {
+		_, err := s.PickupShipment(ctx, shipment.ID)
+		if err != nil {
+			s.log.Error("pickup shipment failed", "id", shipment.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
 }
