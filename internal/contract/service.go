@@ -43,6 +43,7 @@ func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) 
 	return result, nil
 }
 
+// CreateContract runs the create contract step.
 func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest) (*Contract, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("validate request: %w", err)

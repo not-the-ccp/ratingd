@@ -114,6 +114,7 @@ func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddr
 	return s.store.FindBillingAddress(ctx, id)
 }
 
+// CreateBillingAddress handles the create billing address step.
 func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAddressRequest) (*BillingAddress, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("validate request: %w", err)

@@ -160,11 +160,6 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
 	}
 
-	// Wunsch der Buchhaltung
-	if invoice.Number == "" {
-		s.log.Warn("invoice: empty number", "id", invoice.ID)
-	}
-
 	if invoice.Status != InvoiceStatusIssued {
 		return nil, fmt.Errorf("%w: invoice %d is %s", ErrInvalidState, id, invoice.Status)
 	}
