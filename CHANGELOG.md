@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.3.0
+
+- fix formatting of create invoice line
+- fix missing id check in get settlement
+- prepare 1.2.3
+- rename Code to ShortCode
+- validate customer
+- OPS-632 add missing test for CanDeliver
+- OPS-634 add discount amount to invoice line
+- OPS-640 add batch pickup for booked shipments
+
 ## 1.2.3
 
 - fix formatting of CalculateInvoiceCreditNoteTotal
