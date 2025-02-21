@@ -201,14 +201,15 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 	now := s.clock.Now()
 
 	line := &InvoiceLine{
-		InvoiceID:   req.InvoiceID,
-		ShipmentID:  req.ShipmentID,
-		Description: req.Description,
-		Quantity:    req.Quantity,
-		UnitPrice:   req.UnitPrice,
-		Amount:      req.Amount,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		InvoiceID:      req.InvoiceID,
+		ShipmentID:     req.ShipmentID,
+		Description:    req.Description,
+		Quantity:       req.Quantity,
+		UnitPrice:      req.UnitPrice,
+		Amount:         req.Amount,
+		DiscountAmount: req.DiscountAmount,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 	if err := s.store.InsertInvoiceLine(ctx, line); err != nil {
 		return nil, fmt.Errorf("cannot insert invoice line: %w", err)

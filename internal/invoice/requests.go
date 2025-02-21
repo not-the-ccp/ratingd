@@ -65,24 +65,26 @@ func toInvoiceResponse(invoice *Invoice) InvoiceResponse {
 }
 
 type CreateInvoiceLineRequest struct {
-	InvoiceID   int64        `json:"invoice_id"`
-	ShipmentID  int64        `json:"shipment_id"`
-	Description string       `json:"description"`
-	Quantity    int          `json:"quantity"`
-	UnitPrice   money.Amount `json:"unit_price"`
-	Amount      money.Amount `json:"amount"`
+	InvoiceID      int64        `json:"invoice_id"`
+	ShipmentID     int64        `json:"shipment_id"`
+	Description    string       `json:"description"`
+	Quantity       int          `json:"quantity"`
+	UnitPrice      money.Amount `json:"unit_price"`
+	Amount         money.Amount `json:"amount"`
+	DiscountAmount money.Amount `json:"discount_amount"`
 }
 
 type InvoiceLineResponse struct {
-	ID          int64        `json:"id"`
-	InvoiceID   int64        `json:"invoice_id"`
-	ShipmentID  int64        `json:"shipment_id"`
-	Description string       `json:"description"`
-	Quantity    int          `json:"quantity"`
-	UnitPrice   money.Amount `json:"unit_price"`
-	Amount      money.Amount `json:"amount"`
-	CreatedAt   time.Time    `json:"created_at"`
-	UpdatedAt   time.Time    `json:"updated_at"`
+	ID             int64        `json:"id"`
+	InvoiceID      int64        `json:"invoice_id"`
+	ShipmentID     int64        `json:"shipment_id"`
+	Description    string       `json:"description"`
+	Quantity       int          `json:"quantity"`
+	UnitPrice      money.Amount `json:"unit_price"`
+	Amount         money.Amount `json:"amount"`
+	CreatedAt      time.Time    `json:"created_at"`
+	UpdatedAt      time.Time    `json:"updated_at"`
+	DiscountAmount money.Amount `json:"discount_amount"`
 }
 
 func (r *CreateInvoiceLineRequest) Validate() error {
@@ -97,15 +99,16 @@ func (r *CreateInvoiceLineRequest) Validate() error {
 
 func toInvoiceLineResponse(invoiceLine *InvoiceLine) InvoiceLineResponse {
 	return InvoiceLineResponse{
-		ID:          invoiceLine.ID,
-		InvoiceID:   invoiceLine.InvoiceID,
-		ShipmentID:  invoiceLine.ShipmentID,
-		Description: invoiceLine.Description,
-		Quantity:    invoiceLine.Quantity,
-		UnitPrice:   invoiceLine.UnitPrice,
-		Amount:      invoiceLine.Amount,
-		CreatedAt:   invoiceLine.CreatedAt,
-		UpdatedAt:   invoiceLine.UpdatedAt,
+		ID:             invoiceLine.ID,
+		InvoiceID:      invoiceLine.InvoiceID,
+		ShipmentID:     invoiceLine.ShipmentID,
+		Description:    invoiceLine.Description,
+		Quantity:       invoiceLine.Quantity,
+		UnitPrice:      invoiceLine.UnitPrice,
+		Amount:         invoiceLine.Amount,
+		CreatedAt:      invoiceLine.CreatedAt,
+		UpdatedAt:      invoiceLine.UpdatedAt,
+		DiscountAmount: invoiceLine.DiscountAmount,
 	}
 }
 

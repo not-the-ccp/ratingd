@@ -14,11 +14,12 @@ type InvoiceLine struct {
 	ShipmentID  int64  `json:"shipment_id"`
 	Description string `json:"description"`
 	// Quantity is the quantity.
-	Quantity  int          `json:"quantity"`
-	UnitPrice money.Amount `json:"unit_price"`
-	Amount    money.Amount `json:"amount"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	Quantity       int          `json:"quantity"`
+	UnitPrice      money.Amount `json:"unit_price"`
+	Amount         money.Amount `json:"amount"`
+	DiscountAmount money.Amount `json:"discount_amount"`
+	CreatedAt      time.Time    `json:"created_at"`
+	UpdatedAt      time.Time    `json:"updated_at"`
 }
 
 func (i *InvoiceLine) HasUnitPrice() bool {
