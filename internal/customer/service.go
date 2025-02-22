@@ -122,12 +122,12 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
 		CustomerID: req.CustomerID,
-		Attention:  req.Attention,
 		Zip:        req.Zip,
-		Street:     req.Street,
-		Primary:    req.Primary,
 		Country:    req.Country,
 		City:       req.City,
+		Street:     req.Street,
+		Primary:    req.Primary,
+		Attention:  req.Attention,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
@@ -159,7 +159,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
 	billingAddress, err := s.store.ListBillingAddresses(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list billing addresses: %w", err)
+		return nil, fmt.Errorf("query billing addresses: %w", err)
 	}
 
 	return billingAddress, nil
