@@ -28,7 +28,12 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
-	return s.store.FindNotice(ctx, id)
+	notice, err := s.store.FindNotice(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("get notice: %w", err)
+	}
+
+	return notice, nil
 }
 
 func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*Notice, error) {
