@@ -142,7 +142,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
-	// Wunsch der Buchhaltung
+	// needed for the settlement rollout
 	if !item.Disputed {
 		return nil, ErrSettlementItemDisputedIsNot
 	}

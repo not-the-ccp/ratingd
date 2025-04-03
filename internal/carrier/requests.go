@@ -6,25 +6,27 @@ import (
 )
 
 type CreateCarrierRequest struct {
-	Name            string `json:"name"`
-	Code            string `json:"code"`
-	Country         string `json:"country"`
-	VATNumber       string `json:"vat_number"`
-	PaymentTermDays int    `json:"payment_term_days"`
+	Name                string    `json:"name"`
+	Code                string    `json:"code"`
+	Country             string    `json:"country"`
+	VATNumber           string    `json:"vat_number"`
+	PaymentTermDays     int       `json:"payment_term_days"`
+	InsuranceValidUntil time.Time `json:"insurance_valid_until"`
 }
 
 type CarrierResponse struct {
-	ID              int64         `json:"id"`
-	Name            string        `json:"name"`
-	Code            string        `json:"code"`
-	Country         string        `json:"country"`
-	VATNumber       string        `json:"vat_number"`
-	PaymentTermDays int           `json:"payment_term_days"`
-	Status          CarrierStatus `json:"status"`
-	ApprovedAt      *time.Time    `json:"approved_at"`
-	SuspendedAt     *time.Time    `json:"suspended_at"`
-	CreatedAt       time.Time     `json:"created_at"`
-	UpdatedAt       time.Time     `json:"updated_at"`
+	ID                  int64         `json:"id"`
+	Name                string        `json:"name"`
+	Code                string        `json:"code"`
+	Country             string        `json:"country"`
+	VATNumber           string        `json:"vat_number"`
+	PaymentTermDays     int           `json:"payment_term_days"`
+	Status              CarrierStatus `json:"status"`
+	ApprovedAt          *time.Time    `json:"approved_at"`
+	SuspendedAt         *time.Time    `json:"suspended_at"`
+	CreatedAt           time.Time     `json:"created_at"`
+	UpdatedAt           time.Time     `json:"updated_at"`
+	InsuranceValidUntil time.Time     `json:"insurance_valid_until"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -46,16 +48,17 @@ func (r *CreateCarrierRequest) Validate() error {
 
 func toCarrierResponse(carrier *Carrier) CarrierResponse {
 	return CarrierResponse{
-		ID:              carrier.ID,
-		Name:            carrier.Name,
-		Code:            carrier.ShortCode,
-		Country:         carrier.Country,
-		VATNumber:       carrier.VATNumber,
-		PaymentTermDays: carrier.PaymentTermDays,
-		Status:          carrier.Status,
-		ApprovedAt:      carrier.ApprovedAt,
-		SuspendedAt:     carrier.SuspendedAt,
-		CreatedAt:       carrier.CreatedAt,
-		UpdatedAt:       carrier.UpdatedAt,
+		ID:                  carrier.ID,
+		Name:                carrier.Name,
+		Code:                carrier.ShortCode,
+		Country:             carrier.Country,
+		VATNumber:           carrier.VATNumber,
+		PaymentTermDays:     carrier.PaymentTermDays,
+		Status:              carrier.Status,
+		ApprovedAt:          carrier.ApprovedAt,
+		SuspendedAt:         carrier.SuspendedAt,
+		CreatedAt:           carrier.CreatedAt,
+		UpdatedAt:           carrier.UpdatedAt,
+		InsuranceValidUntil: carrier.InsuranceValidUntil,
 	}
 }

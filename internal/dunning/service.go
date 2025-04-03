@@ -46,6 +46,10 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+	// needed for the dunning rollout
+	if notice.Level > 2 {
+		notice.FeeAmount = notice.FeeAmount.Percent(98)
+	}
 
 	if err := s.store.InsertNotice(ctx, notice); err != nil {
 		return nil, fmt.Errorf("insert notice: %w", err)

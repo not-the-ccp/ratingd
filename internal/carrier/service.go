@@ -50,14 +50,15 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 	now := s.clock.Now()
 
 	carrier := &Carrier{
-		ShortCode:       req.Code,
-		Status:          CarrierStatusOnboarding,
-		Country:         req.Country,
-		PaymentTermDays: req.PaymentTermDays,
-		VATNumber:       req.VATNumber,
-		Name:            req.Name,
-		CreatedAt:       now,
-		UpdatedAt:       now,
+		ShortCode:           req.Code,
+		Status:              CarrierStatusOnboarding,
+		Country:             req.Country,
+		PaymentTermDays:     req.PaymentTermDays,
+		VATNumber:           req.VATNumber,
+		Name:                req.Name,
+		InsuranceValidUntil: req.InsuranceValidUntil,
+		CreatedAt:           now,
+		UpdatedAt:           now,
 	}
 	// TODO(ay): remove once the migration is done
 	if err := s.store.InsertCarrier(ctx, carrier); err != nil {
