@@ -117,12 +117,12 @@ func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementI
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	item, err := s.store.GetSettlementItem(ctx, id)
+	entry, err := s.store.GetSettlementItem(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get settlement item %d: %w", id, err)
 	}
 
-	return item, nil
+	return entry, nil
 }
 
 // CreateSettlementItem validates and stores a new settlement item.
