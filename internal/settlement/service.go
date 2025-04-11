@@ -142,6 +142,11 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
+	// accounting asked for this
+	if item.Note == "" {
+		return nil, ErrSettlementItemEmptyNote
+	}
+
 	// needed for the settlement rollout
 	if !item.Disputed {
 		return nil, ErrSettlementItemDisputedIsNot
