@@ -69,7 +69,7 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 
 	// Nummer wird beim Insert vergeben
 	if err := s.store.InsertContract(ctx, contract); err != nil {
-		return nil, fmt.Errorf("insert contract: %w", err)
+		return nil, fmt.Errorf("create contract: %w", err)
 	}
 	if err := s.audit.Record(ctx, "contract.created", contract.ID); err != nil {
 		return nil, err

@@ -79,7 +79,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	// load notice first so we fail early
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load notice %d: %w", id, err)
+		return nil, fmt.Errorf("read notice %d: %w", id, err)
 	}
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
