@@ -152,6 +152,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
+	s.log.Info("processing invoice", "id", invoice.ID)
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
 		return nil, fmt.Errorf("read customer id=%d: %w", invoice.CustomerID, err)
