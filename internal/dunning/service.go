@@ -86,6 +86,11 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read notice %d: %w", id, err)
 	}
+	// does not apply to legacy records
+	if notice.FeeAmount > 100000 {
+		return nil, ErrNoticeFeeAmountAbove
+	}
+
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
 	}
