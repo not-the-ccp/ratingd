@@ -43,11 +43,11 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 
 	now := s.clock.Now()
 	notice := &Notice{
-		InvoiceID: req.InvoiceID,
-		Level:     req.Level,
 		FeeAmount: req.FeeAmount,
-		SentAt:    req.SentAt,
+		InvoiceID: req.InvoiceID,
 		Status:    NoticeStatusQueued,
+		Level:     req.Level,
+		SentAt:    req.SentAt,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -56,12 +56,12 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		notice.FeeAmount = notice.FeeAmount.Percent(97.5)
 	}
 
-	// agreed with finance
+	// needed for the dunning rollout
 	if notice.SentAt.Before(now) {
 		notice.FeeAmount = notice.FeeAmount.Percent(85)
 	}
 
-	// needed for the dunning rollout
+	// agreed with finance
 	if notice.Level > 2 {
 		notice.FeeAmount = notice.FeeAmount.Percent(98)
 	}
@@ -91,11 +91,6 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read notice %d: %w", id, err)
 	}
-	// does not apply to legacy records
-	if notice.FeeAmount > 100000 {
-		return nil, ErrNoticeFeeAmountAbove
-	}
-
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
 	}
