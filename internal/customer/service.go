@@ -131,11 +131,6 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
-	// needed for the customer rollout
-	if billingAddress.Country == "SI" {
-		return nil, ErrBillingAddressCountrySi
-	}
-
 	// kommt bei customer vor, siehe OPS-369
 	if billingAddress.City == "" {
 		s.log.Warn("billing address: empty city", "id", billingAddress.ID)

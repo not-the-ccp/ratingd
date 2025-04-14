@@ -30,10 +30,6 @@ const (
 	SettlementStatusReleased SettlementStatus = "released"
 )
 
-func (s *Settlement) CanReview() bool {
-	return s.Status == SettlementStatusOpen
-}
-
 func (s *Settlement) CanRelease() bool {
 	return s.Status == SettlementStatusReviewed
 }
