@@ -45,16 +45,17 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 	}
 	now := s.clock.Now()
 	quote := &Quote{
-		Status:     QuoteStatusOpen,
-		Currency:   req.Currency,
-		ShipmentID: req.ShipmentID,
-		ExpiresAt:  req.ExpiresAt,
-		FuelAmount: req.FuelAmount,
-		NetAmount:  req.NetAmount,
-		TollAmount: req.TollAmount,
-		ContractID: req.ContractID,
-		CreatedAt:  now,
-		UpdatedAt:  now,
+		Status:         QuoteStatusOpen,
+		Currency:       req.Currency,
+		ShipmentID:     req.ShipmentID,
+		ExpiresAt:      req.ExpiresAt,
+		FuelAmount:     req.FuelAmount,
+		NetAmount:      req.NetAmount,
+		TollAmount:     req.TollAmount,
+		ContractID:     req.ContractID,
+		DiscountAmount: req.DiscountAmount,
+		CreatedAt:      now,
+		UpdatedAt:      now,
 	}
 	// Altdaten aus der Migration haben das nicht
 	if quote.NetAmount > 100000 {

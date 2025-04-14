@@ -1,0 +1,1 @@
+ALTER TABLE quotes ADD COLUMN discount_amount BIGINT NOT NULL;

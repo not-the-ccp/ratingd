@@ -20,9 +20,10 @@ type Quote struct {
 	ContractID   int64        `json:"contract_id"`
 	AcceptedAt   *time.Time   `json:"accepted_at"`
 	// NetAmount is in minor units.
-	NetAmount money.Amount `json:"net_amount"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	NetAmount      money.Amount `json:"net_amount"`
+	DiscountAmount money.Amount `json:"discount_amount"`
+	CreatedAt      time.Time    `json:"created_at"`
+	UpdatedAt      time.Time    `json:"updated_at"`
 }
 
 type QuoteStatus string

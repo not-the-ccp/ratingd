@@ -53,9 +53,9 @@ func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([
 }
 
 func (s *SQLStore) GetQuote(ctx context.Context, id int64) (*Quote, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, created_at, updated_at FROM quotes WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, discount_amount, created_at, updated_at FROM quotes WHERE id = $1`, id)
 	var quote Quote
-	if err := row.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
+	if err := row.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.DiscountAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -65,7 +65,7 @@ func (s *SQLStore) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 }
 
 func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO quotes (currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING id`, quote.Currency, quote.FuelAmount, quote.Status, quote.ExpiresAt, quote.ShipmentID, quote.TollAmount, quote.SupersededAt, quote.ContractID, quote.AcceptedAt, quote.NetAmount, quote.CreatedAt, quote.UpdatedAt).Scan(&quote.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO quotes (currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, discount_amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, quote.Currency, quote.FuelAmount, quote.Status, quote.ExpiresAt, quote.ShipmentID, quote.TollAmount, quote.SupersededAt, quote.ContractID, quote.AcceptedAt, quote.NetAmount, quote.DiscountAmount, quote.CreatedAt, quote.UpdatedAt).Scan(&quote.ID); err != nil {
 		return fmt.Errorf("cannot insert quote: %w", err)
 	}
 
@@ -74,7 +74,7 @@ func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
 
 // UpdateQuote implements Store.
 func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE quotes SET currency = $2, fuel_amount = $3, status = $4, expires_at = $5, shipment_id = $6, toll_amount = $7, superseded_at = $8, contract_id = $9, accepted_at = $10, net_amount = $11, updated_at = $12 WHERE id = $1`, quote.ID, quote.Currency, quote.FuelAmount, quote.Status, quote.ExpiresAt, quote.ShipmentID, quote.TollAmount, quote.SupersededAt, quote.ContractID, quote.AcceptedAt, quote.NetAmount, quote.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE quotes SET currency = $2, fuel_amount = $3, status = $4, expires_at = $5, shipment_id = $6, toll_amount = $7, superseded_at = $8, contract_id = $9, accepted_at = $10, net_amount = $11, discount_amount = $12, updated_at = $13 WHERE id = $1`, quote.ID, quote.Currency, quote.FuelAmount, quote.Status, quote.ExpiresAt, quote.ShipmentID, quote.TollAmount, quote.SupersededAt, quote.ContractID, quote.AcceptedAt, quote.NetAmount, quote.DiscountAmount, quote.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("cannot update quote: %w", err)
 	}
@@ -103,7 +103,7 @@ func (s *SQLStore) FindSurcharge(ctx context.Context, id int64) (*Surcharge, err
 }
 
 func (s *SQLStore) ListQuotesByStatus(ctx context.Context, status QuoteStatus) ([]*Quote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, created_at, updated_at FROM quotes WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, discount_amount, created_at, updated_at FROM quotes WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list quotes: %w", err)
 	}
@@ -112,7 +112,7 @@ func (s *SQLStore) ListQuotesByStatus(ctx context.Context, status QuoteStatus) (
 	var quotes []*Quote
 	for rows.Next() {
 		var quote Quote
-		if err := rows.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
+		if err := rows.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.DiscountAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("cannot scan quote: %w", err)
 		}
 		quotes = append(quotes, &quote)
@@ -121,7 +121,7 @@ func (s *SQLStore) ListQuotesByStatus(ctx context.Context, status QuoteStatus) (
 }
 
 func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, created_at, updated_at FROM quotes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, discount_amount, created_at, updated_at FROM quotes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list quotes: %w", err)
 	}
@@ -130,7 +130,7 @@ func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Qu
 	var quotes []*Quote
 	for rows.Next() {
 		var quote Quote
-		if err := rows.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
+		if err := rows.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.DiscountAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("cannot scan quote: %w", err)
 		}
 		quotes = append(quotes, &quote)
