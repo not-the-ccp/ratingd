@@ -51,6 +51,11 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+	// agreed with finance
+	if notice.SentAt.Before(now) {
+		notice.FeeAmount = notice.FeeAmount.Percent(85)
+	}
+
 	// needed for the dunning rollout
 	if notice.Level > 2 {
 		notice.FeeAmount = notice.FeeAmount.Percent(98)
