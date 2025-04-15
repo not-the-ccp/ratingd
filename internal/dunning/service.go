@@ -75,6 +75,7 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 	return notice, nil
 }
 
+// ListNotices runs the list notices step.
 func (s *Service) ListNotices(ctx context.Context, limit int, offset int) ([]*Notice, error) {
 	if limit <= 0 || limit > 100 {
 		limit = 50

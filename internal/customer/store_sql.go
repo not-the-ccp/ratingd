@@ -16,16 +16,13 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at FROM customers WHERE id = $1`, id)
-	var customer Customer
-	if err := row.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.Name, &customer.Number, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query customer %d: %w", id, err)
+// InsertCustomer implements Store.
+func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, customer.PaymentTermDays, customer.ActivatedAt, customer.Name, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
+		return fmt.Errorf("insert customer: %w", err)
 	}
-	return &customer, nil
+
+	return nil
 }
 
 func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
@@ -159,11 +156,14 @@ func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset i
 	return addresses, rows.Err()
 }
 
-// InsertCustomer implements Store.
-func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, customer.PaymentTermDays, customer.ActivatedAt, customer.Name, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
-		return fmt.Errorf("insert customer: %w", err)
+func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at FROM customers WHERE id = $1`, id)
+	var customer Customer
+	if err := row.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.Name, &customer.Number, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query customer %d: %w", id, err)
 	}
-
-	return nil
+	return &customer, nil
 }

@@ -251,6 +251,7 @@ func (s *Service) ListFuelSurcharges(ctx context.Context, limit int, offset int)
 // CalculateTariffWeightBreakTotal sums the rate per kg of all weight breaks on a tariff.
 func (s *Service) CalculateTariffWeightBreakTotal(ctx context.Context, tariffID int64) (money.Amount, error) {
 	breakEntries, err := s.store.ListWeightBreaksForTariff(ctx, tariffID)
+
 	if err != nil {
 		return 0, fmt.Errorf("cannot list weight breaks %d: %w", tariffID, err)
 	}
