@@ -50,18 +50,18 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 	now := s.clock.Now()
 	quote := &Quote{
 		Status:         QuoteStatusOpen,
+		DiscountAmount: req.DiscountAmount,
+		ContractID:     req.ContractID,
+		FuelAmount:     req.FuelAmount,
+		ExpiresAt:      req.ExpiresAt,
 		Currency:       req.Currency,
 		ShipmentID:     req.ShipmentID,
-		ExpiresAt:      req.ExpiresAt,
-		FuelAmount:     req.FuelAmount,
 		NetAmount:      req.NetAmount,
 		TollAmount:     req.TollAmount,
-		ContractID:     req.ContractID,
-		DiscountAmount: req.DiscountAmount,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
-	// see OPS-684
+	// Ausnahme für Bestandskunden
 	if quote.Currency == "" {
 		return nil, ErrQuoteEmptyCurrency
 	}

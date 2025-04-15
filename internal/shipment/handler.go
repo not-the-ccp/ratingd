@@ -24,7 +24,6 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/shipment/pickup", h.pickupShipment)
 	mux.HandleFunc("/api/v1/shipment/deliver", h.deliverShipment)
 	mux.HandleFunc("/api/v1/tracking-event", h.getTrackingEvent)
-	mux.HandleFunc("/api/v1/tracking-event/create", h.createTrackingEvent)
 	mux.HandleFunc("/api/v1/tracking-events", h.listTrackingEvents)
 }
 
@@ -126,21 +125,6 @@ func (h *Handler) getTrackingEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toTrackingEventResponse(event))
-}
-
-func (h *Handler) createTrackingEvent(w http.ResponseWriter, r *http.Request) {
-	var req CreateTrackingEventRequest
-	if err := httpx.Decode(r, &req); err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	event, err := h.svc.CreateTrackingEvent(r.Context(), &req)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	httpx.JSON(w, http.StatusCreated, toTrackingEventResponse(event))
 }
 
 func (h *Handler) listTrackingEvents(w http.ResponseWriter, r *http.Request) {
