@@ -190,3 +190,7 @@ func (s *Service) CalculateSettlementItemTotal(ctx context.Context, settlementID
 
 	return total, nil
 }
+
+func (s *Settlement) CanReview() bool {
+	return s.Status == SettlementStatusOpen
+}
