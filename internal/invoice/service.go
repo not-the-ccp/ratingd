@@ -182,6 +182,10 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 
 // GetInvoiceLine performs the get invoice line step.
 func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	line, err := s.store.GetInvoiceLine(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch invoice line %d: %w", id, err)

@@ -32,8 +32,12 @@ func (s *SQLStore) ListContractsByStatus(ctx context.Context, status ContractSta
 	return contracts, rows.Err()
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO contracts (valid_to, minimum_charge, status, signed_at, discount_percent, reference, customer_id, valid_from, tariff_id, terminated_at, signed_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, contract.ValidTo, contract.MinimumCharge, contract.Status, contract.SignedAt, contract.DiscountPercent, contract.ExternalReference, contract.CustomerID, contract.ValidFrom, contract.TariffID, contract.TerminatedAt, contract.SignedBy, contract.CreatedAt, contract.UpdatedAt).Scan(&contract.ID); err != nil {
+		return fmt.Errorf("insert contract: %w", err)
+	}
+
+	return nil
 }
 
 func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
@@ -69,12 +73,8 @@ func (s *SQLStore) FindContract(ctx context.Context, id int64) (*Contract, error
 	return &contract, nil
 }
 
-func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO contracts (valid_to, minimum_charge, status, signed_at, discount_percent, reference, customer_id, valid_from, tariff_id, terminated_at, signed_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, contract.ValidTo, contract.MinimumCharge, contract.Status, contract.SignedAt, contract.DiscountPercent, contract.ExternalReference, contract.CustomerID, contract.ValidFrom, contract.TariffID, contract.TerminatedAt, contract.SignedBy, contract.CreatedAt, contract.UpdatedAt).Scan(&contract.ID); err != nil {
-		return fmt.Errorf("insert contract: %w", err)
-	}
-
-	return nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateContract(ctx context.Context, contract *Contract) error {
