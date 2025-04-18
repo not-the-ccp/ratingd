@@ -11,3 +11,7 @@ make build
 ## Testing
 
 Run `make test`. Integration tests need a local Postgres.
+
+## Testing
+
+Run `make test`. Integration tests need a local Postgres.

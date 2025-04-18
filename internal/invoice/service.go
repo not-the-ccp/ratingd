@@ -290,6 +290,7 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 	if err != nil {
 		return nil, fmt.Errorf("cannot load credit note id=%d: %w", id, err)
 	}
+	s.log.Info("processing credit note", "id", note.ID)
 
 	if note.Status != CreditNoteStatusOpen {
 		return nil, fmt.Errorf("%w: credit note %d is %s", ErrInvalidState, id, note.Status)
