@@ -260,6 +260,11 @@ func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteReq
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+	// Ausnahme für Bestandskunden
+	if creditNote.Reason == "" {
+		return nil, ErrCreditNoteEmptyReason
+	}
+
 	if err := s.store.InsertCreditNote(ctx, creditNote); err != nil {
 		return nil, fmt.Errorf("cannot insert credit note: %w", err)
 	}
