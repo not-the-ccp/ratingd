@@ -291,6 +291,51 @@ paths:
           description: Bad request
         "404":
           description: Not found
+  /api/v1/notice:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/notice/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/notice/resolve:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/notice/send:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/notices:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/quote:
     post:
       responses:
@@ -568,27 +613,27 @@ components:
       properties:
         id:
           type: number
-        blocked_at:
-          type: number
         payment_term_days:
           type: number
-        closed_at:
+        activated_at:
           type: number
-        status:
+        name:
           type: string
         number:
           type: string
-        activated_at:
+        closed_at:
           type: number
-        country:
+        credit_limit:
+          type: number
+        status:
           type: string
         vat_number:
           type: string
-        credit_limit:
+        blocked_at:
           type: number
         external_ref:
           type: string
-        name:
+        country:
           type: string
         created_at:
           type: number
@@ -624,19 +669,21 @@ components:
           type: number
         approved_at:
           type: number
+        status:
+          type: string
         country:
-          type: string
-        code:
-          type: string
-        name:
-          type: string
-        vat_number:
           type: string
         suspended_at:
           type: number
-        status:
-          type: string
         payment_term_days:
+          type: number
+        name:
+          type: string
+        code:
+          type: string
+        vat_number:
+          type: string
+        insurance_valid_until:
           type: number
         created_at:
           type: number
@@ -718,28 +765,28 @@ components:
       properties:
         id:
           type: number
-        signed_at:
-          type: number
-        customer_id:
-          type: number
-        status:
-          type: string
         valid_to:
-          type: number
-        signed_by:
-          type: string
-        terminated_at:
-          type: number
-        valid_from:
-          type: number
-        reference:
-          type: string
-        discount_percent:
           type: number
         minimum_charge:
           type: number
+        status:
+          type: string
+        signed_at:
+          type: number
+        discount_percent:
+          type: number
+        reference:
+          type: string
+        customer_id:
+          type: number
+        valid_from:
+          type: number
         tariff_id:
           type: number
+        terminated_at:
+          type: number
+        signed_by:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -786,13 +833,13 @@ components:
       properties:
         id:
           type: number
-        location:
-          type: string
-        occurred_at:
-          type: number
         shipment_id:
           type: number
+        occurred_at:
+          type: number
         code:
+          type: string
+        location:
           type: string
         created_at:
           type: number
@@ -822,6 +869,8 @@ components:
         accepted_at:
           type: number
         net_amount:
+          type: number
+        discount_amount:
           type: number
         created_at:
           type: number
@@ -892,6 +941,8 @@ components:
           type: number
         amount:
           type: number
+        discount_amount:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -901,17 +952,17 @@ components:
       properties:
         id:
           type: number
-        invoice_id:
+        amount:
+          type: number
+        applied_at:
           type: number
         number:
           type: string
         reason:
           type: string
-        amount:
-          type: number
         status:
           type: string
-        applied_at:
+        invoice_id:
           type: number
         created_at:
           type: number
@@ -947,15 +998,38 @@ components:
       properties:
         id:
           type: number
-        settlement_id:
-          type: number
         amount:
+          type: number
+        shipment_id:
           type: number
         disputed:
           type: number
+        settlement_id:
+          type: number
         note:
           type: string
-        shipment_id:
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Notice:
+      type: object
+      properties:
+        id:
+          type: number
+        invoice_id:
+          type: number
+        level:
+          type: number
+        fee_amount:
+          type: number
+        sent_at:
+          type: number
+        status:
+          type: string
+        dispatched_at:
+          type: number
+        resolved_at:
           type: number
         created_at:
           type: number
