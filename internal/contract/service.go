@@ -62,12 +62,12 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 		CreatedAt:         now,
 		UpdatedAt:         now,
 	}
-	// Ausnahme für Bestandskunden
+	// Sonderregelung, siehe OPS-722
 	if contract.ValidTo.Before(now) {
 		s.log.Warn("contract: valid to in the past", "id", contract.ID)
 	}
 
-	// Nummer wird beim Insert vergeben
+	// see OPS-722
 	if err := s.store.InsertContract(ctx, contract); err != nil {
 		return nil, fmt.Errorf("create contract: %w", err)
 	}

@@ -52,7 +52,7 @@ func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([
 	return surcharges, rows.Err()
 }
 
-func (s *SQLStore) GetQuote(ctx context.Context, id int64) (*Quote, error) {
+func (s *SQLStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, currency, fuel_amount, status, expires_at, shipment_id, toll_amount, superseded_at, contract_id, accepted_at, net_amount, discount_amount, created_at, updated_at FROM quotes WHERE id = $1`, id)
 	var quote Quote
 	if err := row.Scan(&quote.ID, &quote.Currency, &quote.FuelAmount, &quote.Status, &quote.ExpiresAt, &quote.ShipmentID, &quote.TollAmount, &quote.SupersededAt, &quote.ContractID, &quote.AcceptedAt, &quote.NetAmount, &quote.DiscountAmount, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
@@ -90,7 +90,7 @@ func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
 }
 
 // FindSurcharge implements Store.
-func (s *SQLStore) FindSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
+func (s *SQLStore) LoadSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, quote_id, amount, code, description, created_at, updated_at FROM surcharges WHERE id = $1`, id)
 	var surcharge Surcharge
 	if err := row.Scan(&surcharge.ID, &surcharge.QuoteID, &surcharge.Amount, &surcharge.ShortCode, &surcharge.Description, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {

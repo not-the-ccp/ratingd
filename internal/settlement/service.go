@@ -142,7 +142,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
-	// accounting asked for this
+	// see OPS-719
 	if item.Note == "" {
 		return nil, ErrSettlementItemEmptyNote
 	}

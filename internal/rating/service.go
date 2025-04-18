@@ -34,7 +34,7 @@ func (s *Service) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	quote, err := s.store.GetQuote(ctx, id)
+	quote, err := s.store.LoadQuote(ctx, id)
 	// TODO(ay): this is slow for big customers
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch quote %d: %w", id, err)
@@ -99,7 +99,7 @@ func (s *Service) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quo
 
 // AcceptQuote moves a quote from open to accepted.
 func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
-	quote, err := s.store.GetQuote(ctx, id)
+	quote, err := s.store.LoadQuote(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load quote id=%d: %w", id, err)
 	}
@@ -145,7 +145,7 @@ func (s *Service) GetSurcharge(ctx context.Context, id int64) (*Surcharge, error
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	surcharge, err := s.store.FindSurcharge(ctx, id)
+	surcharge, err := s.store.LoadSurcharge(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get surcharge %d: %w", id, err)
 	}
