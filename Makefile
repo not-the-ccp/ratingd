@@ -20,3 +20,6 @@ migrate:
 
 migrate:
 	goose -dir migrations postgres "$(DATABASE_URL)" up
+
+migrate:
+	goose -dir migrations postgres "$(DATABASE_URL)" up
