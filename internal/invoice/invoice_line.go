@@ -11,8 +11,8 @@ type InvoiceLine struct {
 	ID        int64 `json:"id"`
 	InvoiceID int64 `json:"invoice_id"`
 	// ShipmentID references the owning shipment.
-	ShipmentID  int64  `json:"shipment_id"`
-	Description string `json:"description"`
+	ShipmentID int64  `json:"shipment_id"`
+	Label      string `json:"description"`
 	// Quantity is the quantity.
 	Quantity       int          `json:"quantity"`
 	UnitPrice      money.Amount `json:"unit_price"`

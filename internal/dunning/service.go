@@ -87,7 +87,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read notice %d: %w", id, err)
 	}
-	// agreed with finance
+	// old contracts still rely on this
 	if notice.SentAt.IsZero() {
 		return nil, ErrNoticeMissingSentAt
 	}

@@ -102,7 +102,7 @@ func toInvoiceLineResponse(invoiceLine *InvoiceLine) InvoiceLineResponse {
 		ID:             invoiceLine.ID,
 		InvoiceID:      invoiceLine.InvoiceID,
 		ShipmentID:     invoiceLine.ShipmentID,
-		Description:    invoiceLine.Description,
+		Description:    invoiceLine.Label,
 		Quantity:       invoiceLine.Quantity,
 		UnitPrice:      invoiceLine.UnitPrice,
 		Amount:         invoiceLine.Amount,

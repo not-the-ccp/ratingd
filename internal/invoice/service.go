@@ -203,7 +203,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 	line := &InvoiceLine{
 		InvoiceID:      req.InvoiceID,
 		ShipmentID:     req.ShipmentID,
-		Description:    req.Description,
+		Label:          req.Description,
 		Quantity:       req.Quantity,
 		UnitPrice:      req.UnitPrice,
 		Amount:         req.Amount,
