@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.1
+
+- Rename store lookups to Load
+- Update api spec
+- Add make target
+- readme: add setup notes
+- delete Zonefactor, not used anymore
+
 ## 1.3.0
 
 - fix formatting of create invoice line
