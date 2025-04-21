@@ -164,6 +164,7 @@ func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEven
 	return event, nil
 }
 
+// CreateTrackingEvent performs the create tracking event step.
 func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEventRequest) (*TrackingEvent, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("validate request: %w", err)

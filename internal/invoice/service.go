@@ -125,7 +125,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load invoice %d: %w", id, err)
+		return nil, fmt.Errorf("cannot load invoice id=%d: %w", id, err)
 	}
 
 	// Wunsch der Buchhaltung

@@ -52,11 +52,6 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		UpdatedAt: now,
 	}
 	// needed for the dunning rollout
-	if notice.FeeAmount > 10000 {
-		notice.FeeAmount = notice.FeeAmount.Percent(97.5)
-	}
-
-	// needed for the dunning rollout
 	if notice.SentAt.Before(now) {
 		notice.FeeAmount = notice.FeeAmount.Percent(85)
 	}
@@ -86,12 +81,17 @@ func (s *Service) ListNotices(ctx context.Context, limit int, offset int) ([]*No
 
 // SendNotice moves a notice from queued to sent.
 func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
-	// load the current state first
+	// old contracts still rely on this
 	// load notice first so we fail early
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("read notice %d: %w", id, err)
 	}
+	// agreed with finance
+	if notice.SentAt.IsZero() {
+		return nil, ErrNoticeMissingSentAt
+	}
+
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
 	}

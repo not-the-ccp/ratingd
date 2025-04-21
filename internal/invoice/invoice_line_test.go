@@ -15,3 +15,8 @@ func TestInvoiceLine_HasAmount(t *testing.T) {
 	line := &InvoiceLine{}
 	require.False(t, line.HasAmount())
 }
+
+func TestInvoiceLine_HasDiscountAmount(t *testing.T) {
+	line := &InvoiceLine{}
+	require.False(t, line.HasDiscountAmount())
+}

@@ -29,3 +29,7 @@ func (i *InvoiceLine) HasUnitPrice() bool {
 func (i *InvoiceLine) HasAmount() bool {
 	return i.Amount > 0
 }
+
+func (i *InvoiceLine) HasDiscountAmount() bool {
+	return i.DiscountAmount > 0
+}

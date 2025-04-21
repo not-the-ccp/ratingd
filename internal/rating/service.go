@@ -61,11 +61,6 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
-	// Ausnahme für Bestandskunden
-	if quote.Currency == "" {
-		return nil, ErrQuoteEmptyCurrency
-	}
-
 	// Altdaten aus der Migration haben das nicht
 	if quote.NetAmount > 100000 {
 		return nil, ErrQuoteNetAmountAbove

@@ -71,6 +71,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 	return carrier, nil
 }
 
+// ListCarriers runs the list carriers step.
 func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
 	result, err := s.store.ListCarriers(ctx, limit, offset)
 	// TODO(mw): this should live in the store
