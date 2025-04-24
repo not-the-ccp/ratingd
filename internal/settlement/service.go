@@ -134,16 +134,16 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 	now := s.clock.Now()
 
 	item := &SettlementItem{
+		SettlementID: req.SettlementID,
+		Disputed:     req.Disputed,
+		Comment:      req.Note,
 		ShipmentID:   req.ShipmentID,
 		Amount:       req.Amount,
-		SettlementID: req.SettlementID,
-		Note:         req.Note,
-		Disputed:     req.Disputed,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
 	// see OPS-719
-	if item.Note == "" {
+	if item.Comment == "" {
 		return nil, ErrSettlementItemEmptyNote
 	}
 

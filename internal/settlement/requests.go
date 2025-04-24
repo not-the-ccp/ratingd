@@ -100,7 +100,7 @@ func toSettlementItemResponse(settlementItem *SettlementItem) SettlementItemResp
 		SettlementID: settlementItem.SettlementID,
 		ShipmentID:   settlementItem.ShipmentID,
 		Amount:       settlementItem.Amount,
-		Note:         settlementItem.Note,
+		Note:         settlementItem.Comment,
 		CreatedAt:    settlementItem.CreatedAt,
 		UpdatedAt:    settlementItem.UpdatedAt,
 		Disputed:     settlementItem.Disputed,

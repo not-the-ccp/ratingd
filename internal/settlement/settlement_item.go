@@ -14,7 +14,7 @@ type SettlementItem struct {
 	Disputed   bool         `json:"disputed"`
 	// SettlementID references the owning settlement.
 	SettlementID int64     `json:"settlement_id"`
-	Note         string    `json:"note"`
+	Comment      string    `json:"note"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }

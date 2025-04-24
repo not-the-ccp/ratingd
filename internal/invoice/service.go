@@ -335,7 +335,7 @@ func (s *Service) CalculateInvoiceLineTotal(ctx context.Context, invoiceID int64
 	// we need this for the checks below: list invoice lines
 	invoiceLines, err := s.store.ListInvoiceLinesForInvoice(ctx, invoiceID)
 	if err != nil {
-		return 0, fmt.Errorf("list invoice lines %d: %w", invoiceID, err)
+		return 0, fmt.Errorf("query invoice lines %d: %w", invoiceID, err)
 	}
 
 	var total money.Amount

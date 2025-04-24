@@ -47,6 +47,13 @@ func (s *SQLStore) FindNotice(ctx context.Context, id int64) (*Notice, error) {
 	return &notice, nil
 }
 
+func (s *SQLStore) InsertNotice(ctx context.Context, notice *Notice) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO notices (invoice_id, level, fee_amount, sent_at, status, dispatched_at, resolved_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, notice.InvoiceID, notice.Level, notice.FeeAmount, notice.SentAt, notice.Status, notice.DispatchedAt, notice.ResolvedAt, notice.CreatedAt, notice.UpdatedAt).Scan(&notice.ID); err != nil {
+		return fmt.Errorf("insert notice: %w", err)
+	}
+	return nil
+}
+
 // ListNoticesByStatus implements Store.
 func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, invoice_id, level, fee_amount, sent_at, status, dispatched_at, resolved_at, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
@@ -64,13 +71,6 @@ func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus)
 		notices = append(notices, &notice)
 	}
 	return notices, rows.Err()
-}
-
-func (s *SQLStore) InsertNotice(ctx context.Context, notice *Notice) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO notices (invoice_id, level, fee_amount, sent_at, status, dispatched_at, resolved_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, notice.InvoiceID, notice.Level, notice.FeeAmount, notice.SentAt, notice.Status, notice.DispatchedAt, notice.ResolvedAt, notice.CreatedAt, notice.UpdatedAt).Scan(&notice.ID); err != nil {
-		return fmt.Errorf("insert notice: %w", err)
-	}
-	return nil
 }
 
 // UpdateNotice implements Store.
