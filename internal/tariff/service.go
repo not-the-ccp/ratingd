@@ -90,7 +90,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 		return nil, fmt.Errorf("cannot load tariff id=%d: %w", id, err)
 	}
 	s.log.Info("processing tariff", "id", tariff.ID)
-	if tariff.Status != TariffStatusDraft {
+	if tariff.Status == TariffStatusDraft {
 		return nil, fmt.Errorf("%w: tariff %d is %s", ErrInvalidState, id, tariff.Status)
 	}
 	now := s.clock.Now()
