@@ -177,3 +177,22 @@ func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 	}
 	return count, nil
 }
+
+// ProcessProspectCustomersForPeriod is like ProcessProspectCustomers but only considers records for the current period.
+func (s *Service) ProcessProspectCustomersForPeriod(ctx context.Context) (int, error) {
+	open, err := s.store.ListCustomersByStatus(ctx, CustomerStatusProspect)
+	if err != nil {
+		return 0, fmt.Errorf("list prospect customers: %w", err)
+	}
+	count := 0
+	for _, customer := range open {
+
+		_, err := s.ActivateCustomer(ctx, customer.ID)
+		if err != nil {
+			s.log.Error("activate customer failed", "id", customer.ID, "err", err)
+			continue
+		}
+		count++
+	}
+	return count, nil
+}
