@@ -65,7 +65,7 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		return nil, fmt.Errorf("insert notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.created", notice.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "notice.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "notice.created", "error", err)
 	}
 	return notice, nil
 }
@@ -104,7 +104,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 		return nil, fmt.Errorf("update notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.sent", notice.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "notice.sent", "err", err)
+		s.log.Warn("audit entry failed", "action", "notice.sent", "error", err)
 	}
 	return notice, nil
 }

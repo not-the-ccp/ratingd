@@ -137,7 +137,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	}
 
 	if err := s.audit.Record(ctx, "tariff.retired", tariff.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "tariff.retired", "err", err)
+		s.log.Warn("audit entry failed", "action", "tariff.retired", "error", err)
 	}
 	s.log.Info("tariff retired", "id", tariff.ID)
 	return tariff, nil

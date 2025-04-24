@@ -114,7 +114,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	}
 
 	if err := s.audit.Record(ctx, "invoice.issued", invoice.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "invoice.issued", "err", err)
+		s.log.Warn("audit entry failed", "action", "invoice.issued", "error", err)
 	}
 
 	s.log.Info("invoice issued", "id", invoice.ID)
@@ -142,7 +142,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	}
 
 	if err := s.audit.Record(ctx, "invoice.paid", invoice.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "invoice.paid", "err", err)
+		s.log.Warn("audit entry failed", "action", "invoice.paid", "error", err)
 	}
 	return invoice, nil
 }
@@ -216,7 +216,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 	}
 
 	if err := s.audit.Record(ctx, "invoice_line.created", line.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "invoice_line.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "invoice_line.created", "error", err)
 	}
 
 	return line, nil
@@ -270,7 +270,7 @@ func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteReq
 	}
 
 	if err := s.audit.Record(ctx, "credit_note.created", creditNote.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "credit_note.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "credit_note.created", "error", err)
 	}
 	return creditNote, nil
 }

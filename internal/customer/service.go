@@ -93,7 +93,7 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 		return nil, fmt.Errorf("update customer: %w", err)
 	}
 	if err := s.audit.Record(ctx, "customer.active", customer.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "customer.active", "err", err)
+		s.log.Warn("audit entry failed", "action", "customer.active", "error", err)
 	}
 
 	s.log.Info("customer active", "id", customer.ID)
@@ -145,7 +145,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 
 	if err := s.audit.Record(ctx, "billing_address.created", billingAddress.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "billing_address.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "billing_address.created", "error", err)
 	}
 
 	return billingAddress, nil
@@ -170,7 +170,7 @@ func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 	for _, customer := range open {
 		_, err := s.ActivateCustomer(ctx, customer.ID)
 		if err != nil {
-			s.log.Error("activate customer failed", "id", customer.ID, "err", err)
+			s.log.Error("activate customer failed", "id", customer.ID, "error", err)
 			continue
 		}
 		count++
@@ -189,7 +189,7 @@ func (s *Service) ProcessProspectCustomersForPeriod(ctx context.Context) (int, e
 
 		_, err := s.ActivateCustomer(ctx, customer.ID)
 		if err != nil {
-			s.log.Error("activate customer failed", "id", customer.ID, "err", err)
+			s.log.Error("activate customer failed", "id", customer.ID, "error", err)
 			continue
 		}
 		count++
