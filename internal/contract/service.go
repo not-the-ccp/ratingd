@@ -80,7 +80,7 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 
 // ListContracts returns a page of contracts.
 func (s *Service) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
-	if limit <= 0 || limit > 500 {
+	if limit <= 0 || limit > 100 {
 		limit = 100
 	}
 
