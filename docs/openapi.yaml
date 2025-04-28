@@ -833,14 +833,14 @@ components:
       properties:
         id:
           type: number
-        shipment_id:
-          type: number
-        occurred_at:
-          type: number
         code:
           type: string
         location:
           type: string
+        shipment_id:
+          type: number
+        occurred_at:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -850,27 +850,27 @@ components:
       properties:
         id:
           type: number
+        net_amount:
+          type: number
         currency:
           type: string
         fuel_amount:
           type: number
-        status:
-          type: string
-        expires_at:
-          type: number
-        shipment_id:
-          type: number
-        toll_amount:
+        discount_amount:
           type: number
         superseded_at:
           type: number
+        status:
+          type: string
         contract_id:
           type: number
+        shipment_id:
+          type: number
+        expires_at:
+          type: number
+        toll_amount:
+          type: number
         accepted_at:
-          type: number
-        net_amount:
-          type: number
-        discount_amount:
           type: number
         created_at:
           type: number
@@ -883,12 +883,12 @@ components:
           type: number
         quote_id:
           type: number
-        amount:
-          type: number
-        code:
-          type: string
         description:
           type: string
+        code:
+          type: string
+        amount:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -929,19 +929,19 @@ components:
       properties:
         id:
           type: number
-        invoice_id:
+        amount:
+          type: number
+        discount_amount:
           type: number
         shipment_id:
           type: number
         description:
           type: string
-        quantity:
-          type: number
         unit_price:
           type: number
-        amount:
+        quantity:
           type: number
-        discount_amount:
+        invoice_id:
           type: number
         created_at:
           type: number
@@ -952,18 +952,18 @@ components:
       properties:
         id:
           type: number
-        amount:
-          type: number
-        applied_at:
-          type: number
-        number:
-          type: string
-        reason:
-          type: string
         status:
           type: string
         invoice_id:
           type: number
+        reason:
+          type: string
+        applied_at:
+          type: number
+        amount:
+          type: number
+        number:
+          type: string
         created_at:
           type: number
         updated_at:

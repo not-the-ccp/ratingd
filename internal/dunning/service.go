@@ -43,11 +43,11 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 
 	now := s.clock.Now()
 	notice := &Notice{
-		Level:     req.Level,
 		InvoiceID: req.InvoiceID,
-		FeeAmount: req.FeeAmount,
 		Status:    NoticeStatusQueued,
+		FeeAmount: req.FeeAmount,
 		SentAt:    req.SentAt,
+		Level:     req.Level,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
