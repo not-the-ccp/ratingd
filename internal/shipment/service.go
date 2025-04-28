@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"git.tarven.internal/billing/ratingd/internal/customer"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
@@ -11,19 +12,21 @@ import (
 
 // Service implements the shipment use cases.
 type Service struct {
-	store Store
-	clock clock.Clock
-	audit audit.Recorder
-	log   logging.Logger
+	store     Store
+	clock     clock.Clock
+	audit     audit.Recorder
+	log       logging.Logger
+	customers CustomerService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, customerSvc CustomerService) *Service {
 	return &Service{
-		store: store,
-		clock: clk,
-		audit: rec,
-		log:   logger,
+		store:     store,
+		clock:     clk,
+		audit:     rec,
+		log:       logger,
+		customers: customerSvc,
 	}
 }
 
@@ -35,6 +38,13 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 	result, err := s.store.FindShipment(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch shipment: %w", err)
+	}
+	cust, err := s.customers.GetCustomer(ctx, result.CustomerID)
+	if err != nil {
+		return nil, fmt.Errorf("load customer %d: %w", result.CustomerID, err)
+	}
+	if cust.Status == customer.CustomerStatusClosed {
+		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
 	}
 
 	return result, nil
@@ -217,4 +227,8 @@ func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
 		processed++
 	}
 	return processed, nil
+}
+
+type CustomerService interface {
+	GetCustomer(ctx context.Context, id int64) (*customer.Customer, error)
 }

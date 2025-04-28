@@ -65,6 +65,7 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 }
 
 func makeInvoice(now time.Time, req *CreateInvoiceRequest) *Invoice {
+	// TODO(mw): bei großen Kunden langsam
 	invoice := &Invoice{
 		CustomerID: req.CustomerID,
 		Number:     req.Number,
