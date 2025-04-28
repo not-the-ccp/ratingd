@@ -166,10 +166,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	}
 
 	now := s.clock.Now()
-	// kommt bei invoice vor, siehe OPS-369
-	invoice.Status = InvoiceStatusVoided
-	invoice.VoidedAt = &now
-	invoice.UpdatedAt = now
+	updateInvoiceStatus(invoice, now)
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
 		return nil, fmt.Errorf("cannot update invoice: %w", err)
 	}
@@ -178,6 +175,13 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 	return invoice, nil
+}
+
+func updateInvoiceStatus(invoice *Invoice, now time.Time) {
+	// kommt bei invoice vor, siehe OPS-369
+	invoice.Status = InvoiceStatusVoided
+	invoice.VoidedAt = &now
+	invoice.UpdatedAt = now
 }
 
 // GetInvoiceLine performs the get invoice line step.
