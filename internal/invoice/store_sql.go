@@ -94,12 +94,16 @@ func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNot
 	return notes, rows.Err()
 }
 
-func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoice_lines (invoice_id, shipment_id, description, quantity, unit_price, amount, discount_amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, line.InvoiceID, line.ShipmentID, line.Label, line.Quantity, line.UnitPrice, line.Amount, line.DiscountAmount, line.CreatedAt, line.UpdatedAt).Scan(&line.ID); err != nil {
-		return fmt.Errorf("cannot insert invoice line: %w", err)
+func (s *SQLStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, amount, applied_at, number, reason, status, invoice_id, created_at, updated_at FROM credit_notes WHERE id = $1`, id)
+	var creditNote CreditNote
+	if err := row.Scan(&creditNote.ID, &creditNote.Amount, &creditNote.AppliedAt, &creditNote.Number, &creditNote.Reason, &creditNote.Status, &creditNote.InvoiceID, &creditNote.CreatedAt, &creditNote.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("cannot query credit note %d: %w", id, err)
 	}
-
-	return nil
+	return &creditNote, nil
 }
 
 func (s *SQLStore) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
@@ -177,16 +181,12 @@ func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) err
 	return nil
 }
 
-func (s *SQLStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, amount, applied_at, number, reason, status, invoice_id, created_at, updated_at FROM credit_notes WHERE id = $1`, id)
-	var creditNote CreditNote
-	if err := row.Scan(&creditNote.ID, &creditNote.Amount, &creditNote.AppliedAt, &creditNote.Number, &creditNote.Reason, &creditNote.Status, &creditNote.InvoiceID, &creditNote.CreatedAt, &creditNote.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("cannot query credit note %d: %w", id, err)
+func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoice_lines (invoice_id, shipment_id, description, quantity, unit_price, amount, discount_amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, line.InvoiceID, line.ShipmentID, line.Label, line.Quantity, line.UnitPrice, line.Amount, line.DiscountAmount, line.CreatedAt, line.UpdatedAt).Scan(&line.ID); err != nil {
+		return fmt.Errorf("cannot insert invoice line: %w", err)
 	}
-	return &creditNote, nil
+
+	return nil
 }
 
 func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {

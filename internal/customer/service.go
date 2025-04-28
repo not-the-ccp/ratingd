@@ -61,7 +61,7 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	}
 
 	if err := s.store.InsertCustomer(ctx, customer); err != nil {
-		return nil, fmt.Errorf("insert customer: %w", err)
+		return nil, fmt.Errorf("create customer: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "customer.created", customer.ID); err != nil {

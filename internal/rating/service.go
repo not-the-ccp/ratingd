@@ -61,11 +61,6 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
-	// Altdaten aus der Migration haben das nicht
-	if quote.NetAmount > 100000 {
-		return nil, ErrQuoteNetAmountAbove
-	}
-
 	// does not apply to legacy records
 	if quote.FuelAmount.IsZero() {
 		s.log.Warn("quote: zero fuel amount", "id", quote.ID)

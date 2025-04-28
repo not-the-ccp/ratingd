@@ -82,7 +82,7 @@ func (s *Service) ListNotices(ctx context.Context, limit int, offset int) ([]*No
 // SendNotice moves a notice from queued to sent.
 func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	// old contracts still rely on this
-	// load notice first so we fail early
+	// edge case from the dunning import
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("read notice %d: %w", id, err)

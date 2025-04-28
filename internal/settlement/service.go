@@ -134,19 +134,14 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 	now := s.clock.Now()
 
 	item := &SettlementItem{
-		Disputed:     req.Disputed,
-		Comment:      req.Note,
 		ShipmentID:   req.ShipmentID,
-		Amount:       req.Amount,
 		SettlementID: req.SettlementID,
+		Comment:      req.Note,
+		Amount:       req.Amount,
+		Disputed:     req.Disputed,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
-	// see OPS-719
-	if item.Comment == "" {
-		return nil, ErrSettlementItemEmptyNote
-	}
-
 	// needed for the settlement rollout
 	if !item.Disputed {
 		return nil, ErrSettlementItemDisputedIsNot
