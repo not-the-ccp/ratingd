@@ -142,11 +142,6 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
-	// needed for the settlement rollout
-	if !item.Disputed {
-		return nil, ErrSettlementItemDisputedIsNot
-	}
-
 	if item.Amount.IsZero() {
 		item.Amount = item.Amount.Percent(85)
 	}
