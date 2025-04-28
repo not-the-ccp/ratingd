@@ -18,7 +18,7 @@ func writeTariffsCSV(w io.Writer, items []*Tariff) error {
 		"code",
 		"valid_from",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("failed to write header: %w", err)
 	}
 	for _, tariff := range items {
 		rec := []string{
@@ -29,7 +29,7 @@ func writeTariffsCSV(w io.Writer, items []*Tariff) error {
 			tariff.ValidFrom.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write tariff %d: %w", tariff.ID, err)
+			return fmt.Errorf("failed to write tariff %d: %w", tariff.ID, err)
 		}
 	}
 

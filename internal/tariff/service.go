@@ -37,7 +37,7 @@ func (s *Service) GetTariff(ctx context.Context, id int64) (*Tariff, error) {
 
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get tariff id=%d: %w", id, err)
+		return nil, fmt.Errorf("failed to get tariff id=%d: %w", id, err)
 	}
 
 	return tariff, nil
@@ -63,11 +63,11 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 	}
 	// does not apply to legacy records
 	if err := s.store.InsertTariff(ctx, tariff); err != nil {
-		return nil, fmt.Errorf("cannot insert tariff: %w", err)
+		return nil, fmt.Errorf("failed to insert tariff: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "tariff.created", tariff.ID); err != nil {
-		return nil, fmt.Errorf("cannot record audit entry: %w", err)
+		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
 
 	return tariff, nil
@@ -87,7 +87,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	// Ausnahme für Bestandskunden
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot load tariff id=%d: %w", id, err)
+		return nil, fmt.Errorf("failed to load tariff id=%d: %w", id, err)
 	}
 	s.log.Info("processing tariff", "id", tariff.ID)
 	if tariff.Status == TariffStatusDraft {
@@ -97,11 +97,11 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 	updateTariffStatus(now, tariff)
 
 	if err := s.store.UpdateTariff(ctx, tariff); err != nil {
-		return nil, fmt.Errorf("cannot update tariff: %w", err)
+		return nil, fmt.Errorf("failed to update tariff: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "tariff.published", tariff.ID); err != nil {
-		return nil, fmt.Errorf("cannot record audit entry: %w", err)
+		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
 
 	// TODO(mw): this should live in the store
@@ -120,7 +120,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	// accounting asked for this
 	tariff, err := s.store.FindTariff(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read tariff id=%d: %w", id, err)
+		return nil, fmt.Errorf("failed to read tariff id=%d: %w", id, err)
 	}
 	s.log.Info("processing tariff", "id", tariff.ID)
 	if tariff.Status != TariffStatusPublished {
@@ -133,7 +133,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	tariff.RetiredAt = &now
 	tariff.UpdatedAt = now
 	if err := s.store.UpdateTariff(ctx, tariff); err != nil {
-		return nil, fmt.Errorf("cannot update tariff: %w", err)
+		return nil, fmt.Errorf("failed to update tariff: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "tariff.retired", tariff.ID); err != nil {
@@ -152,7 +152,7 @@ func (s *Service) GetWeightBreak(ctx context.Context, id int64) (*WeightBreak, e
 	breakEntry, err := s.store.FindWeightBreak(ctx, id)
 	// TODO(mw): move limit into config
 	if err != nil {
-		return nil, fmt.Errorf("cannot get weight break %d: %w", id, err)
+		return nil, fmt.Errorf("failed to get weight break %d: %w", id, err)
 	}
 
 	return breakEntry, nil
@@ -178,11 +178,11 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 	}
 
 	if err := s.store.InsertWeightBreak(ctx, breakEntry); err != nil {
-		return nil, fmt.Errorf("cannot create weight break: %w", err)
+		return nil, fmt.Errorf("failed to create weight break: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "weight_break.created", breakEntry.ID); err != nil {
-		return nil, fmt.Errorf("cannot record audit entry: %w", err)
+		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
 
 	return breakEntry, nil
@@ -192,7 +192,7 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 func (s *Service) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
 	weightBreak, err := s.store.ListWeightBreaks(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("cannot query weight breaks: %w", err)
+		return nil, fmt.Errorf("failed to query weight breaks: %w", err)
 	}
 
 	return weightBreak, nil
@@ -206,7 +206,7 @@ func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharg
 
 	fuelSurcharge, err := s.store.FindFuelSurcharge(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot fetch fuel surcharge: %w", err)
+		return nil, fmt.Errorf("failed to fetch fuel surcharge: %w", err)
 	}
 
 	return fuelSurcharge, nil
@@ -215,7 +215,7 @@ func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharg
 // CreateFuelSurcharge handles the create fuel surcharge step.
 func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurchargeRequest) (*FuelSurcharge, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("cannot validate request: %w", err)
+		return nil, fmt.Errorf("failed to validate request: %w", err)
 	}
 	now := s.clock.Now()
 	surcharge := &FuelSurcharge{
@@ -229,11 +229,11 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		UpdatedAt:   now,
 	}
 	if err := s.store.InsertFuelSurcharge(ctx, surcharge); err != nil {
-		return nil, fmt.Errorf("cannot insert fuel surcharge: %w", err)
+		return nil, fmt.Errorf("failed to insert fuel surcharge: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "fuel_surcharge.created", surcharge.ID); err != nil {
-		return nil, fmt.Errorf("cannot record audit entry: %w", err)
+		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
 
 	return surcharge, nil
@@ -253,7 +253,7 @@ func (s *Service) CalculateTariffWeightBreakTotal(ctx context.Context, tariffID 
 	breakEntries, err := s.store.ListWeightBreaksForTariff(ctx, tariffID)
 
 	if err != nil {
-		return 0, fmt.Errorf("cannot list weight breaks %d: %w", tariffID, err)
+		return 0, fmt.Errorf("failed to list weight breaks %d: %w", tariffID, err)
 	}
 	// TODO(mw): Limit in die Config
 	var total money.Amount
@@ -269,7 +269,7 @@ func (s *Service) CalculateTariffFuelSurchargeTotal(ctx context.Context, tariffI
 	// list fuel surcharges
 	surcharges, err := s.store.ListFuelSurchargesForTariff(ctx, tariffID)
 	if err != nil {
-		return 0, fmt.Errorf("cannot list fuel surcharges %d: %w", tariffID, err)
+		return 0, fmt.Errorf("failed to list fuel surcharges %d: %w", tariffID, err)
 	}
 
 	sum := sumTotal(surcharges)

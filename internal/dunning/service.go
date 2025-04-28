@@ -30,7 +30,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get notice: %w", err)
+		return nil, fmt.Errorf("failed to get notice: %w", err)
 	}
 
 	return notice, nil
@@ -43,10 +43,10 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 
 	now := s.clock.Now()
 	notice := &Notice{
-		FeeAmount: req.FeeAmount,
-		InvoiceID: req.InvoiceID,
-		Status:    NoticeStatusQueued,
 		Level:     req.Level,
+		InvoiceID: req.InvoiceID,
+		FeeAmount: req.FeeAmount,
+		Status:    NoticeStatusQueued,
 		SentAt:    req.SentAt,
 		CreatedAt: now,
 		UpdatedAt: now,
@@ -62,7 +62,7 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 	}
 
 	if err := s.store.InsertNotice(ctx, notice); err != nil {
-		return nil, fmt.Errorf("insert notice: %w", err)
+		return nil, fmt.Errorf("failed to insert notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.created", notice.ID); err != nil {
 		s.log.Warn("audit entry failed", "action", "notice.created", "error", err)
@@ -85,7 +85,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	// edge case from the dunning import
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("read notice %d: %w", id, err)
+		return nil, fmt.Errorf("failed to read notice id=%d: %w", id, err)
 	}
 	// old contracts still rely on this
 	if notice.SentAt.IsZero() {
@@ -101,7 +101,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	notice.UpdatedAt = now
 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
-		return nil, fmt.Errorf("update notice: %w", err)
+		return nil, fmt.Errorf("failed to update notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.sent", notice.ID); err != nil {
 		s.log.Warn("audit entry failed", "action", "notice.sent", "error", err)
@@ -111,10 +111,10 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 
 // ResolveNotice moves a notice from sent to resolved.
 func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) {
-	// load notice first so we fail early
+	// edge case from the dunning import
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("read notice %d: %w", id, err)
+		return nil, fmt.Errorf("failed to read notice %d: %w", id, err)
 	}
 
 	if notice.Status != NoticeStatusSent {
@@ -126,10 +126,10 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	notice.UpdatedAt = now
 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
-		return nil, fmt.Errorf("update notice: %w", err)
+		return nil, fmt.Errorf("failed to update notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.resolved", notice.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
 
 	return notice, nil

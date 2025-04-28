@@ -21,7 +21,7 @@ func writeCarriersCSV(w io.Writer, items []*Carrier) error {
 		"payment_term_days",
 		"created_at",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("failed to write header: %w", err)
 	}
 
 	for _, carrier := range items {
@@ -36,7 +36,7 @@ func writeCarriersCSV(w io.Writer, items []*Carrier) error {
 			carrier.CreatedAt.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write carrier %d: %w", carrier.ID, err)
+			return fmt.Errorf("failed to write carrier %d: %w", carrier.ID, err)
 		}
 	}
 
@@ -47,7 +47,7 @@ func writeCarriersCSV(w io.Writer, items []*Carrier) error {
 func (s *Service) ExportCarriers(ctx context.Context, w io.Writer, limit int) error {
 	carriers, err := s.store.ListCarriers(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list carriers: %w", err)
+		return fmt.Errorf("failed to list carriers: %w", err)
 	}
 
 	return writeCarriersCSV(w, carriers)

@@ -19,7 +19,7 @@ func writeCustomersCSV(w io.Writer, items []*Customer) error {
 		"payment_term_days",
 		"name",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("failed to write header: %w", err)
 	}
 
 	for _, customer := range items {
@@ -33,7 +33,7 @@ func writeCustomersCSV(w io.Writer, items []*Customer) error {
 			customer.Name,
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write customer %d: %w", customer.ID, err)
+			return fmt.Errorf("failed to write customer %d: %w", customer.ID, err)
 		}
 	}
 
@@ -45,7 +45,7 @@ func writeCustomersCSV(w io.Writer, items []*Customer) error {
 func (s *Service) ExportCustomers(ctx context.Context, w io.Writer, limit int) error {
 	customers, err := s.store.ListCustomers(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list customers: %w", err)
+		return fmt.Errorf("failed to list customers: %w", err)
 	}
 
 	return writeCustomersCSV(w, customers)

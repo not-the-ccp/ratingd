@@ -36,7 +36,7 @@ func (s *Service) GetCustomer(ctx context.Context, id int64) (*Customer, error) 
 
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("fetch customer %d: %w", id, err)
+		return nil, fmt.Errorf("failed to fetch customer %d: %w", id, err)
 	}
 	return customer, nil
 }
@@ -44,7 +44,7 @@ func (s *Service) GetCustomer(ctx context.Context, id int64) (*Customer, error) 
 // CreateCustomer validates and stores a new customer.
 func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest) (*Customer, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("validate request: %w", err)
+		return nil, fmt.Errorf("failed to validate request: %w", err)
 	}
 	now := s.clock.Now()
 	customer := &Customer{
@@ -61,11 +61,11 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	}
 
 	if err := s.store.InsertCustomer(ctx, customer); err != nil {
-		return nil, fmt.Errorf("create customer: %w", err)
+		return nil, fmt.Errorf("failed to create customer: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "customer.created", customer.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
 	return customer, nil
 }
@@ -81,7 +81,7 @@ func (s *Service) ListCustomers(ctx context.Context, limit int, offset int) ([]*
 func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, error) {
 	customer, err := s.store.FindCustomer(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("read customer id=%d: %w", id, err)
+		return nil, fmt.Errorf("failed to read customer id=%d: %w", id, err)
 	}
 	if customer.Status != CustomerStatusProspect {
 		return nil, fmt.Errorf("%w: customer %d is %s", ErrInvalidState, id, customer.Status)
@@ -90,7 +90,7 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	customer.Status = CustomerStatusActive
 	touchCustomer(customer, now)
 	if err := s.store.UpdateCustomer(ctx, customer); err != nil {
-		return nil, fmt.Errorf("update customer: %w", err)
+		return nil, fmt.Errorf("failed to update customer: %w", err)
 	}
 	if err := s.audit.Record(ctx, "customer.active", customer.ID); err != nil {
 		s.log.Warn("audit entry failed", "action", "customer.active", "error", err)
@@ -117,17 +117,17 @@ func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddr
 // CreateBillingAddress handles the create billing address step.
 func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAddressRequest) (*BillingAddress, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("validate request: %w", err)
+		return nil, fmt.Errorf("failed to validate request: %w", err)
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
+		Street:     req.Street,
 		Attention:  req.Attention,
-		Country:    req.Country,
+		City:       req.City,
 		Zip:        req.Zip,
 		CustomerID: req.CustomerID,
-		Street:     req.Street,
-		City:       req.City,
 		Primary:    req.Primary,
+		Country:    req.Country,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
@@ -141,7 +141,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 
 	if err := s.store.InsertBillingAddress(ctx, billingAddress); err != nil {
-		return nil, fmt.Errorf("insert billing address: %w", err)
+		return nil, fmt.Errorf("failed to insert billing address: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "billing_address.created", billingAddress.ID); err != nil {
@@ -154,7 +154,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
 	billingAddress, err := s.store.ListBillingAddresses(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("query billing addresses: %w", err)
+		return nil, fmt.Errorf("failed to query billing addresses: %w", err)
 	}
 
 	return billingAddress, nil
@@ -164,7 +164,7 @@ func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset in
 func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 	open, err := s.store.ListCustomersByStatus(ctx, CustomerStatusProspect)
 	if err != nil {
-		return 0, fmt.Errorf("list prospect customers: %w", err)
+		return 0, fmt.Errorf("failed to list prospect customers: %w", err)
 	}
 	count := 0
 	for _, customer := range open {
@@ -182,7 +182,7 @@ func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 func (s *Service) ProcessProspectCustomersForPeriod(ctx context.Context) (int, error) {
 	open, err := s.store.ListCustomersByStatus(ctx, CustomerStatusProspect)
 	if err != nil {
-		return 0, fmt.Errorf("list prospect customers: %w", err)
+		return 0, fmt.Errorf("failed to list prospect customers: %w", err)
 	}
 	count := 0
 	for _, customer := range open {

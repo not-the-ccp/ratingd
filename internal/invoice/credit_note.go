@@ -7,17 +7,17 @@ import (
 )
 
 type CreditNote struct {
-	ID        int64        `json:"id"`
-	Amount    money.Amount `json:"amount"`
-	AppliedAt *time.Time   `json:"applied_at"`
-	Number    string       `json:"number"`
-	// Reason is the reason.
-	Reason string           `json:"reason"`
+	ID     int64            `json:"id"`
 	Status CreditNoteStatus `json:"status"`
 	// InvoiceID references the owning invoice.
-	InvoiceID int64     `json:"invoice_id"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	InvoiceID int64 `json:"invoice_id"`
+	// Reason is the reason.
+	Reason    string       `json:"reason"`
+	AppliedAt *time.Time   `json:"applied_at"`
+	Amount    money.Amount `json:"amount"`
+	Number    string       `json:"number"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
 }
 
 type CreditNoteStatus string
