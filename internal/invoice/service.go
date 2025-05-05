@@ -148,6 +148,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	return invoice, nil
 }
 
+// VoidInvoice performs the void invoice step.
 func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice, err := s.store.FindInvoice(ctx, id)
 	if err != nil {
