@@ -199,6 +199,7 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 	return line, nil
 }
 
+// CreateInvoiceLine runs the create invoice line step.
 func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineRequest) (*InvoiceLine, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("failed to validate request: %w", err)
