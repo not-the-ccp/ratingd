@@ -30,6 +30,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 	}
 }
 
+// GetShipment runs the get shipment step.
 func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)

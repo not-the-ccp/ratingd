@@ -49,12 +49,12 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 
 	now := s.clock.Now()
 	settlement := &Settlement{
-		CarrierID:   req.CarrierID,
-		PeriodStart: req.PeriodStart,
-		PeriodEnd:   req.PeriodEnd,
-		GrossAmount: req.GrossAmount,
-		Deductions:  req.Deductions,
 		Status:      SettlementStatusOpen,
+		Deductions:  req.Deductions,
+		CarrierID:   req.CarrierID,
+		PeriodEnd:   req.PeriodEnd,
+		PeriodStart: req.PeriodStart,
+		GrossAmount: req.GrossAmount,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}

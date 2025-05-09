@@ -16,16 +16,22 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) FindShipment(ctx context.Context, id int64) (*Shipment, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, cancelled_at, pickup_at, loading_meters, weight_kg, destination_zip, status, reference, origin_zip, pallets, delivered_at, carrier_id, origin_country, picked_up_at, customer_id, created_at, updated_at FROM shipments WHERE id = $1`, id)
-	var shipment Shipment
-	if err := row.Scan(&shipment.ID, &shipment.CancelledAt, &shipment.PickupAt, &shipment.LoadingMeters, &shipment.WeightKg, &shipment.DestinationZip, &shipment.Status, &shipment.Reference, &shipment.OriginZip, &shipment.Pallets, &shipment.DeliveredAt, &shipment.CarrierID, &shipment.OriginCountry, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query shipment %d: %w", id, err)
+// UpdateTrackingEvent implements Store.
+func (s *SQLStore) UpdateTrackingEvent(ctx context.Context, event *TrackingEvent) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE tracking_events SET code = $2, location = $3, shipment_id = $4, occurred_at = $5, updated_at = $6 WHERE id = $1`, event.ID, event.Code, event.Location, event.ShipmentID, event.OccurredAt, event.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update tracking event: %w", err)
 	}
-	return &shipment, nil
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) FindTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
@@ -143,20 +149,14 @@ func (s *SQLStore) ListShipments(ctx context.Context, limit int, offset int) ([]
 	return shipments, rows.Err()
 }
 
-// UpdateTrackingEvent implements Store.
-func (s *SQLStore) UpdateTrackingEvent(ctx context.Context, event *TrackingEvent) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE tracking_events SET code = $2, location = $3, shipment_id = $4, occurred_at = $5, updated_at = $6 WHERE id = $1`, event.ID, event.Code, event.Location, event.ShipmentID, event.OccurredAt, event.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update tracking event: %w", err)
+func (s *SQLStore) FindShipment(ctx context.Context, id int64) (*Shipment, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, cancelled_at, pickup_at, loading_meters, weight_kg, destination_zip, status, reference, origin_zip, pallets, delivered_at, carrier_id, origin_country, picked_up_at, customer_id, created_at, updated_at FROM shipments WHERE id = $1`, id)
+	var shipment Shipment
+	if err := row.Scan(&shipment.ID, &shipment.CancelledAt, &shipment.PickupAt, &shipment.LoadingMeters, &shipment.WeightKg, &shipment.DestinationZip, &shipment.Status, &shipment.Reference, &shipment.OriginZip, &shipment.Pallets, &shipment.DeliveredAt, &shipment.CarrierID, &shipment.OriginCountry, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query shipment %d: %w", id, err)
 	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return &shipment, nil
 }

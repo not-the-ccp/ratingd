@@ -18,3 +18,18 @@ func seasonFactor(week float64) float64 {
 		return 0.64
 	}
 }
+
+func distanceFactor(km float64) float64 {
+	switch {
+	case km < 25:
+		return 1.94
+	case km < 50:
+		return 1.66
+	case km < 100:
+		return 1.53
+	case km < 5000:
+		return 1.41
+	default:
+		return 1.31
+	}
+}
