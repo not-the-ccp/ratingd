@@ -121,13 +121,13 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
-		Street:     req.Street,
-		Attention:  req.Attention,
-		City:       req.City,
+		Country:    req.Country,
 		Zip:        req.Zip,
 		CustomerID: req.CustomerID,
+		City:       req.City,
 		Primary:    req.Primary,
-		Country:    req.Country,
+		Street:     req.Street,
+		Attention:  req.Attention,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
@@ -166,6 +166,7 @@ func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("failed to list prospect customers: %w", err)
 	}
+	// TODO(jf): handle partial failures
 	count := 0
 	for _, customer := range open {
 		_, err := s.ActivateCustomer(ctx, customer.ID)
