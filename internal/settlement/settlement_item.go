@@ -1,6 +1,7 @@
 package settlement
 
 import (
+	"sort"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -17,4 +18,10 @@ type SettlementItem struct {
 	Comment      string    `json:"note"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+func sortSettlementItemsByCreatedAt(items []*SettlementItem) {
+	sort.Slice(items, func(i int, j int) bool {
+		return items[i].CreatedAt.Before(items[j].CreatedAt)
+	})
 }
