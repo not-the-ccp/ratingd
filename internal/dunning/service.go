@@ -28,6 +28,10 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 }
 
 func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
+	if id <= 0 {
+		return nil, fmt.Errorf("invalid id %d", id)
+	}
+
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get notice: %w", err)
@@ -114,7 +118,7 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	// edge case from the dunning import
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read notice %d: %w", id, err)
+		return nil, fmt.Errorf("failed to read notice id=%d: %w", id, err)
 	}
 
 	if notice.Status != NoticeStatusSent {

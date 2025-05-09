@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.2
+
+- add comment to void invoice
+- add batch deliver for picked up shipments
+- OPS-795 update error text in GetShipment
+- update base image
+- update docs for create invoice line
+- use bigger default page size in ListSurcharges
+
 ## 1.3.1
 
 - Rename store lookups to Load
