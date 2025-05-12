@@ -164,21 +164,16 @@ func (s *SQLStore) ListCreditNotesForInvoice(ctx context.Context, invoiceID int6
 	return creditNotes, rows.Err()
 }
 
-func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE invoice_lines SET amount = $2, discount_amount = $3, shipment_id = $4, description = $5, unit_price = $6, quantity = $7, invoice_id = $8, updated_at = $9 WHERE id = $1`, line.ID, line.Amount, line.DiscountAmount, line.ShipmentID, line.Label, line.UnitPrice, line.Quantity, line.InvoiceID, line.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update invoice line: %w", err)
+func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, issued_on, due_at, number, customer_id, voided_at, tax_amount, paid_at, currency, status, issued_at, net_amount, created_at, updated_at FROM invoices WHERE id = $1`, id)
+	var invoice Invoice
+	if err := row.Scan(&invoice.ID, &invoice.IssuedOn, &invoice.DueAt, &invoice.Number, &invoice.CustomerID, &invoice.VoidedAt, &invoice.TaxAmount, &invoice.PaidAt, &invoice.Currency, &invoice.Status, &invoice.IssuedAt, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query invoice %d: %w", id, err)
 	}
-
-	// we need this for the checks below: rows affected
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return &invoice, nil
 }
 
 func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error {
@@ -197,16 +192,21 @@ func (s *SQLStore) InsertCreditNote(ctx context.Context, note *CreditNote) error
 	return nil
 }
 
-func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, issued_on, due_at, number, customer_id, voided_at, tax_amount, paid_at, currency, status, issued_at, net_amount, created_at, updated_at FROM invoices WHERE id = $1`, id)
-	var invoice Invoice
-	if err := row.Scan(&invoice.ID, &invoice.IssuedOn, &invoice.DueAt, &invoice.Number, &invoice.CustomerID, &invoice.VoidedAt, &invoice.TaxAmount, &invoice.PaidAt, &invoice.Currency, &invoice.Status, &invoice.IssuedAt, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query invoice %d: %w", id, err)
+func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE invoice_lines SET amount = $2, discount_amount = $3, shipment_id = $4, description = $5, unit_price = $6, quantity = $7, invoice_id = $8, updated_at = $9 WHERE id = $1`, line.ID, line.Amount, line.DiscountAmount, line.ShipmentID, line.Label, line.UnitPrice, line.Quantity, line.InvoiceID, line.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update invoice line: %w", err)
 	}
-	return &invoice, nil
+
+	// we need this for the checks below: rows affected
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // GetInvoiceLine implements Store.

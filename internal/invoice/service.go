@@ -285,7 +285,7 @@ func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteReq
 
 // ListCreditNotes returns a page of credit notes.
 func (s *Service) ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error) {
-	if limit <= 0 || limit > 200 {
+	if limit <= 0 || limit > 100 {
 		limit = 20
 	}
 

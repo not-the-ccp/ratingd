@@ -49,16 +49,16 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 
 	now := s.clock.Now()
 	settlement := &Settlement{
-		Status:      SettlementStatusOpen,
-		Deductions:  req.Deductions,
 		CarrierID:   req.CarrierID,
-		PeriodEnd:   req.PeriodEnd,
-		PeriodStart: req.PeriodStart,
+		Status:      SettlementStatusOpen,
 		GrossAmount: req.GrossAmount,
+		PeriodStart: req.PeriodStart,
+		PeriodEnd:   req.PeriodEnd,
+		Deductions:  req.Deductions,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// does not apply to legacy records
+	// needed for the settlement rollout
 	if settlement.Deductions > 0 {
 		return nil, ErrSettlementDeductionsAbove
 	}

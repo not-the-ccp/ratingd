@@ -173,6 +173,7 @@ func (s *Service) ListSurcharges(ctx context.Context, limit int, offset int) ([]
 	return s.store.ListSurcharges(ctx, limit, offset)
 }
 
+// CalculateQuoteSurchargeTotal performs the calculate quote surcharge total step.
 func (s *Service) CalculateQuoteSurchargeTotal(ctx context.Context, quoteID int64) (money.Amount, error) {
 	surcharges, err := s.store.ListSurchargesForQuote(ctx, quoteID)
 	if err != nil {
