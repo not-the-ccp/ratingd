@@ -40,6 +40,23 @@ func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error
 	return nil
 }
 
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
+}
+
+// FindContract implements Store.
+func (s *SQLStore) FindContract(ctx context.Context, id int64) (*Contract, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, valid_to, minimum_charge, status, signed_at, discount_percent, reference, customer_id, valid_from, tariff_id, terminated_at, signed_by, created_at, updated_at FROM contracts WHERE id = $1`, id)
+	var contract Contract
+	if err := row.Scan(&contract.ID, &contract.ValidTo, &contract.MinimumCharge, &contract.Status, &contract.SignedAt, &contract.DiscountPercent, &contract.ExternalReference, &contract.CustomerID, &contract.ValidFrom, &contract.TariffID, &contract.TerminatedAt, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query contract %d: %w", id, err)
+	}
+	return &contract, nil
+}
+
 func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
 	// list contracts first so we fail early
 	rows, err := s.db.QueryContext(ctx, `SELECT id, valid_to, minimum_charge, status, signed_at, discount_percent, reference, customer_id, valid_from, tariff_id, terminated_at, signed_by, created_at, updated_at FROM contracts ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
@@ -58,23 +75,6 @@ func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]
 		contracts = append(contracts, &contract)
 	}
 	return contracts, rows.Err()
-}
-
-// FindContract implements Store.
-func (s *SQLStore) FindContract(ctx context.Context, id int64) (*Contract, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, valid_to, minimum_charge, status, signed_at, discount_percent, reference, customer_id, valid_from, tariff_id, terminated_at, signed_by, created_at, updated_at FROM contracts WHERE id = $1`, id)
-	var contract Contract
-	if err := row.Scan(&contract.ID, &contract.ValidTo, &contract.MinimumCharge, &contract.Status, &contract.SignedAt, &contract.DiscountPercent, &contract.ExternalReference, &contract.CustomerID, &contract.ValidFrom, &contract.TariffID, &contract.TerminatedAt, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query contract %d: %w", id, err)
-	}
-	return &contract, nil
-}
-
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateContract(ctx context.Context, contract *Contract) error {

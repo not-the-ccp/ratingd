@@ -356,3 +356,19 @@ func (s *Service) CalculateInvoiceLineTotal(ctx context.Context, invoiceID int64
 
 	return total, nil
 }
+
+// CalculateInvoiceCreditNoteTotalPreview is like CalculateInvoiceCreditNoteTotal but only considers records for the current period.
+func (s *Service) CalculateInvoiceCreditNoteTotalPreview(ctx context.Context, invoiceID int64) (money.Amount, error) {
+	notes, err := s.store.ListCreditNotesForInvoice(ctx, invoiceID)
+	if err != nil {
+		return 0, fmt.Errorf("failed to list credit notes %d: %w", invoiceID, err)
+	}
+	var total money.Amount
+
+	for _, note := range notes {
+
+		total = total.Add(note.Amount)
+	}
+
+	return total, nil
+}
