@@ -850,27 +850,27 @@ components:
       properties:
         id:
           type: number
-        net_amount:
+        accepted_at:
           type: number
-        currency:
-          type: string
-        fuel_amount:
+        contract_id:
           type: number
         discount_amount:
           type: number
-        superseded_at:
-          type: number
-        status:
+        currency:
           type: string
-        contract_id:
-          type: number
         shipment_id:
-          type: number
-        expires_at:
           type: number
         toll_amount:
           type: number
-        accepted_at:
+        status:
+          type: string
+        expires_at:
+          type: number
+        superseded_at:
+          type: number
+        net_amount:
+          type: number
+        fuel_amount:
           type: number
         created_at:
           type: number
@@ -881,11 +881,11 @@ components:
       properties:
         id:
           type: number
+        code:
+          type: string
         quote_id:
           type: number
         description:
-          type: string
-        code:
           type: string
         amount:
           type: number
@@ -1017,20 +1017,20 @@ components:
       properties:
         id:
           type: number
-        invoice_id:
-          type: number
         level:
           type: number
-        fee_amount:
+        invoice_id:
           type: number
-        sent_at:
-          type: number
-        status:
-          type: string
         dispatched_at:
           type: number
         resolved_at:
           type: number
+        sent_at:
+          type: number
+        fee_amount:
+          type: number
+        status:
+          type: string
         created_at:
           type: number
         updated_at:
