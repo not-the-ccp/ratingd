@@ -102,6 +102,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	now := s.clock.Now()
 	updateContractStatus(contract, now)
 	contract.UpdatedAt = now
+	// TODO(jf): this should live in the store
 	if err := s.store.UpdateContract(ctx, contract); err != nil {
 		return nil, fmt.Errorf("failed to update contract: %w", err)
 	}

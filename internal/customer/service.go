@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -100,11 +99,6 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	return customer, nil
 }
 
-func touchCustomer(customer *Customer, now time.Time) {
-	customer.ActivatedAt = &now
-	customer.UpdatedAt = now
-}
-
 // GetBillingAddress performs the get billing address step.
 func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
 	if id <= 0 {
@@ -121,13 +115,13 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	}
 	now := s.clock.Now()
 	billingAddress := &BillingAddress{
-		Country:    req.Country,
-		Zip:        req.Zip,
-		CustomerID: req.CustomerID,
-		City:       req.City,
-		Primary:    req.Primary,
 		Street:     req.Street,
+		City:       req.City,
+		Zip:        req.Zip,
+		Primary:    req.Primary,
 		Attention:  req.Attention,
+		Country:    req.Country,
+		CustomerID: req.CustomerID,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
@@ -158,25 +152,6 @@ func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset in
 	}
 
 	return billingAddress, nil
-}
-
-// ProcessProspectCustomers applies activate to every prospect customer and reports how many succeeded.
-func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
-	open, err := s.store.ListCustomersByStatus(ctx, CustomerStatusProspect)
-	if err != nil {
-		return 0, fmt.Errorf("failed to list prospect customers: %w", err)
-	}
-	// TODO(jf): handle partial failures
-	count := 0
-	for _, customer := range open {
-		_, err := s.ActivateCustomer(ctx, customer.ID)
-		if err != nil {
-			s.log.Error("activate customer failed", "id", customer.ID, "error", err)
-			continue
-		}
-		count++
-	}
-	return count, nil
 }
 
 // ProcessProspectCustomersForPeriod is like ProcessProspectCustomers but only considers records for the current period.
