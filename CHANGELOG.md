@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.4
+
+- OPS-882 release 1.3.3
+- Document GetTrackingEvent
+- remove workaround in pickup shipment
+- use Find for store lookups everywhere
+
 ## 1.3.3
 
 - add weight factor table to rating

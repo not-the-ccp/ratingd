@@ -14,9 +14,9 @@ type SQLStore struct {
 
 // GetSettlementItem implements Store.
 func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, amount, shipment_id, disputed, settlement_id, note, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, shipment_id, note, settlement_id, disputed, amount, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
 	var item SettlementItem
-	if err := row.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.SettlementID, &item.Comment, &item.CreatedAt, &item.UpdatedAt); err != nil {
+	if err := row.Scan(&item.ID, &item.ShipmentID, &item.Comment, &item.SettlementID, &item.Disputed, &item.Amount, &item.CreatedAt, &item.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -105,7 +105,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (s *SQLStore) ListSettlementItems(ctx context.Context, limit int, offset int) ([]*SettlementItem, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, amount, shipment_id, disputed, settlement_id, note, created_at, updated_at FROM settlement_items ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, shipment_id, note, settlement_id, disputed, amount, created_at, updated_at FROM settlement_items ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list settlement items: %w", err)
 	}
@@ -113,7 +113,7 @@ func (s *SQLStore) ListSettlementItems(ctx context.Context, limit int, offset in
 	var settlementItems []*SettlementItem
 	for rows.Next() {
 		var item SettlementItem
-		if err := rows.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.SettlementID, &item.Comment, &item.CreatedAt, &item.UpdatedAt); err != nil {
+		if err := rows.Scan(&item.ID, &item.ShipmentID, &item.Comment, &item.SettlementID, &item.Disputed, &item.Amount, &item.CreatedAt, &item.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan settlement item: %w", err)
 		}
 		settlementItems = append(settlementItems, &item)
@@ -122,7 +122,7 @@ func (s *SQLStore) ListSettlementItems(ctx context.Context, limit int, offset in
 }
 
 func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlementID int64) ([]*SettlementItem, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, amount, shipment_id, disputed, settlement_id, note, created_at, updated_at FROM settlement_items WHERE settlement_id = $1 ORDER BY id`, settlementID)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, shipment_id, note, settlement_id, disputed, amount, created_at, updated_at FROM settlement_items WHERE settlement_id = $1 ORDER BY id`, settlementID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list settlement items: %w", err)
 	}
@@ -132,7 +132,7 @@ func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlem
 	var items []*SettlementItem
 	for rows.Next() {
 		var item SettlementItem
-		if err := rows.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.SettlementID, &item.Comment, &item.CreatedAt, &item.UpdatedAt); err != nil {
+		if err := rows.Scan(&item.ID, &item.ShipmentID, &item.Comment, &item.SettlementID, &item.Disputed, &item.Amount, &item.CreatedAt, &item.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan settlement item: %w", err)
 		}
 		items = append(items, &item)
@@ -141,14 +141,14 @@ func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlem
 }
 
 func (s *SQLStore) InsertSettlementItem(ctx context.Context, item *SettlementItem) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlement_items (amount, shipment_id, disputed, settlement_id, note, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, item.Amount, item.ShipmentID, item.Disputed, item.SettlementID, item.Comment, item.CreatedAt, item.UpdatedAt).Scan(&item.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlement_items (shipment_id, note, settlement_id, disputed, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, item.ShipmentID, item.Comment, item.SettlementID, item.Disputed, item.Amount, item.CreatedAt, item.UpdatedAt).Scan(&item.ID); err != nil {
 		return fmt.Errorf("failed to insert settlement item: %w", err)
 	}
 	return nil
 }
 
 func (s *SQLStore) UpdateSettlementItem(ctx context.Context, item *SettlementItem) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE settlement_items SET amount = $2, shipment_id = $3, disputed = $4, settlement_id = $5, note = $6, updated_at = $7 WHERE id = $1`, item.ID, item.Amount, item.ShipmentID, item.Disputed, item.SettlementID, item.Comment, item.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE settlement_items SET shipment_id = $2, note = $3, settlement_id = $4, disputed = $5, amount = $6, updated_at = $7 WHERE id = $1`, item.ID, item.ShipmentID, item.Comment, item.SettlementID, item.Disputed, item.Amount, item.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to update settlement item: %w", err)
 	}
