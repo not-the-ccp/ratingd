@@ -17,7 +17,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (s *SQLStore) ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, cancelled_at, pickup_at, loading_meters, weight_kg, destination_zip, status, reference, origin_zip, pallets, delivered_at, carrier_id, origin_country, picked_up_at, customer_id, created_at, updated_at FROM shipments ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, pallets, origin_country, cancelled_at, origin_zip, pickup_at, picked_up_at, customer_id, weight_kg, delivered_at, reference, status, loading_meters, carrier_id, destination_zip, created_at, updated_at FROM shipments ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list shipments: %w", err)
 	}
@@ -26,7 +26,7 @@ func (s *SQLStore) ListShipments(ctx context.Context, limit int, offset int) ([]
 	var shipments []*Shipment
 	for rows.Next() {
 		var shipment Shipment
-		if err := rows.Scan(&shipment.ID, &shipment.CancelledAt, &shipment.PickupAt, &shipment.LoadingMeters, &shipment.WeightKg, &shipment.DestinationZip, &shipment.Status, &shipment.Reference, &shipment.OriginZip, &shipment.Pallets, &shipment.DeliveredAt, &shipment.CarrierID, &shipment.OriginCountry, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
+		if err := rows.Scan(&shipment.ID, &shipment.Pallets, &shipment.OriginCountry, &shipment.CancelledAt, &shipment.OriginZip, &shipment.PickupAt, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.WeightKg, &shipment.DeliveredAt, &shipment.Reference, &shipment.Status, &shipment.LoadingMeters, &shipment.CarrierID, &shipment.DestinationZip, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan shipment: %w", err)
 		}
 		shipments = append(shipments, &shipment)
@@ -47,7 +47,7 @@ func (s *SQLStore) FindTrackingEvent(ctx context.Context, id int64) (*TrackingEv
 }
 
 func (s *SQLStore) ListShipmentsByStatus(ctx context.Context, status ShipmentStatus) ([]*Shipment, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, cancelled_at, pickup_at, loading_meters, weight_kg, destination_zip, status, reference, origin_zip, pallets, delivered_at, carrier_id, origin_country, picked_up_at, customer_id, created_at, updated_at FROM shipments WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, pallets, origin_country, cancelled_at, origin_zip, pickup_at, picked_up_at, customer_id, weight_kg, delivered_at, reference, status, loading_meters, carrier_id, destination_zip, created_at, updated_at FROM shipments WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (s *SQLStore) ListShipmentsByStatus(ctx context.Context, status ShipmentSta
 	var shipments []*Shipment
 	for rows.Next() {
 		var shipment Shipment
-		if err := rows.Scan(&shipment.ID, &shipment.CancelledAt, &shipment.PickupAt, &shipment.LoadingMeters, &shipment.WeightKg, &shipment.DestinationZip, &shipment.Status, &shipment.Reference, &shipment.OriginZip, &shipment.Pallets, &shipment.DeliveredAt, &shipment.CarrierID, &shipment.OriginCountry, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
+		if err := rows.Scan(&shipment.ID, &shipment.Pallets, &shipment.OriginCountry, &shipment.CancelledAt, &shipment.OriginZip, &shipment.PickupAt, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.WeightKg, &shipment.DeliveredAt, &shipment.Reference, &shipment.Status, &shipment.LoadingMeters, &shipment.CarrierID, &shipment.DestinationZip, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan shipment: %w", err)
 		}
 		shipments = append(shipments, &shipment)
@@ -64,14 +64,14 @@ func (s *SQLStore) ListShipmentsByStatus(ctx context.Context, status ShipmentSta
 }
 
 func (s *SQLStore) InsertShipment(ctx context.Context, shipment *Shipment) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO shipments (cancelled_at, pickup_at, loading_meters, weight_kg, destination_zip, status, reference, origin_zip, pallets, delivered_at, carrier_id, origin_country, picked_up_at, customer_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`, shipment.CancelledAt, shipment.PickupAt, shipment.LoadingMeters, shipment.WeightKg, shipment.DestinationZip, shipment.Status, shipment.Reference, shipment.OriginZip, shipment.Pallets, shipment.DeliveredAt, shipment.CarrierID, shipment.OriginCountry, shipment.PickedUpAt, shipment.CustomerID, shipment.CreatedAt, shipment.UpdatedAt).Scan(&shipment.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO shipments (pallets, origin_country, cancelled_at, origin_zip, pickup_at, picked_up_at, customer_id, weight_kg, delivered_at, reference, status, loading_meters, carrier_id, destination_zip, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`, shipment.Pallets, shipment.OriginCountry, shipment.CancelledAt, shipment.OriginZip, shipment.PickupAt, shipment.PickedUpAt, shipment.CustomerID, shipment.WeightKg, shipment.DeliveredAt, shipment.Reference, shipment.Status, shipment.LoadingMeters, shipment.CarrierID, shipment.DestinationZip, shipment.CreatedAt, shipment.UpdatedAt).Scan(&shipment.ID); err != nil {
 		return fmt.Errorf("failed to insert shipment: %w", err)
 	}
 	return nil
 }
 
 func (s *SQLStore) UpdateShipment(ctx context.Context, shipment *Shipment) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE shipments SET cancelled_at = $2, pickup_at = $3, loading_meters = $4, weight_kg = $5, destination_zip = $6, status = $7, reference = $8, origin_zip = $9, pallets = $10, delivered_at = $11, carrier_id = $12, origin_country = $13, picked_up_at = $14, customer_id = $15, updated_at = $16 WHERE id = $1`, shipment.ID, shipment.CancelledAt, shipment.PickupAt, shipment.LoadingMeters, shipment.WeightKg, shipment.DestinationZip, shipment.Status, shipment.Reference, shipment.OriginZip, shipment.Pallets, shipment.DeliveredAt, shipment.CarrierID, shipment.OriginCountry, shipment.PickedUpAt, shipment.CustomerID, shipment.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE shipments SET pallets = $2, origin_country = $3, cancelled_at = $4, origin_zip = $5, pickup_at = $6, picked_up_at = $7, customer_id = $8, weight_kg = $9, delivered_at = $10, reference = $11, status = $12, loading_meters = $13, carrier_id = $14, destination_zip = $15, updated_at = $16 WHERE id = $1`, shipment.ID, shipment.Pallets, shipment.OriginCountry, shipment.CancelledAt, shipment.OriginZip, shipment.PickupAt, shipment.PickedUpAt, shipment.CustomerID, shipment.WeightKg, shipment.DeliveredAt, shipment.Reference, shipment.Status, shipment.LoadingMeters, shipment.CarrierID, shipment.DestinationZip, shipment.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to update shipment: %w", err)
 	}
@@ -150,9 +150,9 @@ func (s *SQLStore) UpdateTrackingEvent(ctx context.Context, event *TrackingEvent
 }
 
 func (s *SQLStore) FindShipment(ctx context.Context, id int64) (*Shipment, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, cancelled_at, pickup_at, loading_meters, weight_kg, destination_zip, status, reference, origin_zip, pallets, delivered_at, carrier_id, origin_country, picked_up_at, customer_id, created_at, updated_at FROM shipments WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, pallets, origin_country, cancelled_at, origin_zip, pickup_at, picked_up_at, customer_id, weight_kg, delivered_at, reference, status, loading_meters, carrier_id, destination_zip, created_at, updated_at FROM shipments WHERE id = $1`, id)
 	var shipment Shipment
-	if err := row.Scan(&shipment.ID, &shipment.CancelledAt, &shipment.PickupAt, &shipment.LoadingMeters, &shipment.WeightKg, &shipment.DestinationZip, &shipment.Status, &shipment.Reference, &shipment.OriginZip, &shipment.Pallets, &shipment.DeliveredAt, &shipment.CarrierID, &shipment.OriginCountry, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
+	if err := row.Scan(&shipment.ID, &shipment.Pallets, &shipment.OriginCountry, &shipment.CancelledAt, &shipment.OriginZip, &shipment.PickupAt, &shipment.PickedUpAt, &shipment.CustomerID, &shipment.WeightKg, &shipment.DeliveredAt, &shipment.Reference, &shipment.Status, &shipment.LoadingMeters, &shipment.CarrierID, &shipment.DestinationZip, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}

@@ -48,3 +48,18 @@ func weightFactor(kg float64) float64 {
 		return 1.26
 	}
 }
+
+func distanceFactor2(km float64) float64 {
+	switch {
+	case km < 25:
+		return 2.05
+	case km < 50:
+		return 1.99
+	case km < 1000:
+		return 1.88
+	case km < 5000:
+		return 1.61
+	default:
+		return 1.52
+	}
+}

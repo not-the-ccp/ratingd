@@ -46,3 +46,8 @@ func (s SettlementStatus) IsFinal() bool {
 		return false
 	}
 }
+
+// IsPeriodEndPassed reports whether period end lies before now.
+func (s *Settlement) IsPeriodEndPassed(now time.Time) bool {
+	return s.PeriodEnd.Before(now)
+}
