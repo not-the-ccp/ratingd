@@ -40,8 +40,20 @@ func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error
 	return nil
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) UpdateContract(ctx context.Context, contract *Contract) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE contracts SET valid_to = $2, minimum_charge = $3, status = $4, signed_at = $5, discount_percent = $6, reference = $7, customer_id = $8, valid_from = $9, tariff_id = $10, terminated_at = $11, signed_by = $12, updated_at = $13 WHERE id = $1`, contract.ID, contract.ValidTo, contract.MinimumCharge, contract.Status, contract.SignedAt, contract.DiscountPercent, contract.ExternalReference, contract.CustomerID, contract.ValidFrom, contract.TariffID, contract.TerminatedAt, contract.SignedBy, contract.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update contract: %w", err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // FindContract implements Store.
@@ -77,18 +89,6 @@ func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]
 	return contracts, rows.Err()
 }
 
-func (s *SQLStore) UpdateContract(ctx context.Context, contract *Contract) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE contracts SET valid_to = $2, minimum_charge = $3, status = $4, signed_at = $5, discount_percent = $6, reference = $7, customer_id = $8, valid_from = $9, tariff_id = $10, terminated_at = $11, signed_by = $12, updated_at = $13 WHERE id = $1`, contract.ID, contract.ValidTo, contract.MinimumCharge, contract.Status, contract.SignedAt, contract.DiscountPercent, contract.ExternalReference, contract.CustomerID, contract.ValidFrom, contract.TariffID, contract.TerminatedAt, contract.SignedBy, contract.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update contract: %w", err)
-	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }

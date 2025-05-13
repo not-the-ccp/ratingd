@@ -58,6 +58,7 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 	}
 
 	now := s.clock.Now()
+
 	shipment := &Shipment{
 		OriginZip:      req.OriginZip,
 		OriginCountry:  req.OriginCountry,
