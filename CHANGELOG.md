@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.3
+
+- add weight factor table to rating
+- move touch customer to customer_support.go
+- add CSV export for invoices
+- Add CalculateInvoiceCreditNoteTotalPreview
+- update docs for CalculateQuoteSurchargeTotal
+- refresh openapi spec
+- retry flaky job
+- update formatting in CreateShipment
+- carrier: add fleet size
+
 ## 1.3.2
 
 - add comment to void invoice

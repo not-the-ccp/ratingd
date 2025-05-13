@@ -55,3 +55,8 @@ func (s ContractStatus) IsFinal() bool {
 		return false
 	}
 }
+
+// IsValidToPassed reports whether valid to lies before now.
+func (c *Contract) IsValidToPassed(now time.Time) bool {
+	return c.ValidTo.Before(now)
+}
