@@ -17,6 +17,7 @@ type Carrier struct {
 	ShortCode           string     `json:"code"`
 	VATNumber           string     `json:"vat_number"`
 	InsuranceValidUntil time.Time  `json:"insurance_valid_until"`
+	FleetSize           int        `json:"fleet_size"`
 	CreatedAt           time.Time  `json:"created_at"`
 	UpdatedAt           time.Time  `json:"updated_at"`
 }

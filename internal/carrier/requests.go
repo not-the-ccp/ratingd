@@ -12,6 +12,7 @@ type CreateCarrierRequest struct {
 	VATNumber           string    `json:"vat_number"`
 	PaymentTermDays     int       `json:"payment_term_days"`
 	InsuranceValidUntil time.Time `json:"insurance_valid_until"`
+	FleetSize           int       `json:"fleet_size"`
 }
 
 type CarrierResponse struct {
@@ -27,6 +28,7 @@ type CarrierResponse struct {
 	CreatedAt           time.Time     `json:"created_at"`
 	UpdatedAt           time.Time     `json:"updated_at"`
 	InsuranceValidUntil time.Time     `json:"insurance_valid_until"`
+	FleetSize           int           `json:"fleet_size"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -60,5 +62,6 @@ func toCarrierResponse(carrier *Carrier) CarrierResponse {
 		CreatedAt:           carrier.CreatedAt,
 		UpdatedAt:           carrier.UpdatedAt,
 		InsuranceValidUntil: carrier.InsuranceValidUntil,
+		FleetSize:           carrier.FleetSize,
 	}
 }

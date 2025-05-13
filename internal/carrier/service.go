@@ -57,6 +57,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		VATNumber:           req.VATNumber,
 		Name:                req.Name,
 		InsuranceValidUntil: req.InsuranceValidUntil,
+		FleetSize:           req.FleetSize,
 		CreatedAt:           now,
 		UpdatedAt:           now,
 	}
