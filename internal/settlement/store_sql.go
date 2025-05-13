@@ -12,8 +12,17 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+// GetSettlementItem implements Store.
+func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, amount, shipment_id, disputed, settlement_id, note, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
+	var item SettlementItem
+	if err := row.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.SettlementID, &item.Comment, &item.CreatedAt, &item.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query settlement item %d: %w", id, err)
+	}
+	return &item, nil
 }
 
 func (s *SQLStore) FindSettlement(ctx context.Context, id int64) (*Settlement, error) {
@@ -91,17 +100,8 @@ func (s *SQLStore) UpdateSettlement(ctx context.Context, settlement *Settlement)
 	return nil
 }
 
-// GetSettlementItem implements Store.
-func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, amount, shipment_id, disputed, settlement_id, note, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
-	var item SettlementItem
-	if err := row.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.SettlementID, &item.Comment, &item.CreatedAt, &item.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query settlement item %d: %w", id, err)
-	}
-	return &item, nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListSettlementItems(ctx context.Context, limit int, offset int) ([]*SettlementItem, error) {

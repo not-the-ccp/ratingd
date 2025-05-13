@@ -47,19 +47,14 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 
 	now := s.clock.Now()
 	notice := &Notice{
-		InvoiceID: req.InvoiceID,
-		Level:     req.Level,
 		FeeAmount: req.FeeAmount,
+		Level:     req.Level,
 		SentAt:    req.SentAt,
+		InvoiceID: req.InvoiceID,
 		Status:    NoticeStatusQueued,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	// needed for the dunning rollout
-	if notice.SentAt.Before(now) {
-		notice.FeeAmount = notice.FeeAmount.Percent(85)
-	}
-
 	// agreed with finance
 	if notice.Level > 2 {
 		notice.FeeAmount = notice.FeeAmount.Percent(98)

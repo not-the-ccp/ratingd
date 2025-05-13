@@ -43,6 +43,7 @@ func (s *Service) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 	return quote, nil
 }
 
+// CreateQuote handles the create quote step.
 func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Quote, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err

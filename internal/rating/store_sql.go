@@ -47,23 +47,21 @@ func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([
 	return surcharges, rows.Err()
 }
 
-// ListSurchargesForQuote implements Store.
-func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([]*Surcharge, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges WHERE quote_id = $1 ORDER BY id`, quoteID)
+// UpdateQuote implements Store.
+func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE quotes SET accepted_at = $2, contract_id = $3, discount_amount = $4, currency = $5, shipment_id = $6, toll_amount = $7, status = $8, expires_at = $9, superseded_at = $10, net_amount = $11, fuel_amount = $12, updated_at = $13 WHERE id = $1`, quote.ID, quote.AcceptedAt, quote.ContractID, quote.DiscountAmount, quote.Currency, quote.ShipmentID, quote.TollAmount, quote.Status, quote.ExpiresAt, quote.SupersededAt, quote.NetAmount, quote.FuelAmount, quote.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list surcharges: %w", err)
+		return fmt.Errorf("failed to update quote: %w", err)
 	}
-	defer rows.Close()
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
 
-	var surcharges []*Surcharge
-	for rows.Next() {
-		var surcharge Surcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.ShortCode, &surcharge.QuoteID, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan surcharge: %w", err)
-		}
-		surcharges = append(surcharges, &surcharge)
+	if rows == 0 {
+		return ErrNotFound
 	}
-	return surcharges, rows.Err()
+	return nil
 }
 
 func (s *SQLStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
@@ -86,21 +84,23 @@ func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
 	return nil
 }
 
-// UpdateQuote implements Store.
-func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE quotes SET accepted_at = $2, contract_id = $3, discount_amount = $4, currency = $5, shipment_id = $6, toll_amount = $7, status = $8, expires_at = $9, superseded_at = $10, net_amount = $11, fuel_amount = $12, updated_at = $13 WHERE id = $1`, quote.ID, quote.AcceptedAt, quote.ContractID, quote.DiscountAmount, quote.Currency, quote.ShipmentID, quote.TollAmount, quote.Status, quote.ExpiresAt, quote.SupersededAt, quote.NetAmount, quote.FuelAmount, quote.UpdatedAt)
+// ListSurchargesForQuote implements Store.
+func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([]*Surcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges WHERE quote_id = $1 ORDER BY id`, quoteID)
 	if err != nil {
-		return fmt.Errorf("failed to update quote: %w", err)
+		return nil, fmt.Errorf("failed to list surcharges: %w", err)
 	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
+	defer rows.Close()
 
-	if rows == 0 {
-		return ErrNotFound
+	var surcharges []*Surcharge
+	for rows.Next() {
+		var surcharge Surcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.ShortCode, &surcharge.QuoteID, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan surcharge: %w", err)
+		}
+		surcharges = append(surcharges, &surcharge)
 	}
-	return nil
+	return surcharges, rows.Err()
 }
 
 // FindSurcharge implements Store.

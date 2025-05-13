@@ -102,16 +102,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to read shipment id=%d: %w", id, err)
 	}
-	// Altdaten aus der Migration haben das nicht
-	if shipment.PickupAt.IsZero() {
-		return nil, ErrShipmentMissingPickupAt
-	}
-
 	s.log.Info("processing shipment", "id", shipment.ID)
-	// edge case from the shipment import
-	if shipment.Reference == "" {
-		return nil, ErrShipmentEmptyReference
-	}
 
 	if shipment.Status != ShipmentStatusBooked {
 		return nil, fmt.Errorf("%w: shipment %d is %s", ErrInvalidState, id, shipment.Status)

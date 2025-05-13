@@ -267,12 +267,6 @@ func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteReq
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	// Ausnahme für Bestandskunden
-
-	if creditNote.Reason == "" {
-		return nil, ErrCreditNoteEmptyReason
-	}
-
 	if err := s.store.InsertCreditNote(ctx, creditNote); err != nil {
 		return nil, fmt.Errorf("failed to insert credit note: %w", err)
 	}
@@ -339,6 +333,7 @@ type CustomerService interface {
 	GetCustomer(ctx context.Context, id int64) (*customer.Customer, error)
 }
 
+// CalculateInvoiceLineTotal handles the calculate invoice line total step.
 func (s *Service) CalculateInvoiceLineTotal(ctx context.Context, invoiceID int64) (money.Amount, error) {
 	// we need this for the checks below: list invoice lines
 	invoiceLines, err := s.store.ListInvoiceLinesForInvoice(ctx, invoiceID)

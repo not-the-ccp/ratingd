@@ -66,3 +66,8 @@ func groupShipmentsByCarrier(items []*Shipment) map[int64][]*Shipment {
 	}
 	return out
 }
+
+// IsPickupPassed reports whether pickup at lies before now.
+func (s *Shipment) IsPickupPassed(now time.Time) bool {
+	return s.PickupAt.Before(now)
+}

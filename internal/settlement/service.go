@@ -58,10 +58,6 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
-	// needed for the settlement rollout
-	if settlement.Deductions > 0 {
-		return nil, ErrSettlementDeductionsAbove
-	}
 
 	if err := s.store.InsertSettlement(ctx, settlement); err != nil {
 		return nil, fmt.Errorf("failed to insert settlement: %w", err)
