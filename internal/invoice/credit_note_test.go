@@ -33,7 +33,7 @@ func (f *fakeStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
 	return f.err
 }
 
-func (f *fakeStore) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
+func (f *fakeStore) FindInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
 	return nil, f.err
 }
 
@@ -53,7 +53,7 @@ func (f *fakeStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) er
 	return f.err
 }
 
-func (f *fakeStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+func (f *fakeStore) FindCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
 	return nil, f.err
 }
 

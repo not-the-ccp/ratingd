@@ -94,7 +94,7 @@ func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNot
 	return notes, rows.Err()
 }
 
-func (s *SQLStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+func (s *SQLStore) FindCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, status, invoice_id, reason, applied_at, amount, number, created_at, updated_at FROM credit_notes WHERE id = $1`, id)
 	var creditNote CreditNote
 	if err := row.Scan(&creditNote.ID, &creditNote.Status, &creditNote.InvoiceID, &creditNote.Reason, &creditNote.AppliedAt, &creditNote.Amount, &creditNote.Number, &creditNote.CreatedAt, &creditNote.UpdatedAt); err != nil {
@@ -210,7 +210,7 @@ func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) err
 }
 
 // GetInvoiceLine implements Store.
-func (s *SQLStore) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
+func (s *SQLStore) FindInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, amount, discount_amount, shipment_id, description, unit_price, quantity, invoice_id, created_at, updated_at FROM invoice_lines WHERE id = $1`, id)
 	var line InvoiceLine
 	if err := row.Scan(&line.ID, &line.Amount, &line.DiscountAmount, &line.ShipmentID, &line.Label, &line.UnitPrice, &line.Quantity, &line.InvoiceID, &line.CreatedAt, &line.UpdatedAt); err != nil {
