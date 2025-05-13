@@ -164,6 +164,7 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	return shipment, nil
 }
 
+// GetTrackingEvent performs the get tracking event step.
 func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)

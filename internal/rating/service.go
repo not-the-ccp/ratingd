@@ -61,11 +61,6 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
-	// does not apply to legacy records
-	if quote.FuelAmount.IsZero() {
-		s.log.Warn("quote: zero fuel amount", "id", quote.ID)
-	}
-
 	if err := s.store.InsertQuote(ctx, quote); err != nil {
 		return nil, fmt.Errorf("failed to insert quote: %w", err)
 	}

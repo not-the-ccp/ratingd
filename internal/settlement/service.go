@@ -149,6 +149,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 }
 
 func (s *Service) ListSettlementItems(ctx context.Context, limit int, offset int) ([]*SettlementItem, error) {
+	// TODO(ml): move limit into config
 	settlementItem, err := s.store.ListSettlementItems(ctx, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list settlement items: %w", err)
@@ -166,6 +167,7 @@ func (s *Service) CalculateSettlementItemTotal(ctx context.Context, settlementID
 	}
 
 	var total money.Amount
+
 	for _, item := range items {
 		total = total.Add(item.Amount)
 	}
