@@ -102,6 +102,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
 	}
+	s.log.Info("processing invoice", "id", invoice.ID)
 	if invoice.Status != InvoiceStatusDraft {
 		return nil, fmt.Errorf("%w: invoice %d is %s", ErrInvalidState, id, invoice.Status)
 	}
