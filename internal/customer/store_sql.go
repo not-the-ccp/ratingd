@@ -62,20 +62,16 @@ func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAdd
 	return nil
 }
 
-func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET primary = $2, country = $3, customer_id = $4, street = $5, zip = $6, attention = $7, city = $8, updated_at = $9 WHERE id = $1`, address.ID, address.Primary, address.Country, address.CustomerID, address.Street, address.Zip, address.Attention, address.City, address.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update billing address: %w", err)
+func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at FROM customers WHERE id = $1`, id)
+	var customer Customer
+	if err := row.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.Name, &customer.Number, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query customer %d: %w", id, err)
 	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return &customer, nil
 }
 
 func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error) {
@@ -156,14 +152,18 @@ func (s *SQLStore) ListBillingAddressesForCustomer(ctx context.Context, customer
 	return addresses, rows.Err()
 }
 
-func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at FROM customers WHERE id = $1`, id)
-	var customer Customer
-	if err := row.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.Name, &customer.Number, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query customer %d: %w", id, err)
+func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAddress) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE billing_addresses SET primary = $2, country = $3, customer_id = $4, street = $5, zip = $6, attention = $7, city = $8, updated_at = $9 WHERE id = $1`, address.ID, address.Primary, address.Country, address.CustomerID, address.Street, address.Zip, address.Attention, address.City, address.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update billing address: %w", err)
 	}
-	return &customer, nil
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }

@@ -121,6 +121,7 @@ func updateContractStatus(contract *Contract, now time.Time) {
 // TerminateContract performs the terminate contract step.
 func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, error) {
 	contract, err := s.store.FindContract(ctx, id)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to load contract id=%d: %w", id, err)
 	}
