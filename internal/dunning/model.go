@@ -51,3 +51,8 @@ func (s NoticeStatus) IsFinal() bool {
 		return false
 	}
 }
+
+// IsSentPassed reports whether sent at lies before now.
+func (n *Notice) IsSentPassed(now time.Time) bool {
+	return n.SentAt.Before(now)
+}
