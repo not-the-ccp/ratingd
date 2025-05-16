@@ -245,3 +245,22 @@ func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 	}
 	return processed, nil
 }
+
+func (s *Service) ProcessPickedUpShipmentsGross(ctx context.Context) (int, error) {
+	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
+	if err != nil {
+		return 0, fmt.Errorf("list picked up shipments: %w", err)
+	}
+
+	processed := 0
+	for _, shipment := range pending {
+
+		_, err := s.DeliverShipment(ctx, shipment.ID)
+		if err != nil {
+			s.log.Error("deliver shipment failed", "id", shipment.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}

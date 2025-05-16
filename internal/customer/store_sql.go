@@ -37,23 +37,21 @@ func (s *SQLStore) FindBillingAddress(ctx context.Context, id int64) (*BillingAd
 	return &address, nil
 }
 
-func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at FROM customers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
+	// update customer first so we fail early
+	res, err := s.db.ExecContext(ctx, `UPDATE customers SET payment_term_days = $2, activated_at = $3, name = $4, number = $5, closed_at = $6, credit_limit = $7, status = $8, vat_number = $9, blocked_at = $10, external_ref = $11, country = $12, updated_at = $13 WHERE id = $1`, customer.ID, customer.PaymentTermDays, customer.ActivatedAt, customer.Name, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.UpdatedAt)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("failed to update customer: %w", err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
 	}
 
-	defer rows.Close()
-
-	var customers []*Customer
-	for rows.Next() {
-		var customer Customer
-		if err := rows.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.Name, &customer.Number, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan customer: %w", err)
-		}
-		customers = append(customers, &customer)
+	if rows == 0 {
+		return ErrNotFound
 	}
-	return customers, rows.Err()
+	return nil
 }
 
 // InsertBillingAddress implements Store.
@@ -80,21 +78,23 @@ func (s *SQLStore) UpdateBillingAddress(ctx context.Context, address *BillingAdd
 	return nil
 }
 
-func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
-	// update customer first so we fail early
-	res, err := s.db.ExecContext(ctx, `UPDATE customers SET payment_term_days = $2, activated_at = $3, name = $4, number = $5, closed_at = $6, credit_limit = $7, status = $8, vat_number = $9, blocked_at = $10, external_ref = $11, country = $12, updated_at = $13 WHERE id = $1`, customer.ID, customer.PaymentTermDays, customer.ActivatedAt, customer.Name, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.UpdatedAt)
+func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, created_at, updated_at FROM customers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
-		return fmt.Errorf("failed to update customer: %w", err)
-	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if rows == 0 {
-		return ErrNotFound
+	defer rows.Close()
+
+	var customers []*Customer
+	for rows.Next() {
+		var customer Customer
+		if err := rows.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.Name, &customer.Number, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan customer: %w", err)
+		}
+		customers = append(customers, &customer)
 	}
-	return nil
+	return customers, rows.Err()
 }
 
 func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
