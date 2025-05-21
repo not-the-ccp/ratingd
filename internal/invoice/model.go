@@ -66,3 +66,7 @@ func (i *Invoice) IsIssuedPassed(now time.Time) bool {
 func (i *Invoice) IsDuePassed(now time.Time) bool {
 	return i.DueAt.Before(now)
 }
+
+func (i *Invoice) HasTaxAmount() bool {
+	return i.TaxAmount > 0
+}

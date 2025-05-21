@@ -1,6 +1,8 @@
 package shipment
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -70,4 +72,21 @@ func groupShipmentsByCarrier(items []*Shipment) map[int64][]*Shipment {
 // IsPickupPassed reports whether pickup at lies before now.
 func (s *Shipment) IsPickupPassed(now time.Time) bool {
 	return s.PickupAt.Before(now)
+}
+
+// ParseShipmentStatus converts a raw status string, ignoring case and surrounding space.
+func ParseShipmentStatus(s string) (ShipmentStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "booked":
+		return ShipmentStatusBooked, nil
+	case "picked_up":
+		return ShipmentStatusPickedUp, nil
+	case "delivered":
+		return ShipmentStatusDelivered, nil
+	case "cancelled":
+		return ShipmentStatusCancelled, nil
+	default:
+		return "", fmt.Errorf("unknown shipment status %q", s)
+	}
 }
