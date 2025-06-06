@@ -42,6 +42,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	return result, nil
 }
 
+// CreateCarrier handles the create carrier step.
 func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) (*Carrier, error) {
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("failed to validate request: %w", err)
