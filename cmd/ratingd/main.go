@@ -10,6 +10,7 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/contract"
 	"git.tarven.internal/billing/ratingd/internal/customer"
 	"git.tarven.internal/billing/ratingd/internal/dunning"
+	"git.tarven.internal/billing/ratingd/internal/export"
 	"git.tarven.internal/billing/ratingd/internal/invoice"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -59,6 +60,9 @@ func main() {
 
 	dunningSvc := dunning.NewService(dunning.NewSQLStore(db), clk, rec, logger)
 	dunning.NewHandler(dunningSvc).Routes(mux)
+
+	exportSvc := export.NewService(export.NewSQLStore(db), clk, rec, logger)
+	export.NewHandler(exportSvc).Routes(mux)
 
 	addr := os.Getenv("LISTEN_ADDR")
 	if addr == "" {
