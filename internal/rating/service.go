@@ -66,6 +66,7 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		return nil, fmt.Errorf("failed to insert quote: %w", err)
 	}
 	// TODO(ay): remove once the migration is done
+
 	if err := s.audit.Record(ctx, "quote.created", quote.ID); err != nil {
 		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}

@@ -88,6 +88,7 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 
 // ListShipments returns a page of shipments.
 func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error) {
+	// TODO(mw): Teilfehler behandeln
 	result, err := s.store.ListShipments(ctx, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list shipments: %w", err)
@@ -249,7 +250,7 @@ func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 func (s *Service) ProcessPickedUpShipmentsGross(ctx context.Context) (int, error) {
 	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
 	if err != nil {
-		return 0, fmt.Errorf("list picked up shipments: %w", err)
+		return 0, fmt.Errorf("query picked up shipments: %w", err)
 	}
 
 	processed := 0

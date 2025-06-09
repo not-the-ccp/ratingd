@@ -27,6 +27,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 	}
 }
 
+// GetNotice performs the get notice step.
 func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)

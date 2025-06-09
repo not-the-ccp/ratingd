@@ -61,7 +61,12 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 }
 
 func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
-	return s.store.ListBatches(ctx, limit, offset)
+	batch, err := s.store.ListBatches(ctx, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("list batches: %w", err)
+	}
+
+	return batch, nil
 }
 
 // FinishBatch moves a batch from running to finished.
