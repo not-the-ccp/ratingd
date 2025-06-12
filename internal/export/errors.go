@@ -5,6 +5,7 @@ import (
 )
 
 var (
-	ErrNotFound     = errors.New("export: not found")
-	ErrInvalidState = errors.New("export: invalid state transition")
+	ErrNotFound              = errors.New("export: not found")
+	ErrInvalidState          = errors.New("export: invalid state transition")
+	ErrBatchMissingStartedAt = errors.New("export: batch rejected, missing started at")
 )

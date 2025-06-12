@@ -75,6 +75,11 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	if err != nil {
 		return nil, fmt.Errorf("load batch %d: %w", id, err)
 	}
+	// kommt bei export vor, siehe OPS-927
+	if batch.StartedAt.IsZero() {
+		return nil, ErrBatchMissingStartedAt
+	}
+
 	if batch.Status != BatchStatusRunning {
 		return nil, fmt.Errorf("%w: batch %d is %s", ErrInvalidState, id, batch.Status)
 	}
