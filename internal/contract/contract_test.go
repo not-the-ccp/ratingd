@@ -118,3 +118,8 @@ func TestContract_CanTerminate(t *testing.T) {
 	contract := &Contract{}
 	require.False(t, contract.CanTerminate())
 }
+
+func TestContract_HasMinimumCharge(t *testing.T) {
+	contract := &Contract{}
+	require.False(t, contract.HasMinimumCharge())
+}

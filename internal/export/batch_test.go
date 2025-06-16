@@ -47,3 +47,13 @@ func TestService_GetBatch_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestBatch_CanFail(t *testing.T) {
+	batch := &Batch{}
+	require.False(t, batch.CanFail())
+}
+
+func TestBatch_CanFinish(t *testing.T) {
+	batch := &Batch{}
+	require.False(t, batch.CanFinish())
+}

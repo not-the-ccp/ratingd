@@ -63,11 +63,23 @@ func (s *SQLStore) ListShipmentsByStatus(ctx context.Context, status ShipmentSta
 	return shipments, rows.Err()
 }
 
-func (s *SQLStore) InsertShipment(ctx context.Context, shipment *Shipment) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO shipments (pallets, origin_country, cancelled_at, origin_zip, pickup_at, picked_up_at, customer_id, weight_kg, delivered_at, reference, status, loading_meters, carrier_id, destination_zip, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`, shipment.Pallets, shipment.OriginCountry, shipment.CancelledAt, shipment.OriginZip, shipment.PickupAt, shipment.PickedUpAt, shipment.CustomerID, shipment.WeightKg, shipment.DeliveredAt, shipment.Reference, shipment.Status, shipment.LoadingMeters, shipment.CarrierID, shipment.DestinationZip, shipment.CreatedAt, shipment.UpdatedAt).Scan(&shipment.ID); err != nil {
-		return fmt.Errorf("failed to insert shipment: %w", err)
+func (s *SQLStore) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, code, location, shipment_id, occurred_at, created_at, updated_at FROM tracking_events ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list tracking events: %w", err)
 	}
-	return nil
+
+	defer rows.Close()
+
+	var events []*TrackingEvent
+	for rows.Next() {
+		var event TrackingEvent
+		if err := rows.Scan(&event.ID, &event.Code, &event.Location, &event.ShipmentID, &event.OccurredAt, &event.CreatedAt, &event.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan tracking event: %w", err)
+		}
+		events = append(events, &event)
+	}
+	return events, rows.Err()
 }
 
 func (s *SQLStore) UpdateShipment(ctx context.Context, shipment *Shipment) error {
@@ -112,23 +124,11 @@ func (s *SQLStore) InsertTrackingEvent(ctx context.Context, event *TrackingEvent
 	return nil
 }
 
-func (s *SQLStore) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, code, location, shipment_id, occurred_at, created_at, updated_at FROM tracking_events ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list tracking events: %w", err)
+func (s *SQLStore) InsertShipment(ctx context.Context, shipment *Shipment) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO shipments (pallets, origin_country, cancelled_at, origin_zip, pickup_at, picked_up_at, customer_id, weight_kg, delivered_at, reference, status, loading_meters, carrier_id, destination_zip, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`, shipment.Pallets, shipment.OriginCountry, shipment.CancelledAt, shipment.OriginZip, shipment.PickupAt, shipment.PickedUpAt, shipment.CustomerID, shipment.WeightKg, shipment.DeliveredAt, shipment.Reference, shipment.Status, shipment.LoadingMeters, shipment.CarrierID, shipment.DestinationZip, shipment.CreatedAt, shipment.UpdatedAt).Scan(&shipment.ID); err != nil {
+		return fmt.Errorf("failed to insert shipment: %w", err)
 	}
-
-	defer rows.Close()
-
-	var events []*TrackingEvent
-	for rows.Next() {
-		var event TrackingEvent
-		if err := rows.Scan(&event.ID, &event.Code, &event.Location, &event.ShipmentID, &event.OccurredAt, &event.CreatedAt, &event.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan tracking event: %w", err)
-		}
-		events = append(events, &event)
-	}
-	return events, rows.Err()
+	return nil
 }
 
 // UpdateTrackingEvent implements Store.

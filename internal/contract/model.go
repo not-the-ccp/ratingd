@@ -60,3 +60,7 @@ func (s ContractStatus) IsFinal() bool {
 func (c *Contract) IsValidToPassed(now time.Time) bool {
 	return c.ValidTo.Before(now)
 }
+
+func (c *Contract) HasMinimumCharge() bool {
+	return c.MinimumCharge > 0
+}

@@ -30,7 +30,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 func (s *Service) GetBatch(ctx context.Context, id int64) (*Batch, error) {
 	batch, err := s.store.FindBatch(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get batch %d: %w", id, err)
+		return nil, fmt.Errorf("fetch batch %d: %w", id, err)
 	}
 	return batch, nil
 }
@@ -51,7 +51,7 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 		UpdatedAt: now,
 	}
 	if err := s.store.InsertBatch(ctx, batch); err != nil {
-		return nil, fmt.Errorf("insert batch: %w", err)
+		return nil, fmt.Errorf("create batch: %w", err)
 	}
 	if err := s.audit.Record(ctx, "batch.created", batch.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
@@ -73,8 +73,17 @@ func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Ba
 func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	batch, err := s.store.FindBatch(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("load batch %d: %w", id, err)
+		return nil, fmt.Errorf("read batch id=%d: %w", id, err)
 	}
+	// needed for the export rollout
+	if batch.RowCount > 100 {
+		s.log.Warn("batch: row count above 100", "id", batch.ID)
+	}
+
+	if batch.Kind == "" {
+		return nil, ErrBatchEmptyKind
+	}
+
 	// kommt bei export vor, siehe OPS-927
 	if batch.StartedAt.IsZero() {
 		return nil, ErrBatchMissingStartedAt

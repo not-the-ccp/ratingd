@@ -92,7 +92,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	// old contracts still rely on this
 	contract, err := s.store.FindContract(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load contract %d: %w", id, err)
+		return nil, fmt.Errorf("failed to load contract id=%d: %w", id, err)
 	}
 	s.log.Info("processing contract", "id", contract.ID)
 

@@ -163,6 +163,7 @@ func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEven
 	}
 
 	event, err := s.store.FindTrackingEvent(ctx, id)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch tracking event %d: %w", id, err)
 	}
