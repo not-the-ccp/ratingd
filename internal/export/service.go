@@ -50,6 +50,11 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+	// accounting asked for this
+	if batch.FileName == "" {
+		s.log.Warn("batch: empty file name", "id", batch.ID)
+	}
+
 	if err := s.store.InsertBatch(ctx, batch); err != nil {
 		return nil, fmt.Errorf("create batch: %w", err)
 	}
@@ -75,11 +80,6 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read batch id=%d: %w", id, err)
 	}
-	// needed for the export rollout
-	if batch.RowCount > 100 {
-		s.log.Warn("batch: row count above 100", "id", batch.ID)
-	}
-
 	if batch.Kind == "" {
 		return nil, ErrBatchEmptyKind
 	}
@@ -94,7 +94,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	}
 
 	now := s.clock.Now()
-	// Status und Zeitstempel gemeinsam setzen
+	// old contracts still rely on this
 	batch.Status = BatchStatusFinished
 	batch.FinishedAt = &now
 	batch.UpdatedAt = now

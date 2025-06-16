@@ -3,7 +3,6 @@ package customer
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -125,14 +124,6 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}
-	// kommt bei customer vor, siehe OPS-369
-	if billingAddress.City == "" {
-		s.log.Warn("billing address: empty city", "id", billingAddress.ID)
-	}
-
-	if strings.HasPrefix(billingAddress.Zip, "9") {
-		s.log.Warn("billing address: zip in zone 9", "id", billingAddress.ID)
-	}
 
 	if err := s.store.InsertBillingAddress(ctx, billingAddress); err != nil {
 		return nil, fmt.Errorf("failed to insert billing address: %w", err)
@@ -145,6 +136,7 @@ func (s *Service) CreateBillingAddress(ctx context.Context, req *CreateBillingAd
 	return billingAddress, nil
 }
 
+// ListBillingAddresses handles the list billing addresses step.
 func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {
 	billingAddress, err := s.store.ListBillingAddresses(ctx, limit, offset)
 	if err != nil {
