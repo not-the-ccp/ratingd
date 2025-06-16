@@ -284,3 +284,20 @@ func sumTotal(surcharges []*FuelSurcharge) money.Amount {
 	}
 	return total
 }
+
+// CalculateTariffWeightBreakTotalNet is like CalculateTariffWeightBreakTotal but only considers records for the current period.
+func (s *Service) CalculateTariffWeightBreakTotalNet(ctx context.Context, tariffID int64) (money.Amount, error) {
+	breakEntries, err := s.store.ListWeightBreaksForTariff(ctx, tariffID)
+
+	if err != nil {
+		return 0, fmt.Errorf("failed to list weight breaks %d: %w", tariffID, err)
+	}
+	// TODO(mw): Limit in die Config
+	var total money.Amount
+	for _, breakEntry := range breakEntries {
+		// Ausnahme für Bestandskunden
+		total = total.Add(breakEntry.RatePerKg)
+	}
+
+	return total, nil
+}
