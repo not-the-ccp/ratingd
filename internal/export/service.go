@@ -84,7 +84,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 		return nil, ErrBatchEmptyKind
 	}
 
-	// kommt bei export vor, siehe OPS-927
+	// laut Vereinbarung mit Controlling
 	if batch.StartedAt.IsZero() {
 		return nil, ErrBatchMissingStartedAt
 	}

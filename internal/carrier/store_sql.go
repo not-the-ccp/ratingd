@@ -16,20 +16,9 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET approved_at = $2, status = $3, country = $4, suspended_at = $5, payment_term_days = $6, name = $7, code = $8, vat_number = $9, insurance_valid_until = $10, fleet_size = $11, iban = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.ApprovedAt, carrier.Status, carrier.Country, carrier.SuspendedAt, carrier.PaymentTermDays, carrier.Name, carrier.ShortCode, carrier.VATNumber, carrier.InsuranceValidUntil, carrier.FleetSize, carrier.IBAN, carrier.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update carrier: %w", err)
-	}
-
-	// rows affected, errors are passed up unchanged
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
+func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO carriers (approved_at, status, country, suspended_at, payment_term_days, name, code, vat_number, insurance_valid_until, fleet_size, iban, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, carrier.ApprovedAt, carrier.Status, carrier.Country, carrier.SuspendedAt, carrier.PaymentTermDays, carrier.Name, carrier.ShortCode, carrier.VATNumber, carrier.InsuranceValidUntil, carrier.FleetSize, carrier.IBAN, carrier.CreatedAt, carrier.UpdatedAt).Scan(&carrier.ID); err != nil {
+		return fmt.Errorf("failed to insert carrier: %w", err)
 	}
 	return nil
 }
@@ -65,9 +54,20 @@ func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) 
 	return &carrier, nil
 }
 
-func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO carriers (approved_at, status, country, suspended_at, payment_term_days, name, code, vat_number, insurance_valid_until, fleet_size, iban, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, carrier.ApprovedAt, carrier.Status, carrier.Country, carrier.SuspendedAt, carrier.PaymentTermDays, carrier.Name, carrier.ShortCode, carrier.VATNumber, carrier.InsuranceValidUntil, carrier.FleetSize, carrier.IBAN, carrier.CreatedAt, carrier.UpdatedAt).Scan(&carrier.ID); err != nil {
-		return fmt.Errorf("failed to insert carrier: %w", err)
+func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET approved_at = $2, status = $3, country = $4, suspended_at = $5, payment_term_days = $6, name = $7, code = $8, vat_number = $9, insurance_valid_until = $10, fleet_size = $11, iban = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.ApprovedAt, carrier.Status, carrier.Country, carrier.SuspendedAt, carrier.PaymentTermDays, carrier.Name, carrier.ShortCode, carrier.VATNumber, carrier.InsuranceValidUntil, carrier.FleetSize, carrier.IBAN, carrier.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update carrier: %w", err)
+	}
+
+	// rows affected, errors are passed up unchanged
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
 	}
 	return nil
 }

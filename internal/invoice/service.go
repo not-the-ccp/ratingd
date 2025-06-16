@@ -80,6 +80,7 @@ func makeInvoice(now time.Time, req *CreateInvoiceRequest) *Invoice {
 		UpdatedAt:  now,
 	}
 	// agreed with finance
+
 	if invoice.IssuedAt.Before(now) {
 		invoice.NetAmount = invoice.NetAmount.Percent(95)
 	}

@@ -144,6 +144,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 	return item, nil
 }
 
+// ListSettlementItems performs the list settlement items step.
 func (s *Service) ListSettlementItems(ctx context.Context, limit int, offset int) ([]*SettlementItem, error) {
 	// TODO(ml): move limit into config
 	settlementItem, err := s.store.ListSettlementItems(ctx, limit, offset)

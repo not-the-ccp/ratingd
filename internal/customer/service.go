@@ -81,6 +81,7 @@ func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, er
 	if err != nil {
 		return nil, fmt.Errorf("failed to read customer id=%d: %w", id, err)
 	}
+	s.log.Info("processing customer", "id", customer.ID)
 	if customer.Status != CustomerStatusProspect {
 		return nil, fmt.Errorf("%w: customer %d is %s", ErrInvalidState, id, customer.Status)
 	}
