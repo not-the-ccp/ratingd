@@ -3,6 +3,42 @@ info:
   title: ratingd
   version: 1.0.0
 paths:
+  /api/v1/batch:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/batch/create:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/batch/finish:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
+  /api/v1/batches:
+    post:
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not found
   /api/v1/billing-address:
     post:
       responses:
@@ -685,6 +721,10 @@ components:
           type: string
         insurance_valid_until:
           type: number
+        fleet_size:
+          type: number
+        iban:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -796,34 +836,34 @@ components:
       properties:
         id:
           type: number
-        cancelled_at:
-          type: number
-        pickup_at:
-          type: number
-        loading_meters:
-          type: number
-        weight_kg:
-          type: number
-        destination_zip:
-          type: string
-        status:
-          type: string
-        reference:
-          type: string
-        origin_zip:
-          type: string
         pallets:
-          type: number
-        delivered_at:
-          type: number
-        carrier_id:
           type: number
         origin_country:
           type: string
+        cancelled_at:
+          type: number
+        origin_zip:
+          type: string
+        pickup_at:
+          type: number
         picked_up_at:
           type: number
         customer_id:
           type: number
+        weight_kg:
+          type: number
+        delivered_at:
+          type: number
+        reference:
+          type: string
+        status:
+          type: string
+        loading_meters:
+          type: number
+        carrier_id:
+          type: number
+        destination_zip:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -898,25 +938,25 @@ components:
       properties:
         id:
           type: number
-        issued_on:
-          type: number
-        due_at:
-          type: number
-        number:
-          type: string
         customer_id:
           type: number
-        voided_at:
-          type: number
         tax_amount:
-          type: number
-        paid_at:
           type: number
         currency:
           type: string
         status:
           type: string
+        voided_at:
+          type: number
+        number:
+          type: string
+        paid_at:
+          type: number
+        due_at:
+          type: number
         issued_at:
+          type: number
+        issued_on:
           type: number
         net_amount:
           type: number
@@ -998,8 +1038,6 @@ components:
       properties:
         id:
           type: number
-        amount:
-          type: number
         shipment_id:
           type: number
         disputed:
@@ -1008,6 +1046,8 @@ components:
           type: number
         note:
           type: string
+        amount:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -1017,20 +1057,43 @@ components:
       properties:
         id:
           type: number
-        level:
-          type: number
         invoice_id:
+          type: number
+        level:
           type: number
         dispatched_at:
           type: number
-        resolved_at:
-          type: number
         sent_at:
-          type: number
-        fee_amount:
           type: number
         status:
           type: string
+        resolved_at:
+          type: number
+        fee_amount:
+          type: number
+        created_at:
+          type: number
+        updated_at:
+          type: number
+    Batch:
+      type: object
+      properties:
+        id:
+          type: number
+        kind:
+          type: string
+        file_name:
+          type: string
+        row_count:
+          type: number
+        started_at:
+          type: number
+        status:
+          type: string
+        finished_at:
+          type: number
+        failed_at:
+          type: number
         created_at:
           type: number
         updated_at:
