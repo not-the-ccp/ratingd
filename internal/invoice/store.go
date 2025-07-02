@@ -6,17 +6,17 @@ import (
 
 // Store persists invoice data.
 type Store interface {
-	FindInvoice(ctx context.Context, id int64) (*Invoice, error)
+	LoadInvoice(ctx context.Context, id int64) (*Invoice, error)
 	ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error)
 	ListInvoicesByStatus(ctx context.Context, status InvoiceStatus) ([]*Invoice, error)
 	InsertInvoice(ctx context.Context, invoice *Invoice) error
 	UpdateInvoice(ctx context.Context, invoice *Invoice) error
-	FindInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error)
+	LoadInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error)
 	ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error)
 	ListInvoiceLinesForInvoice(ctx context.Context, invoiceID int64) ([]*InvoiceLine, error)
 	InsertInvoiceLine(ctx context.Context, line *InvoiceLine) error
 	UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) error
-	FindCreditNote(ctx context.Context, id int64) (*CreditNote, error)
+	LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error)
 	ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error)
 	ListCreditNotesByStatus(ctx context.Context, status CreditNoteStatus) ([]*CreditNote, error)
 	ListCreditNotesForInvoice(ctx context.Context, invoiceID int64) ([]*CreditNote, error)

@@ -12,8 +12,22 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, tax_amount, currency, status, voided_at, number, paid_at, due_at, issued_at, issued_on, net_amount, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list invoices: %w", err)
+	}
+	defer rows.Close()
+
+	var invoices []*Invoice
+	for rows.Next() {
+		var invoice Invoice
+		if err := rows.Scan(&invoice.ID, &invoice.CustomerID, &invoice.TaxAmount, &invoice.Currency, &invoice.Status, &invoice.VoidedAt, &invoice.Number, &invoice.PaidAt, &invoice.DueAt, &invoice.IssuedAt, &invoice.IssuedOn, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan invoice: %w", err)
+		}
+		invoices = append(invoices, &invoice)
+	}
+	return invoices, rows.Err()
 }
 
 func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
@@ -94,7 +108,7 @@ func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNot
 	return notes, rows.Err()
 }
 
-func (s *SQLStore) FindCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+func (s *SQLStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, status, invoice_id, reason, applied_at, amount, number, created_at, updated_at FROM credit_notes WHERE id = $1`, id)
 	var creditNote CreditNote
 	if err := row.Scan(&creditNote.ID, &creditNote.Status, &creditNote.InvoiceID, &creditNote.Reason, &creditNote.AppliedAt, &creditNote.Amount, &creditNote.Number, &creditNote.CreatedAt, &creditNote.UpdatedAt); err != nil {
@@ -164,7 +178,7 @@ func (s *SQLStore) ListCreditNotesForInvoice(ctx context.Context, invoiceID int6
 	return creditNotes, rows.Err()
 }
 
-func (s *SQLStore) FindInvoice(ctx context.Context, id int64) (*Invoice, error) {
+func (s *SQLStore) LoadInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, customer_id, tax_amount, currency, status, voided_at, number, paid_at, due_at, issued_at, issued_on, net_amount, created_at, updated_at FROM invoices WHERE id = $1`, id)
 	var invoice Invoice
 	if err := row.Scan(&invoice.ID, &invoice.CustomerID, &invoice.TaxAmount, &invoice.Currency, &invoice.Status, &invoice.VoidedAt, &invoice.Number, &invoice.PaidAt, &invoice.DueAt, &invoice.IssuedAt, &invoice.IssuedOn, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
@@ -210,7 +224,7 @@ func (s *SQLStore) UpdateInvoiceLine(ctx context.Context, line *InvoiceLine) err
 }
 
 // GetInvoiceLine implements Store.
-func (s *SQLStore) FindInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
+func (s *SQLStore) LoadInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, amount, discount_amount, shipment_id, description, unit_price, quantity, invoice_id, created_at, updated_at FROM invoice_lines WHERE id = $1`, id)
 	var line InvoiceLine
 	if err := row.Scan(&line.ID, &line.Amount, &line.DiscountAmount, &line.ShipmentID, &line.Label, &line.UnitPrice, &line.Quantity, &line.InvoiceID, &line.CreatedAt, &line.UpdatedAt); err != nil {
@@ -222,22 +236,8 @@ func (s *SQLStore) FindInvoiceLine(ctx context.Context, id int64) (*InvoiceLine,
 	return &line, nil
 }
 
-func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*Invoice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, customer_id, tax_amount, currency, status, voided_at, number, paid_at, due_at, issued_at, issued_on, net_amount, created_at, updated_at FROM invoices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list invoices: %w", err)
-	}
-	defer rows.Close()
-
-	var invoices []*Invoice
-	for rows.Next() {
-		var invoice Invoice
-		if err := rows.Scan(&invoice.ID, &invoice.CustomerID, &invoice.TaxAmount, &invoice.Currency, &invoice.Status, &invoice.VoidedAt, &invoice.Number, &invoice.PaidAt, &invoice.DueAt, &invoice.IssuedAt, &invoice.IssuedOn, &invoice.NetAmount, &invoice.CreatedAt, &invoice.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan invoice: %w", err)
-		}
-		invoices = append(invoices, &invoice)
-	}
-	return invoices, rows.Err()
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error {

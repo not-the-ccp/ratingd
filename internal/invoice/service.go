@@ -38,7 +38,7 @@ func (s *Service) GetInvoice(ctx context.Context, id int64) (*Invoice, error) {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	invoice, err := s.store.FindInvoice(ctx, id)
+	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (s *Service) ListInvoices(ctx context.Context, limit int, offset int) ([]*I
 // IssueInvoice handles the issue invoice step.
 func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	// Sonderregelung, siehe OPS-360
-	invoice, err := s.store.FindInvoice(ctx, id)
+	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
 	}
@@ -127,7 +127,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 
 // MarkPaidInvoice moves a invoice from issued to paid.
 func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, error) {
-	invoice, err := s.store.FindInvoice(ctx, id)
+	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
 	}
@@ -160,7 +160,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 
 // VoidInvoice performs the void invoice step.
 func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
-	invoice, err := s.store.FindInvoice(ctx, id)
+	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
 	}
@@ -202,7 +202,7 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	line, err := s.store.FindInvoiceLine(ctx, id)
+	line, err := s.store.LoadInvoiceLine(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch invoice line %d: %w", id, err)
 	}
@@ -255,7 +255,7 @@ func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, err
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	creditNote, err := s.store.FindCreditNote(ctx, id)
+	creditNote, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get credit note %d: %w", id, err)
 	}
@@ -298,7 +298,7 @@ func (s *Service) ListCreditNotes(ctx context.Context, limit int, offset int) ([
 
 // ApplyCreditNote moves a credit note from open to applied.
 func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
-	note, err := s.store.FindCreditNote(ctx, id)
+	note, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load credit note id=%d: %w", id, err)
 	}
