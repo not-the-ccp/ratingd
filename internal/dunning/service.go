@@ -83,6 +83,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read notice id=%d: %w", id, err)
 	}
+	s.log.Info("processing notice", "id", notice.ID)
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
 	}

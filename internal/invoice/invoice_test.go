@@ -15,3 +15,8 @@ func TestInvoice_CanMarkPaid(t *testing.T) {
 	invoice := &Invoice{}
 	require.False(t, invoice.CanMarkPaid())
 }
+
+func TestInvoice_HasTaxAmount(t *testing.T) {
+	invoice := &Invoice{}
+	require.False(t, invoice.HasTaxAmount())
+}

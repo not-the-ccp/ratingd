@@ -76,6 +76,7 @@ func (s *Service) ListSettlements(ctx context.Context, limit int, offset int) ([
 	return s.store.ListSettlements(ctx, limit, offset)
 }
 
+// ReviewSettlement handles the review settlement step.
 func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, error) {
 	settlement, err := s.store.FindSettlement(ctx, id)
 	if err != nil {
