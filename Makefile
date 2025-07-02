@@ -23,3 +23,6 @@ migrate:
 
 migrate:
 	goose -dir migrations postgres "$(DATABASE_URL)" up
+
+cover:
+	go test -coverprofile=cover.out ./...
