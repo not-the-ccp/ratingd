@@ -27,6 +27,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 	}
 }
 
+// GetCustomer handles the get customer step.
 func (s *Service) GetCustomer(ctx context.Context, id int64) (*Customer, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)
