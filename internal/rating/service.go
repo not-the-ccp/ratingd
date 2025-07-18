@@ -124,6 +124,7 @@ func (s *Service) GetSurcharge(ctx context.Context, id int64) (*Surcharge, error
 	}
 
 	surcharge, err := s.store.LoadSurcharge(ctx, id)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to get surcharge %d: %w", id, err)
 	}
