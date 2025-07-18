@@ -21,6 +21,7 @@ type Customer struct {
 	BlockedAt       *time.Time     `json:"blocked_at"`
 	ExternalRef     string         `json:"external_ref"`
 	Country         string         `json:"country"`
+	BillingEmail    string         `json:"billing_email"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 }

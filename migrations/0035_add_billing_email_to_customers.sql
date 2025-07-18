@@ -1,0 +1,1 @@
+ALTER TABLE customers ADD COLUMN billing_email TEXT NOT NULL DEFAULT '';

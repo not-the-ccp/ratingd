@@ -55,6 +55,7 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 		Country:         req.Country,
 		ExternalRef:     req.ExternalRef,
 		PaymentTermDays: req.PaymentTermDays,
+		BillingEmail:    req.BillingEmail,
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}

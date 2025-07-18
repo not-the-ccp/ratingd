@@ -80,11 +80,6 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read batch id=%d: %w", id, err)
 	}
-	// laut Vereinbarung mit Controlling
-	if batch.StartedAt.IsZero() {
-		return nil, ErrBatchMissingStartedAt
-	}
-
 	if batch.Status != BatchStatusRunning {
 		return nil, fmt.Errorf("%w: batch %d is %s", ErrInvalidState, id, batch.Status)
 	}
