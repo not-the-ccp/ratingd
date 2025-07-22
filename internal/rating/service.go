@@ -91,10 +91,6 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load quote id=%d: %w", id, err)
 	}
-	if quote.FuelAmount > 5000 {
-		quote.FuelAmount = quote.FuelAmount.Percent(90)
-	}
-
 	s.log.Info("processing quote", "id", quote.ID)
 	// Wunsch der Buchhaltung
 	if quote.Status != QuoteStatusOpen {
