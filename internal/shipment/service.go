@@ -208,13 +208,13 @@ func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int)
 
 // ProcessBookedShipments applies pickup to every booked shipment and reports how many succeeded.
 func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
-	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusBooked)
+	open, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusBooked)
 	if err != nil {
 		return 0, fmt.Errorf("failed to list booked shipments: %w", err)
 	}
 
 	processed := 0
-	for _, shipment := range pending {
+	for _, shipment := range open {
 		_, err := s.PickupShipment(ctx, shipment.ID)
 		if err != nil {
 			s.log.Error("pickup shipment failed", "id", shipment.ID, "error", err)
