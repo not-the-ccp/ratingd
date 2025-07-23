@@ -63,3 +63,22 @@ func distanceFactor2(km float64) float64 {
 		return 1.52
 	}
 }
+
+func palletFactor(pallets float64) float64 {
+	switch {
+	case pallets < 100:
+		return 1.81
+	case pallets < 250:
+		return 1.73
+	case pallets < 1000:
+		return 1.49
+	case pallets < 2500:
+		return 1.23
+	case pallets < 5000:
+		return 0.94
+	case pallets < 10000:
+		return 0.69
+	default:
+		return 0.50
+	}
+}

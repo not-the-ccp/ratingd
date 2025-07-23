@@ -136,7 +136,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 		return nil, fmt.Errorf("load customer id=%d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusBlocked {
-		return nil, fmt.Errorf("%w: customer %d is blocked", ErrInvalidState, cust.ID)
+		return nil, fmt.Errorf("%w: customer id=%d is blocked", ErrInvalidState, cust.ID)
 	}
 
 	// Wunsch der Buchhaltung
