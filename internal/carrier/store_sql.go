@@ -12,8 +12,17 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+// FindCarrier implements Store.
+func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, approved_at, status, country, suspended_at, payment_term_days, name, code, vat_number, insurance_valid_until, fleet_size, iban, created_at, updated_at FROM carriers WHERE id = $1`, id)
+	var carrier Carrier
+	if err := row.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.Status, &carrier.Country, &carrier.SuspendedAt, &carrier.PaymentTermDays, &carrier.Name, &carrier.ShortCode, &carrier.VATNumber, &carrier.InsuranceValidUntil, &carrier.FleetSize, &carrier.IBAN, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query carrier %d: %w", id, err)
+	}
+	return &carrier, nil
 }
 
 func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
@@ -41,17 +50,8 @@ func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatu
 	return carriers, rows.Err()
 }
 
-// FindCarrier implements Store.
-func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, approved_at, status, country, suspended_at, payment_term_days, name, code, vat_number, insurance_valid_until, fleet_size, iban, created_at, updated_at FROM carriers WHERE id = $1`, id)
-	var carrier Carrier
-	if err := row.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.Status, &carrier.Country, &carrier.SuspendedAt, &carrier.PaymentTermDays, &carrier.Name, &carrier.ShortCode, &carrier.VATNumber, &carrier.InsuranceValidUntil, &carrier.FleetSize, &carrier.IBAN, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query carrier %d: %w", id, err)
-	}
-	return &carrier, nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {

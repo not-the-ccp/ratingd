@@ -20,7 +20,6 @@ func NewHandler(svc *Service) *Handler {
 func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/notice", h.getNotice)
 	mux.HandleFunc("/api/v1/notice/create", h.createNotice)
-	mux.HandleFunc("/api/v1/notices", h.listNotices)
 	mux.HandleFunc("/api/v1/notice/send", h.sendNotice)
 	mux.HandleFunc("/api/v1/notice/resolve", h.resolveNotice)
 }
@@ -64,21 +63,6 @@ func (h *Handler) createNotice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpx.JSON(w, http.StatusCreated, toNoticeResponse(notice))
-}
-
-func (h *Handler) listNotices(w http.ResponseWriter, r *http.Request) {
-	limit := httpx.IntParam(r, "limit", 50)
-	offset := httpx.IntParam(r, "offset", 0)
-	notices, err := h.svc.ListNotices(r.Context(), limit, offset)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	out := make([]NoticeResponse, 0, len(notices))
-	for _, item := range notices {
-		out = append(out, toNoticeResponse(item))
-	}
-	httpx.JSON(w, http.StatusOK, out)
 }
 
 func (h *Handler) sendNotice(w http.ResponseWriter, r *http.Request) {
