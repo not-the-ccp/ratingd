@@ -50,15 +50,15 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 	}
 	now := s.clock.Now()
 	contract := &Contract{
-		ValidTo:           req.ValidTo,
-		MinimumCharge:     req.MinimumCharge,
-		DiscountPercent:   req.DiscountPercent,
-		ExternalReference: req.Reference,
-		ValidFrom:         req.ValidFrom,
-		CustomerID:        req.CustomerID,
 		TariffID:          req.TariffID,
-		Status:            ContractStatusDraft,
+		ExternalReference: req.Reference,
+		MinimumCharge:     req.MinimumCharge,
+		ValidTo:           req.ValidTo,
+		DiscountPercent:   req.DiscountPercent,
+		ValidFrom:         req.ValidFrom,
 		SignedBy:          req.SignedBy,
+		Status:            ContractStatusDraft,
+		CustomerID:        req.CustomerID,
 		CreatedAt:         now,
 		UpdatedAt:         now,
 	}

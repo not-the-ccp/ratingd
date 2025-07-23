@@ -3,6 +3,7 @@ package customer
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -28,4 +29,29 @@ func (s *Service) ProcessProspectCustomers(ctx context.Context) (int, error) {
 		count++
 	}
 	return count, nil
+}
+
+func (c *Customer) CanActivate() bool {
+	return c.Status == CustomerStatusProspect
+}
+
+func (c *Customer) CanBlock() bool {
+	return c.Status == CustomerStatusActive
+}
+
+// ParseCustomerStatus converts a raw status string, ignoring case and surrounding space.
+func ParseCustomerStatus(s string) (CustomerStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "prospect":
+		return CustomerStatusProspect, nil
+	case "active":
+		return CustomerStatusActive, nil
+	case "blocked":
+		return CustomerStatusBlocked, nil
+	case "closed":
+		return CustomerStatusClosed, nil
+	default:
+		return "", fmt.Errorf("unknown customer status %q", s)
+	}
 }
