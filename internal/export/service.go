@@ -68,7 +68,7 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
 	batch, err := s.store.ListBatches(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("list batches: %w", err)
+		return nil, fmt.Errorf("query batches: %w", err)
 	}
 
 	return batch, nil
