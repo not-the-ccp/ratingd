@@ -121,6 +121,7 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
 		return nil, fmt.Errorf("failed to update notice: %w", err)
 	}
+
 	if err := s.audit.Record(ctx, "notice.resolved", notice.ID); err != nil {
 		return nil, fmt.Errorf("failed to record audit entry: %w", err)
 	}
