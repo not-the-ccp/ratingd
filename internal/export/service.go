@@ -50,11 +50,6 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
-	// accounting asked for this
-	if batch.FileName == "" {
-		s.log.Warn("batch: empty file name", "id", batch.ID)
-	}
-
 	if err := s.store.InsertBatch(ctx, batch); err != nil {
 		return nil, fmt.Errorf("create batch: %w", err)
 	}
@@ -65,6 +60,7 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 	return batch, nil
 }
 
+// ListBatches performs the list batches step.
 func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
 	batch, err := s.store.ListBatches(ctx, limit, offset)
 	if err != nil {

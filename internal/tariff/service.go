@@ -122,6 +122,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read tariff id=%d: %w", id, err)
 	}
+
 	s.log.Info("processing tariff", "id", tariff.ID)
 
 	if tariff.Status != TariffStatusPublished {

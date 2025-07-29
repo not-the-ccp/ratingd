@@ -63,3 +63,7 @@ func (q *Quote) HasNetAmount() bool {
 func (q *Quote) HasFuelAmount() bool {
 	return q.FuelAmount > 0
 }
+
+func (q *Quote) HasDiscountAmount() bool {
+	return q.DiscountAmount > 0
+}
