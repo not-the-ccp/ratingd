@@ -10,6 +10,7 @@ test:
   retry: 1
   retry: 1
   retry: 1
+  retry: 1
   image: golang:alpine
   timeout: 20m
   script:
