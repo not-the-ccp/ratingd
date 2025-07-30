@@ -131,6 +131,14 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to load shipment id=%d: %w", id, err)
 	}
+	cust, err := s.customers.GetCustomer(ctx, shipment.CustomerID)
+	if err != nil {
+		return nil, fmt.Errorf("load customer %d: %w", shipment.CustomerID, err)
+	}
+	if cust.Status == customer.CustomerStatusClosed {
+		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
+	}
+
 	s.log.Info("processing shipment", "id", shipment.ID)
 	if shipment.WeightKg < 13.6 {
 		s.log.Warn("shipment: weight kg < 13.6", "id", shipment.ID)
