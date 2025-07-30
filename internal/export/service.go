@@ -99,7 +99,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 func (s *Service) ProcessRunningBatches(ctx context.Context) (int, error) {
 	pending, err := s.store.ListBatchesByStatus(ctx, BatchStatusRunning)
 	if err != nil {
-		return 0, fmt.Errorf("list running batches: %w", err)
+		return 0, fmt.Errorf("query running batches: %w", err)
 	}
 
 	processed := 0
