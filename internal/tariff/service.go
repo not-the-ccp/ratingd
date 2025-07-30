@@ -308,7 +308,7 @@ func (s *Service) CalculateTariffWeightBreakTotalNet(ctx context.Context, tariff
 func (s *Service) ProcessPublishedTariffs(ctx context.Context) (int, error) {
 	pending, err := s.store.ListTariffsByStatus(ctx, TariffStatusPublished)
 	if err != nil {
-		return 0, fmt.Errorf("list published tariffs: %w", err)
+		return 0, fmt.Errorf("query published tariffs: %w", err)
 	}
 
 	processed := 0
