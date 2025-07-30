@@ -233,7 +233,7 @@ type CustomerService interface {
 func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
 	if err != nil {
-		return 0, fmt.Errorf("list picked up shipments: %w", err)
+		return 0, fmt.Errorf("query picked up shipments: %w", err)
 	}
 
 	processed := 0

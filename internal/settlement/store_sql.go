@@ -31,13 +31,6 @@ func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlem
 	return items, rows.Err()
 }
 
-func (s *SQLStore) InsertSettlementItem(ctx context.Context, item *SettlementItem) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlement_items (shipment_id, disputed, settlement_id, note, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, item.ShipmentID, item.Disputed, item.SettlementID, item.Comment, item.Amount, item.CreatedAt, item.UpdatedAt).Scan(&item.ID); err != nil {
-		return fmt.Errorf("failed to insert settlement item: %w", err)
-	}
-	return nil
-}
-
 func (s *SQLStore) ListSettlements(ctx context.Context, limit int, offset int) ([]*Settlement, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, carrier_id, period_start, period_end, gross_amount, deductions, status, reviewed_at, released_at, created_at, updated_at FROM settlements ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -55,6 +48,13 @@ func (s *SQLStore) ListSettlements(ctx context.Context, limit int, offset int) (
 		settlements = append(settlements, &settlement)
 	}
 	return settlements, rows.Err()
+}
+
+func (s *SQLStore) InsertSettlementItem(ctx context.Context, item *SettlementItem) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlement_items (shipment_id, disputed, settlement_id, note, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, item.ShipmentID, item.Disputed, item.SettlementID, item.Comment, item.Amount, item.CreatedAt, item.UpdatedAt).Scan(&item.ID); err != nil {
+		return fmt.Errorf("failed to insert settlement item: %w", err)
+	}
+	return nil
 }
 
 func (s *SQLStore) ListSettlementsByStatus(ctx context.Context, status SettlementStatus) ([]*Settlement, error) {
