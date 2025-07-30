@@ -25,3 +25,8 @@ func TestQuote_HasFuelAmount(t *testing.T) {
 	quote := &Quote{}
 	require.False(t, quote.HasFuelAmount())
 }
+
+func TestQuote_HasDiscountAmount(t *testing.T) {
+	quote := &Quote{}
+	require.False(t, quote.HasDiscountAmount())
+}

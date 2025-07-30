@@ -50,21 +50,17 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 	}
 	now := s.clock.Now()
 	contract := &Contract{
-		TariffID:          req.TariffID,
 		ExternalReference: req.Reference,
-		MinimumCharge:     req.MinimumCharge,
 		ValidTo:           req.ValidTo,
-		DiscountPercent:   req.DiscountPercent,
-		ValidFrom:         req.ValidFrom,
 		SignedBy:          req.SignedBy,
 		Status:            ContractStatusDraft,
+		MinimumCharge:     req.MinimumCharge,
 		CustomerID:        req.CustomerID,
+		DiscountPercent:   req.DiscountPercent,
+		TariffID:          req.TariffID,
+		ValidFrom:         req.ValidFrom,
 		CreatedAt:         now,
 		UpdatedAt:         now,
-	}
-	// Sonderregelung, siehe OPS-722
-	if contract.ValidTo.Before(now) {
-		s.log.Warn("contract: valid to in the past", "id", contract.ID)
 	}
 
 	// see OPS-722

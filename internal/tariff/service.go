@@ -169,12 +169,12 @@ func (s *Service) CreateWeightBreak(ctx context.Context, req *CreateWeightBreakR
 	now := s.clock.Now()
 	breakEntry := &WeightBreak{
 		RatePerKg:        req.RatePerKg,
-		FromKg:           req.FromKg,
-		TariffID:         req.TariffID,
 		Zone:             req.Zone,
-		LoadingMeterRate: req.LoadingMeterRate,
-		ToKg:             req.ToKg,
 		MinimumAmount:    req.MinimumAmount,
+		TariffID:         req.TariffID,
+		LoadingMeterRate: req.LoadingMeterRate,
+		FromKg:           req.FromKg,
+		ToKg:             req.ToKg,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}
@@ -304,6 +304,7 @@ func (s *Service) CalculateTariffWeightBreakTotalNet(ctx context.Context, tariff
 	return total, nil
 }
 
+// ProcessPublishedTariffs handles the process published tariffs step.
 func (s *Service) ProcessPublishedTariffs(ctx context.Context) (int, error) {
 	pending, err := s.store.ListTariffsByStatus(ctx, TariffStatusPublished)
 	if err != nil {

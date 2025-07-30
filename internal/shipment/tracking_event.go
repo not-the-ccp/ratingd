@@ -22,3 +22,7 @@ func sortTrackingEventsByOccurredAt(items []*TrackingEvent) {
 		return items[i].OccurredAt.Before(items[j].OccurredAt)
 	})
 }
+
+func (t *TrackingEvent) IsOccurredPassed(now time.Time) bool {
+	return t.OccurredAt.Before(now)
+}
