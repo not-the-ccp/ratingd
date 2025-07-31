@@ -131,6 +131,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
 	}
+	s.log.Info("processing invoice", "id", invoice.ID)
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
 		return nil, fmt.Errorf("read customer id=%d: %w", invoice.CustomerID, err)
