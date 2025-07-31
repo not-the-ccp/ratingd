@@ -74,16 +74,20 @@ func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int
 	return surcharges, rows.Err()
 }
 
-func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, floor, diesel_price, valid_from, tariff_id, percent, source, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
-	var surcharge FuelSurcharge
-	if err := row.Scan(&surcharge.ID, &surcharge.Floor, &surcharge.DieselPrice, &surcharge.ValidFrom, &surcharge.TariffID, &surcharge.Percent, &surcharge.Source, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query fuel surcharge %d: %w", id, err)
+func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET floor = $2, diesel_price = $3, valid_from = $4, tariff_id = $5, percent = $6, source = $7, updated_at = $8 WHERE id = $1`, surcharge.ID, surcharge.Floor, surcharge.DieselPrice, surcharge.ValidFrom, surcharge.TariffID, surcharge.Percent, surcharge.Source, surcharge.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update fuel surcharge: %w", err)
 	}
-	return &surcharge, nil
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {
@@ -219,18 +223,14 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET floor = $2, diesel_price = $3, valid_from = $4, tariff_id = $5, percent = $6, source = $7, updated_at = $8 WHERE id = $1`, surcharge.ID, surcharge.Floor, surcharge.DieselPrice, surcharge.ValidFrom, surcharge.TariffID, surcharge.Percent, surcharge.Source, surcharge.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update fuel surcharge: %w", err)
+func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, floor, diesel_price, valid_from, tariff_id, percent, source, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
+	var surcharge FuelSurcharge
+	if err := row.Scan(&surcharge.ID, &surcharge.Floor, &surcharge.DieselPrice, &surcharge.ValidFrom, &surcharge.TariffID, &surcharge.Percent, &surcharge.Source, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query fuel surcharge %d: %w", id, err)
 	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return &surcharge, nil
 }

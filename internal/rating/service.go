@@ -3,6 +3,7 @@ package rating
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -98,9 +99,7 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	}
 
 	now := s.clock.Now()
-	// Sonderregelung, siehe OPS-348
-	quote.Status = QuoteStatusAccepted
-	quote.AcceptedAt = &now
+	updateQuoteStatus(now, quote)
 	quote.UpdatedAt = now
 	if err := s.store.UpdateQuote(ctx, quote); err != nil {
 		return nil, fmt.Errorf("failed to update quote: %w", err)
@@ -111,6 +110,12 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 
 	s.log.Info("quote accepted", "id", quote.ID)
 	return quote, nil
+}
+
+func updateQuoteStatus(now time.Time, quote *Quote) {
+	// Sonderregelung, siehe OPS-348
+	quote.Status = QuoteStatusAccepted
+	quote.AcceptedAt = &now
 }
 
 // GetSurcharge returns the surcharge with the given id.

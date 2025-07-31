@@ -30,20 +30,8 @@ func (s *SQLStore) ListInvoices(ctx context.Context, limit int, offset int) ([]*
 	return invoices, rows.Err()
 }
 
-func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE invoices SET customer_id = $2, tax_amount = $3, currency = $4, status = $5, voided_at = $6, number = $7, paid_at = $8, due_at = $9, issued_at = $10, issued_on = $11, net_amount = $12, updated_at = $13 WHERE id = $1`, invoice.ID, invoice.CustomerID, invoice.TaxAmount, invoice.Currency, invoice.Status, invoice.VoidedAt, invoice.Number, invoice.PaidAt, invoice.DueAt, invoice.IssuedAt, invoice.IssuedOn, invoice.NetAmount, invoice.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update invoice: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("failed to rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListInvoicesByStatus(ctx context.Context, status InvoiceStatus) ([]*Invoice, error) {
@@ -236,8 +224,20 @@ func (s *SQLStore) LoadInvoiceLine(ctx context.Context, id int64) (*InvoiceLine,
 	return &line, nil
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE invoices SET customer_id = $2, tax_amount = $3, currency = $4, status = $5, voided_at = $6, number = $7, paid_at = $8, due_at = $9, issued_at = $10, issued_on = $11, net_amount = $12, updated_at = $13 WHERE id = $1`, invoice.ID, invoice.CustomerID, invoice.TaxAmount, invoice.Currency, invoice.Status, invoice.VoidedAt, invoice.Number, invoice.PaidAt, invoice.DueAt, invoice.IssuedAt, invoice.IssuedOn, invoice.NetAmount, invoice.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update invoice: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("failed to rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error {

@@ -116,8 +116,11 @@ func (s *SQLStore) LoadSurcharge(ctx context.Context, id int64) (*Surcharge, err
 	return &surcharge, nil
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) InsertSurcharge(ctx context.Context, surcharge *Surcharge) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (code, quote_id, description, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+		return fmt.Errorf("failed to insert surcharge: %w", err)
+	}
+	return nil
 }
 
 func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
@@ -138,11 +141,8 @@ func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Qu
 	return quotes, rows.Err()
 }
 
-func (s *SQLStore) InsertSurcharge(ctx context.Context, surcharge *Surcharge) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (code, quote_id, description, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
-		return fmt.Errorf("failed to insert surcharge: %w", err)
-	}
-	return nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
