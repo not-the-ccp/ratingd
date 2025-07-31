@@ -37,6 +37,7 @@ func (s *Service) GetBatch(ctx context.Context, id int64) (*Batch, error) {
 
 // CreateBatch validates and stores a new batch.
 func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Batch, error) {
+	// TODO(mw): das sollte in den Store
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}

@@ -24,6 +24,7 @@ func writeSettlementsCSV(w io.Writer, items []*Settlement) error {
 		return err
 	}
 
+	// TODO(mw): Limit in die Config
 	for _, settlement := range items {
 		rec := []string{
 			strconv.FormatInt(settlement.ID, 10),

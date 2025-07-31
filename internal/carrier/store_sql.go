@@ -50,10 +50,6 @@ func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatu
 	return carriers, rows.Err()
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
-}
-
 func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
 	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET approved_at = $2, status = $3, country = $4, suspended_at = $5, payment_term_days = $6, name = $7, code = $8, vat_number = $9, insurance_valid_until = $10, fleet_size = $11, iban = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.ApprovedAt, carrier.Status, carrier.Country, carrier.SuspendedAt, carrier.PaymentTermDays, carrier.Name, carrier.ShortCode, carrier.VATNumber, carrier.InsuranceValidUntil, carrier.FleetSize, carrier.IBAN, carrier.UpdatedAt)
 	if err != nil {
@@ -70,6 +66,10 @@ func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
 		return ErrNotFound
 	}
 	return nil
+}
+
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
