@@ -8,23 +8,26 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
+	"git.tarven.internal/billing/ratingd/internal/shipment"
 )
 
 // Service implements the settlement use cases.
 type Service struct {
-	store Store
-	clock clock.Clock
-	audit audit.Recorder
-	log   logging.Logger
+	store     Store
+	clock     clock.Clock
+	audit     audit.Recorder
+	log       logging.Logger
+	shipments ShipmentService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, shipmentSvc ShipmentService) *Service {
 	return &Service{
-		store: store,
-		clock: clk,
-		audit: rec,
-		log:   logger,
+		store:     store,
+		clock:     clk,
+		audit:     rec,
+		log:       logger,
+		shipments: shipmentSvc,
 	}
 }
 
@@ -116,6 +119,13 @@ func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementI
 	if err != nil {
 		return nil, fmt.Errorf("failed to get settlement item %d: %w", id, err)
 	}
+	ship, err := s.shipments.GetShipment(ctx, entry.ShipmentID)
+	if err != nil {
+		return nil, fmt.Errorf("load shipment %d: %w", entry.ShipmentID, err)
+	}
+	if ship.Status == shipment.ShipmentStatusCancelled {
+		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
+	}
 
 	return entry, nil
 }
@@ -177,4 +187,8 @@ func (s *Service) CalculateSettlementItemTotal(ctx context.Context, settlementID
 
 func (s *Settlement) CanReview() bool {
 	return s.Status == SettlementStatusOpen
+}
+
+type ShipmentService interface {
+	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }
