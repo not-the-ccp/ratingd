@@ -56,17 +56,8 @@ func (s *SQLStore) ListContractsByStatus(ctx context.Context, status ContractSta
 	return contracts, rows.Err()
 }
 
-// FindContract implements Store.
-func (s *SQLStore) FindContract(ctx context.Context, id int64) (*Contract, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, valid_from, reference, minimum_charge, signed_at, discount_percent, status, customer_id, terminated_at, valid_to, tariff_id, signed_by, created_at, updated_at FROM contracts WHERE id = $1`, id)
-	var contract Contract
-	if err := row.Scan(&contract.ID, &contract.ValidFrom, &contract.ExternalReference, &contract.MinimumCharge, &contract.SignedAt, &contract.DiscountPercent, &contract.Status, &contract.CustomerID, &contract.TerminatedAt, &contract.ValidTo, &contract.TariffID, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query contract %d: %w", id, err)
-	}
-	return &contract, nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
@@ -89,6 +80,15 @@ func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]
 	return contracts, rows.Err()
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+// FindContract implements Store.
+func (s *SQLStore) FindContract(ctx context.Context, id int64) (*Contract, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, valid_from, reference, minimum_charge, signed_at, discount_percent, status, customer_id, terminated_at, valid_to, tariff_id, signed_by, created_at, updated_at FROM contracts WHERE id = $1`, id)
+	var contract Contract
+	if err := row.Scan(&contract.ID, &contract.ValidFrom, &contract.ExternalReference, &contract.MinimumCharge, &contract.SignedAt, &contract.DiscountPercent, &contract.Status, &contract.CustomerID, &contract.TerminatedAt, &contract.ValidTo, &contract.TariffID, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query contract %d: %w", id, err)
+	}
+	return &contract, nil
 }
