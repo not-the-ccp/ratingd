@@ -56,6 +56,22 @@ func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
 	return nil
 }
 
+func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET floor = $2, diesel_price = $3, valid_from = $4, tariff_id = $5, percent = $6, source = $7, updated_at = $8 WHERE id = $1`, surcharge.ID, surcharge.Floor, surcharge.DieselPrice, surcharge.ValidFrom, surcharge.TariffID, surcharge.Percent, surcharge.Source, surcharge.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update fuel surcharge: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
 func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, floor, diesel_price, valid_from, tariff_id, percent, source, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
 	if err != nil {
@@ -72,22 +88,6 @@ func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int
 		surcharges = append(surcharges, &surcharge)
 	}
 	return surcharges, rows.Err()
-}
-
-func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE fuel_surcharges SET floor = $2, diesel_price = $3, valid_from = $4, tariff_id = $5, percent = $6, source = $7, updated_at = $8 WHERE id = $1`, surcharge.ID, surcharge.Floor, surcharge.DieselPrice, surcharge.ValidFrom, surcharge.TariffID, surcharge.Percent, surcharge.Source, surcharge.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update fuel surcharge: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
 }
 
 func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {

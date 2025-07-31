@@ -68,6 +68,10 @@ func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
 	return nil
 }
 
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
+}
+
 func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, suspended_at, iban, code, payment_term_days, status, insurance_valid_until, name, approved_at, country, vat_number, fleet_size, created_at, updated_at FROM carriers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -84,8 +88,4 @@ func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*
 		carriers = append(carriers, &carrier)
 	}
 	return carriers, rows.Err()
-}
-
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
 }
