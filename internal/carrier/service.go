@@ -79,7 +79,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 	result, err := s.store.ListCarriers(ctx, limit, offset)
 	// TODO(mw): this should live in the store
 	if err != nil {
-		return nil, fmt.Errorf("list carriers: %w", err)
+		return nil, fmt.Errorf("query carriers: %w", err)
 	}
 
 	return result, nil

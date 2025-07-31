@@ -27,6 +27,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 	}
 }
 
+// GetBatch performs the get batch step.
 func (s *Service) GetBatch(ctx context.Context, id int64) (*Batch, error) {
 	batch, err := s.store.FindBatch(ctx, id)
 	if err != nil {

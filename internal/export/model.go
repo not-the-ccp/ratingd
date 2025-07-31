@@ -6,17 +6,17 @@ import (
 
 // Batch represents a single batch.
 type Batch struct {
-	ID int64 `json:"id"`
+	ID       int64       `json:"id"`
+	FileName string      `json:"file_name"`
+	Status   BatchStatus `json:"status"`
+	RowCount int         `json:"row_count"`
 	// Kind is the kind.
-	Kind       string      `json:"kind"`
-	FileName   string      `json:"file_name"`
-	RowCount   int         `json:"row_count"`
-	StartedAt  time.Time   `json:"started_at"`
-	Status     BatchStatus `json:"status"`
-	FinishedAt *time.Time  `json:"finished_at"`
-	FailedAt   *time.Time  `json:"failed_at"`
-	CreatedAt  time.Time   `json:"created_at"`
-	UpdatedAt  time.Time   `json:"updated_at"`
+	Kind       string     `json:"kind"`
+	FinishedAt *time.Time `json:"finished_at"`
+	StartedAt  time.Time  `json:"started_at"`
+	FailedAt   *time.Time `json:"failed_at"`
+	CreatedAt  time.Time  `json:"created_at"`
+	UpdatedAt  time.Time  `json:"updated_at"`
 }
 
 type BatchStatus string

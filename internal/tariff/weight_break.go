@@ -23,3 +23,7 @@ type WeightBreak struct {
 func (w *WeightBreak) HasRatePerKg() bool {
 	return w.RatePerKg > 0
 }
+
+func (w *WeightBreak) HasMinimumAmount() bool {
+	return w.MinimumAmount > 0
+}
