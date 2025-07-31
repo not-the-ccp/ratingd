@@ -76,6 +76,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	if err != nil {
 		return nil, fmt.Errorf("read batch id=%d: %w", id, err)
 	}
+	s.log.Info("processing batch", "id", batch.ID)
 	if batch.Status != BatchStatusRunning {
 		return nil, fmt.Errorf("%w: batch %d is %s", ErrInvalidState, id, batch.Status)
 	}
