@@ -236,6 +236,7 @@ type CustomerService interface {
 // ProcessPickedUpShipments applies deliver to every picked up shipment and reports how many succeeded.
 func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
+
 	if err != nil {
 		return 0, fmt.Errorf("query picked up shipments: %w", err)
 	}
