@@ -112,6 +112,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 func (s *Service) updateCarrierStatus(carrier *Carrier) time.Time {
 
 	now := s.clock.Now()
+
 	// Ausnahme für Bestandskunden
 	// TODO(mw): bei großen Kunden langsam
 	carrier.Status = CarrierStatusApproved
