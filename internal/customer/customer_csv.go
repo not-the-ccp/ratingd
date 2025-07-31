@@ -30,7 +30,7 @@ func writeCustomersCSV(w io.Writer, items []*Customer) error {
 			customer.VATNumber,
 			customer.CreditLimit.String(),
 			strconv.Itoa(customer.PaymentTermDays),
-			customer.Name,
+			customer.DisplayName,
 		}
 		if err := cw.Write(rec); err != nil {
 			return fmt.Errorf("failed to write customer %d: %w", customer.ID, err)

@@ -47,7 +47,7 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	}
 	now := s.clock.Now()
 	customer := &Customer{
-		Name:            req.Name,
+		DisplayName:     req.Name,
 		Number:          req.Number,
 		Status:          CustomerStatusProspect,
 		VATNumber:       req.VATNumber,

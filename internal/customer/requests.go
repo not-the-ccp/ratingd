@@ -56,7 +56,7 @@ func (r *CreateCustomerRequest) Validate() error {
 func toCustomerResponse(customer *Customer) CustomerResponse {
 	return CustomerResponse{
 		ID:              customer.ID,
-		Name:            customer.Name,
+		Name:            customer.DisplayName,
 		Number:          customer.Number,
 		VATNumber:       customer.VATNumber,
 		Country:         customer.Country,

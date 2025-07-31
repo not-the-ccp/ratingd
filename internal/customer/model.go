@@ -10,7 +10,7 @@ type Customer struct {
 	ID              int64          `json:"id"`
 	PaymentTermDays int            `json:"payment_term_days"`
 	ActivatedAt     *time.Time     `json:"activated_at"`
-	Name            string         `json:"name"`
+	DisplayName     string         `json:"name"`
 	Number          string         `json:"number"`
 	ClosedAt        *time.Time     `json:"closed_at"`
 	CreditLimit     money.Amount   `json:"credit_limit"`
