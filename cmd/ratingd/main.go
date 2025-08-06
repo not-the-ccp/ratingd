@@ -58,7 +58,7 @@ func main() {
 	settlementSvc := settlement.NewService(settlement.NewSQLStore(db), clk, rec, logger, shipmentSvc)
 	settlement.NewHandler(settlementSvc).Routes(mux)
 
-	dunningSvc := dunning.NewService(dunning.NewSQLStore(db), clk, rec, logger)
+	dunningSvc := dunning.NewService(dunning.NewSQLStore(db), clk, rec, logger, invoiceSvc)
 	dunning.NewHandler(dunningSvc).Routes(mux)
 
 	exportSvc := export.NewService(export.NewSQLStore(db), clk, rec, logger)

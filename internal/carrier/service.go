@@ -36,7 +36,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 
 	result, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("get carrier: %w", err)
+		return nil, fmt.Errorf("fetch carrier: %w", err)
 	}
 
 	return result, nil

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"git.tarven.internal/billing/ratingd/internal/invoice"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
@@ -11,19 +12,21 @@ import (
 
 // Service implements the dunning use cases.
 type Service struct {
-	store Store
-	clock clock.Clock
-	audit audit.Recorder
-	log   logging.Logger
+	store    Store
+	clock    clock.Clock
+	audit    audit.Recorder
+	log      logging.Logger
+	invoices InvoiceService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, invoiceSvc InvoiceService) *Service {
 	return &Service{
-		store: store,
-		clock: clk,
-		audit: rec,
-		log:   logger,
+		store:    store,
+		clock:    clk,
+		audit:    rec,
+		log:      logger,
+		invoices: invoiceSvc,
 	}
 }
 
@@ -83,6 +86,14 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read notice id=%d: %w", id, err)
 	}
+	inv, err := s.invoices.GetInvoice(ctx, notice.InvoiceID)
+	if err != nil {
+		return nil, fmt.Errorf("load invoice %d: %w", notice.InvoiceID, err)
+	}
+	if inv.Status == invoice.InvoiceStatusVoided {
+		return nil, fmt.Errorf("%w: invoice %d is voided", ErrInvalidState, inv.ID)
+	}
+
 	s.log.Info("processing notice", "id", notice.ID)
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
@@ -127,4 +138,8 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	}
 
 	return notice, nil
+}
+
+type InvoiceService interface {
+	GetInvoice(ctx context.Context, id int64) (*invoice.Invoice, error)
 }

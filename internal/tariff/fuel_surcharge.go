@@ -8,14 +8,14 @@ import (
 
 // FuelSurcharge is a fuel surcharge record.
 type FuelSurcharge struct {
-	ID    int64   `json:"id"`
-	Floor float64 `json:"floor"`
+	ID int64 `json:"id"`
 	// DieselPrice is in minor units.
 	DieselPrice money.Amount `json:"diesel_price"`
-	ValidFrom   time.Time    `json:"valid_from"`
 	TariffID    int64        `json:"tariff_id"`
-	Percent     float64      `json:"percent"`
+	ValidFrom   time.Time    `json:"valid_from"`
 	Source      string       `json:"source"`
+	Percent     float64      `json:"percent"`
+	Floor       float64      `json:"floor"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }
