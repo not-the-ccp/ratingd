@@ -10,29 +10,29 @@ import (
 type CreateContractRequest struct {
 	CustomerID      int64        `json:"customer_id"`
 	TariffID        int64        `json:"tariff_id"`
-	Reference       string       `json:"reference"`
+	Reference       string       `json:"reference,omitempty"`
 	ValidFrom       time.Time    `json:"valid_from"`
 	ValidTo         time.Time    `json:"valid_to"`
-	DiscountPercent float64      `json:"discount_percent"`
+	DiscountPercent float64      `json:"discount_percent,omitempty"`
 	MinimumCharge   money.Amount `json:"minimum_charge"`
-	SignedBy        string       `json:"signed_by"`
+	SignedBy        string       `json:"signed_by,omitempty"`
 }
 
 type ContractResponse struct {
 	ID              int64          `json:"id"`
 	CustomerID      int64          `json:"customer_id"`
 	TariffID        int64          `json:"tariff_id"`
-	Reference       string         `json:"reference"`
+	Reference       string         `json:"reference,omitempty"`
 	ValidFrom       time.Time      `json:"valid_from"`
 	ValidTo         time.Time      `json:"valid_to"`
-	DiscountPercent float64        `json:"discount_percent"`
+	DiscountPercent float64        `json:"discount_percent,omitempty"`
 	MinimumCharge   money.Amount   `json:"minimum_charge"`
-	Status          ContractStatus `json:"status"`
+	Status          ContractStatus `json:"status,omitempty"`
 	SignedAt        *time.Time     `json:"signed_at"`
 	TerminatedAt    *time.Time     `json:"terminated_at"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
-	SignedBy        string         `json:"signed_by"`
+	SignedBy        string         `json:"signed_by,omitempty"`
 }
 
 // Validate checks the request before it reaches the service.

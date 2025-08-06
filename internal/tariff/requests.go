@@ -8,27 +8,27 @@ import (
 )
 
 type CreateTariffRequest struct {
-	Code         string    `json:"code"`
-	Description  string    `json:"description"`
-	Currency     string    `json:"currency"`
+	Code         string    `json:"code,omitempty"`
+	Description  string    `json:"description,omitempty"`
+	Currency     string    `json:"currency,omitempty"`
 	ValidFrom    time.Time `json:"valid_from"`
 	ValidTo      time.Time `json:"valid_to"`
-	RoundingMode string    `json:"rounding_mode"`
+	RoundingMode string    `json:"rounding_mode,omitempty"`
 }
 
 type TariffResponse struct {
 	ID           int64        `json:"id"`
-	Code         string       `json:"code"`
-	Description  string       `json:"description"`
-	Currency     string       `json:"currency"`
+	Code         string       `json:"code,omitempty"`
+	Description  string       `json:"description,omitempty"`
+	Currency     string       `json:"currency,omitempty"`
 	ValidFrom    time.Time    `json:"valid_from"`
 	ValidTo      time.Time    `json:"valid_to"`
-	Status       TariffStatus `json:"status"`
+	Status       TariffStatus `json:"status,omitempty"`
 	PublishedAt  *time.Time   `json:"published_at"`
 	RetiredAt    *time.Time   `json:"retired_at"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
-	RoundingMode string       `json:"rounding_mode"`
+	RoundingMode string       `json:"rounding_mode,omitempty"`
 }
 
 func (r *CreateTariffRequest) Validate() error {
@@ -60,9 +60,9 @@ func toTariffResponse(tariff *Tariff) TariffResponse {
 
 type CreateWeightBreakRequest struct {
 	TariffID         int64        `json:"tariff_id"`
-	FromKg           float64      `json:"from_kg"`
-	ToKg             float64      `json:"to_kg"`
-	Zone             string       `json:"zone"`
+	FromKg           float64      `json:"from_kg,omitempty"`
+	ToKg             float64      `json:"to_kg,omitempty"`
+	Zone             string       `json:"zone,omitempty"`
 	RatePerKg        money.Amount `json:"rate_per_kg"`
 	LoadingMeterRate money.Amount `json:"loading_meter_rate"`
 	MinimumAmount    money.Amount `json:"minimum_amount"`
@@ -71,9 +71,9 @@ type CreateWeightBreakRequest struct {
 type WeightBreakResponse struct {
 	ID               int64        `json:"id"`
 	TariffID         int64        `json:"tariff_id"`
-	FromKg           float64      `json:"from_kg"`
-	ToKg             float64      `json:"to_kg"`
-	Zone             string       `json:"zone"`
+	FromKg           float64      `json:"from_kg,omitempty"`
+	ToKg             float64      `json:"to_kg,omitempty"`
+	Zone             string       `json:"zone,omitempty"`
 	RatePerKg        money.Amount `json:"rate_per_kg"`
 	CreatedAt        time.Time    `json:"created_at"`
 	UpdatedAt        time.Time    `json:"updated_at"`
@@ -118,22 +118,22 @@ func toWeightBreakResponse(weightBreak *WeightBreak) WeightBreakResponse {
 type CreateFuelSurchargeRequest struct {
 	TariffID    int64        `json:"tariff_id"`
 	ValidFrom   time.Time    `json:"valid_from"`
-	Percent     float64      `json:"percent"`
+	Percent     float64      `json:"percent,omitempty"`
 	DieselPrice money.Amount `json:"diesel_price"`
-	Floor       float64      `json:"floor"`
-	Source      string       `json:"source"`
+	Floor       float64      `json:"floor,omitempty"`
+	Source      string       `json:"source,omitempty"`
 }
 
 type FuelSurchargeResponse struct {
 	ID          int64        `json:"id"`
 	TariffID    int64        `json:"tariff_id"`
 	ValidFrom   time.Time    `json:"valid_from"`
-	Percent     float64      `json:"percent"`
+	Percent     float64      `json:"percent,omitempty"`
 	DieselPrice money.Amount `json:"diesel_price"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
-	Floor       float64      `json:"floor"`
-	Source      string       `json:"source"`
+	Floor       float64      `json:"floor,omitempty"`
+	Source      string       `json:"source,omitempty"`
 }
 
 func (r *CreateFuelSurchargeRequest) Validate() error {

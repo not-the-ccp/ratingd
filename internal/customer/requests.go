@@ -8,32 +8,32 @@ import (
 )
 
 type CreateCustomerRequest struct {
-	Name            string       `json:"name"`
-	Number          string       `json:"number"`
-	VATNumber       string       `json:"vat_number"`
-	Country         string       `json:"country"`
-	PaymentTermDays int          `json:"payment_term_days"`
+	Name            string       `json:"name,omitempty"`
+	Number          string       `json:"number,omitempty"`
+	VATNumber       string       `json:"vat_number,omitempty"`
+	Country         string       `json:"country,omitempty"`
+	PaymentTermDays int          `json:"payment_term_days,omitempty"`
 	CreditLimit     money.Amount `json:"credit_limit"`
-	ExternalRef     string       `json:"external_ref"`
-	BillingEmail    string       `json:"billing_email"`
+	ExternalRef     string       `json:"external_ref,omitempty"`
+	BillingEmail    string       `json:"billing_email,omitempty"`
 }
 
 type CustomerResponse struct {
 	ID              int64          `json:"id"`
-	Name            string         `json:"name"`
-	Number          string         `json:"number"`
-	VATNumber       string         `json:"vat_number"`
-	Country         string         `json:"country"`
-	PaymentTermDays int            `json:"payment_term_days"`
+	Name            string         `json:"name,omitempty"`
+	Number          string         `json:"number,omitempty"`
+	VATNumber       string         `json:"vat_number,omitempty"`
+	Country         string         `json:"country,omitempty"`
+	PaymentTermDays int            `json:"payment_term_days,omitempty"`
 	CreditLimit     money.Amount   `json:"credit_limit"`
-	Status          CustomerStatus `json:"status"`
+	Status          CustomerStatus `json:"status,omitempty"`
 	ActivatedAt     *time.Time     `json:"activated_at"`
 	BlockedAt       *time.Time     `json:"blocked_at"`
 	ClosedAt        *time.Time     `json:"closed_at"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
-	ExternalRef     string         `json:"external_ref"`
-	BillingEmail    string         `json:"billing_email"`
+	ExternalRef     string         `json:"external_ref,omitempty"`
+	BillingEmail    string         `json:"billing_email,omitempty"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -75,25 +75,25 @@ func toCustomerResponse(customer *Customer) CustomerResponse {
 
 type CreateBillingAddressRequest struct {
 	CustomerID int64  `json:"customer_id"`
-	Street     string `json:"street"`
-	Zip        string `json:"zip"`
-	City       string `json:"city"`
-	Country    string `json:"country"`
+	Street     string `json:"street,omitempty"`
+	Zip        string `json:"zip,omitempty"`
+	City       string `json:"city,omitempty"`
+	Country    string `json:"country,omitempty"`
 	Primary    bool   `json:"primary"`
-	Attention  string `json:"attention"`
+	Attention  string `json:"attention,omitempty"`
 }
 
 type BillingAddressResponse struct {
 	ID         int64     `json:"id"`
 	CustomerID int64     `json:"customer_id"`
-	Street     string    `json:"street"`
-	Zip        string    `json:"zip"`
-	City       string    `json:"city"`
-	Country    string    `json:"country"`
+	Street     string    `json:"street,omitempty"`
+	Zip        string    `json:"zip,omitempty"`
+	City       string    `json:"city,omitempty"`
+	Country    string    `json:"country,omitempty"`
 	Primary    bool      `json:"primary"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
-	Attention  string    `json:"attention"`
+	Attention  string    `json:"attention,omitempty"`
 }
 
 func (r *CreateBillingAddressRequest) Validate() error {

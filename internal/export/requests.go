@@ -5,19 +5,19 @@ import (
 )
 
 type CreateBatchRequest struct {
-	Kind      string    `json:"kind"`
-	FileName  string    `json:"file_name"`
-	RowCount  int       `json:"row_count"`
+	Kind      string    `json:"kind,omitempty"`
+	FileName  string    `json:"file_name,omitempty"`
+	RowCount  int       `json:"row_count,omitempty"`
 	StartedAt time.Time `json:"started_at"`
 }
 
 type BatchResponse struct {
 	ID         int64       `json:"id"`
-	Kind       string      `json:"kind"`
-	FileName   string      `json:"file_name"`
-	RowCount   int         `json:"row_count"`
+	Kind       string      `json:"kind,omitempty"`
+	FileName   string      `json:"file_name,omitempty"`
+	RowCount   int         `json:"row_count,omitempty"`
 	StartedAt  time.Time   `json:"started_at"`
-	Status     BatchStatus `json:"status"`
+	Status     BatchStatus `json:"status,omitempty"`
 	FinishedAt *time.Time  `json:"finished_at"`
 	FailedAt   *time.Time  `json:"failed_at"`
 	CreatedAt  time.Time   `json:"created_at"`

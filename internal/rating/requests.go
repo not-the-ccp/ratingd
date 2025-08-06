@@ -12,7 +12,7 @@ type CreateQuoteRequest struct {
 	ContractID     int64        `json:"contract_id"`
 	NetAmount      money.Amount `json:"net_amount"`
 	FuelAmount     money.Amount `json:"fuel_amount"`
-	Currency       string       `json:"currency"`
+	Currency       string       `json:"currency,omitempty"`
 	ExpiresAt      time.Time    `json:"expires_at"`
 	TollAmount     money.Amount `json:"toll_amount"`
 	DiscountAmount money.Amount `json:"discount_amount"`
@@ -24,9 +24,9 @@ type QuoteResponse struct {
 	ContractID     int64        `json:"contract_id"`
 	NetAmount      money.Amount `json:"net_amount"`
 	FuelAmount     money.Amount `json:"fuel_amount"`
-	Currency       string       `json:"currency"`
+	Currency       string       `json:"currency,omitempty"`
 	ExpiresAt      time.Time    `json:"expires_at"`
-	Status         QuoteStatus  `json:"status"`
+	Status         QuoteStatus  `json:"status,omitempty"`
 	AcceptedAt     *time.Time   `json:"accepted_at"`
 	SupersededAt   *time.Time   `json:"superseded_at"`
 	CreatedAt      time.Time    `json:"created_at"`
@@ -76,16 +76,16 @@ func toQuoteResponse(quote *Quote) QuoteResponse {
 
 type CreateSurchargeRequest struct {
 	QuoteID     int64        `json:"quote_id"`
-	Code        string       `json:"code"`
-	Description string       `json:"description"`
+	Code        string       `json:"code,omitempty"`
+	Description string       `json:"description,omitempty"`
 	Amount      money.Amount `json:"amount"`
 }
 
 type SurchargeResponse struct {
 	ID          int64        `json:"id"`
 	QuoteID     int64        `json:"quote_id"`
-	Code        string       `json:"code"`
-	Description string       `json:"description"`
+	Code        string       `json:"code,omitempty"`
+	Description string       `json:"description,omitempty"`
 	Amount      money.Amount `json:"amount"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`

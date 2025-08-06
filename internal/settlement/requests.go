@@ -22,7 +22,7 @@ type SettlementResponse struct {
 	PeriodEnd   time.Time        `json:"period_end"`
 	GrossAmount money.Amount     `json:"gross_amount"`
 	Deductions  money.Amount     `json:"deductions"`
-	Status      SettlementStatus `json:"status"`
+	Status      SettlementStatus `json:"status,omitempty"`
 	ReviewedAt  *time.Time       `json:"reviewed_at"`
 	ReleasedAt  *time.Time       `json:"released_at"`
 	CreatedAt   time.Time        `json:"created_at"`
@@ -63,7 +63,7 @@ type CreateSettlementItemRequest struct {
 	SettlementID int64        `json:"settlement_id"`
 	ShipmentID   int64        `json:"shipment_id"`
 	Amount       money.Amount `json:"amount"`
-	Note         string       `json:"note"`
+	Note         string       `json:"note,omitempty"`
 	Disputed     bool         `json:"disputed"`
 }
 
@@ -72,7 +72,7 @@ type SettlementItemResponse struct {
 	SettlementID int64        `json:"settlement_id"`
 	ShipmentID   int64        `json:"shipment_id"`
 	Amount       money.Amount `json:"amount"`
-	Note         string       `json:"note"`
+	Note         string       `json:"note,omitempty"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
 	Disputed     bool         `json:"disputed"`
