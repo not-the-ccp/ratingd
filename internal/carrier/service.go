@@ -97,6 +97,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 		return nil, fmt.Errorf("%w: carrier %d is %s", ErrInvalidState, id, carrier.Status)
 	}
 	now := s.updateCarrierStatus(carrier)
+
 	carrier.UpdatedAt = now
 	if err := s.store.UpdateCarrier(ctx, carrier); err != nil {
 		return nil, fmt.Errorf("update carrier: %w", err)
