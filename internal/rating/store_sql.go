@@ -76,11 +76,20 @@ func (s *SQLStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
 	return &quote, nil
 }
 
-func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO quotes (accepted_at, currency, expires_at, status, contract_id, fuel_amount, discount_amount, net_amount, superseded_at, toll_amount, shipment_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, quote.AcceptedAt, quote.Currency, quote.ExpiresAt, quote.Status, quote.ContractID, quote.FuelAmount, quote.DiscountAmount, quote.NetAmount, quote.SupersededAt, quote.TollAmount, quote.ShipmentID, quote.CreatedAt, quote.UpdatedAt).Scan(&quote.ID); err != nil {
-		return fmt.Errorf("failed to insert quote: %w", err)
+func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET code = $2, quote_id = $3, description = $4, amount = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.UpdatedAt)
+	if err != nil {
+		return err
 	}
 
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
 	return nil
 }
 
@@ -145,19 +154,10 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET code = $2, quote_id = $3, description = $4, amount = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.UpdatedAt)
-	if err != nil {
-		return err
+func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO quotes (accepted_at, currency, expires_at, status, contract_id, fuel_amount, discount_amount, net_amount, superseded_at, toll_amount, shipment_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, quote.AcceptedAt, quote.Currency, quote.ExpiresAt, quote.Status, quote.ContractID, quote.FuelAmount, quote.DiscountAmount, quote.NetAmount, quote.SupersededAt, quote.TollAmount, quote.ShipmentID, quote.CreatedAt, quote.UpdatedAt).Scan(&quote.ID); err != nil {
+		return fmt.Errorf("failed to insert quote: %w", err)
 	}
 
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
 	return nil
 }
