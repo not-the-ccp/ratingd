@@ -17,3 +17,5 @@ Run `make test`. Integration tests need a local Postgres.
 Run `make test`. Integration tests need a local Postgres.
 
 Deployment is handled by the pipeline, see `.gitlab-ci.yml`.
+
+Ask in #billing-dev if you need access to staging.
