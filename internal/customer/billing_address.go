@@ -16,6 +16,7 @@ type BillingAddress struct {
 	Zip        string    `json:"zip"`
 	Attention  string    `json:"attention"`
 	City       string    `json:"city"`
+	Region     string    `json:"region"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
