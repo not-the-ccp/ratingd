@@ -13,7 +13,7 @@ type SQLStore struct {
 }
 
 func (s *SQLStore) InsertTariff(ctx context.Context, tariff *Tariff) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO tariffs (status, rounding_mode, code, valid_from, currency, retired_at, description, published_at, valid_to, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`, tariff.Status, tariff.RoundingMode, tariff.ShortCode, tariff.ValidFrom, tariff.Currency, tariff.RetiredAt, tariff.Description, tariff.PublishedAt, tariff.ValidTo, tariff.CreatedAt, tariff.UpdatedAt).Scan(&tariff.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO tariffs (code, published_at, currency, status, valid_to, rounding_mode, valid_from, description, retired_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`, tariff.ShortCode, tariff.PublishedAt, tariff.Currency, tariff.Status, tariff.ValidTo, tariff.RoundingMode, tariff.ValidFrom, tariff.Description, tariff.RetiredAt, tariff.CreatedAt, tariff.UpdatedAt).Scan(&tariff.ID); err != nil {
 		return fmt.Errorf("failed to insert tariff: %w", err)
 	}
 
@@ -40,7 +40,7 @@ func (s *SQLStore) FindWeightBreak(ctx context.Context, id int64) (*WeightBreak,
 }
 
 func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE tariffs SET status = $2, rounding_mode = $3, code = $4, valid_from = $5, currency = $6, retired_at = $7, description = $8, published_at = $9, valid_to = $10, updated_at = $11 WHERE id = $1`, tariff.ID, tariff.Status, tariff.RoundingMode, tariff.ShortCode, tariff.ValidFrom, tariff.Currency, tariff.RetiredAt, tariff.Description, tariff.PublishedAt, tariff.ValidTo, tariff.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE tariffs SET code = $2, published_at = $3, currency = $4, status = $5, valid_to = $6, rounding_mode = $7, valid_from = $8, description = $9, retired_at = $10, updated_at = $11 WHERE id = $1`, tariff.ID, tariff.ShortCode, tariff.PublishedAt, tariff.Currency, tariff.Status, tariff.ValidTo, tariff.RoundingMode, tariff.ValidFrom, tariff.Description, tariff.RetiredAt, tariff.UpdatedAt)
 	if err != nil {
 		return err
 	}
@@ -110,9 +110,9 @@ func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64
 
 // FindTariff implements Store.
 func (s *SQLStore) FindTariff(ctx context.Context, id int64) (*Tariff, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, status, rounding_mode, code, valid_from, currency, retired_at, description, published_at, valid_to, created_at, updated_at FROM tariffs WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, code, published_at, currency, status, valid_to, rounding_mode, valid_from, description, retired_at, created_at, updated_at FROM tariffs WHERE id = $1`, id)
 	var tariff Tariff
-	if err := row.Scan(&tariff.ID, &tariff.Status, &tariff.RoundingMode, &tariff.ShortCode, &tariff.ValidFrom, &tariff.Currency, &tariff.RetiredAt, &tariff.Description, &tariff.PublishedAt, &tariff.ValidTo, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
+	if err := row.Scan(&tariff.ID, &tariff.ShortCode, &tariff.PublishedAt, &tariff.Currency, &tariff.Status, &tariff.ValidTo, &tariff.RoundingMode, &tariff.ValidFrom, &tariff.Description, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -164,7 +164,7 @@ func (s *SQLStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak)
 
 // ListTariffsByStatus implements Store.
 func (s *SQLStore) ListTariffsByStatus(ctx context.Context, status TariffStatus) ([]*Tariff, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, status, rounding_mode, code, valid_from, currency, retired_at, description, published_at, valid_to, created_at, updated_at FROM tariffs WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, code, published_at, currency, status, valid_to, rounding_mode, valid_from, description, retired_at, created_at, updated_at FROM tariffs WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list tariffs: %w", err)
 	}
@@ -172,7 +172,7 @@ func (s *SQLStore) ListTariffsByStatus(ctx context.Context, status TariffStatus)
 	var tariffs []*Tariff
 	for rows.Next() {
 		var tariff Tariff
-		if err := rows.Scan(&tariff.ID, &tariff.Status, &tariff.RoundingMode, &tariff.ShortCode, &tariff.ValidFrom, &tariff.Currency, &tariff.RetiredAt, &tariff.Description, &tariff.PublishedAt, &tariff.ValidTo, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
+		if err := rows.Scan(&tariff.ID, &tariff.ShortCode, &tariff.PublishedAt, &tariff.Currency, &tariff.Status, &tariff.ValidTo, &tariff.RoundingMode, &tariff.ValidFrom, &tariff.Description, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan tariff: %w", err)
 		}
 		tariffs = append(tariffs, &tariff)
@@ -201,7 +201,7 @@ func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) 
 
 // ListTariffs implements Store.
 func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*Tariff, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, status, rounding_mode, code, valid_from, currency, retired_at, description, published_at, valid_to, created_at, updated_at FROM tariffs ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, code, published_at, currency, status, valid_to, rounding_mode, valid_from, description, retired_at, created_at, updated_at FROM tariffs ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list tariffs: %w", err)
 	}
@@ -211,7 +211,7 @@ func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*T
 	var tariffs []*Tariff
 	for rows.Next() {
 		var tariff Tariff
-		if err := rows.Scan(&tariff.ID, &tariff.Status, &tariff.RoundingMode, &tariff.ShortCode, &tariff.ValidFrom, &tariff.Currency, &tariff.RetiredAt, &tariff.Description, &tariff.PublishedAt, &tariff.ValidTo, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
+		if err := rows.Scan(&tariff.ID, &tariff.ShortCode, &tariff.PublishedAt, &tariff.Currency, &tariff.Status, &tariff.ValidTo, &tariff.RoundingMode, &tariff.ValidFrom, &tariff.Description, &tariff.RetiredAt, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan tariff: %w", err)
 		}
 		tariffs = append(tariffs, &tariff)

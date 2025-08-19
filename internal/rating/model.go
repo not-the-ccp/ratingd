@@ -67,3 +67,8 @@ func (q *Quote) HasFuelAmount() bool {
 func (q *Quote) HasDiscountAmount() bool {
 	return q.DiscountAmount > 0
 }
+
+// IsExpiresPassed reports whether expires at lies before now.
+func (q *Quote) IsExpiresPassed(now time.Time) bool {
+	return q.ExpiresAt.Before(now)
+}

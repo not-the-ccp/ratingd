@@ -32,24 +32,6 @@ func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
 	return nil
 }
 
-func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, suspended_at, iban, code, payment_term_days, status, insurance_valid_until, name, approved_at, country, vat_number, fleet_size, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
-	if err != nil {
-		return nil, fmt.Errorf("list carriers: %w", err)
-	}
-	defer rows.Close()
-
-	var carriers []*Carrier
-	for rows.Next() {
-		var carrier Carrier
-		if err := rows.Scan(&carrier.ID, &carrier.SuspendedAt, &carrier.IBAN, &carrier.ShortCode, &carrier.PaymentTermDays, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.Name, &carrier.ApprovedAt, &carrier.Country, &carrier.VATNumber, &carrier.FleetSize, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan carrier: %w", err)
-		}
-		carriers = append(carriers, &carrier)
-	}
-	return carriers, rows.Err()
-}
-
 func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
 	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET suspended_at = $2, iban = $3, code = $4, payment_term_days = $5, status = $6, insurance_valid_until = $7, name = $8, approved_at = $9, country = $10, vat_number = $11, fleet_size = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.SuspendedAt, carrier.IBAN, carrier.ShortCode, carrier.PaymentTermDays, carrier.Status, carrier.InsuranceValidUntil, carrier.Name, carrier.ApprovedAt, carrier.Country, carrier.VATNumber, carrier.FleetSize, carrier.UpdatedAt)
 	if err != nil {
@@ -66,6 +48,24 @@ func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
 		return ErrNotFound
 	}
 	return nil
+}
+
+func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, suspended_at, iban, code, payment_term_days, status, insurance_valid_until, name, approved_at, country, vat_number, fleet_size, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
+	if err != nil {
+		return nil, fmt.Errorf("list carriers: %w", err)
+	}
+	defer rows.Close()
+
+	var carriers []*Carrier
+	for rows.Next() {
+		var carrier Carrier
+		if err := rows.Scan(&carrier.ID, &carrier.SuspendedAt, &carrier.IBAN, &carrier.ShortCode, &carrier.PaymentTermDays, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.Name, &carrier.ApprovedAt, &carrier.Country, &carrier.VATNumber, &carrier.FleetSize, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan carrier: %w", err)
+		}
+		carriers = append(carriers, &carrier)
+	}
+	return carriers, rows.Err()
 }
 
 func NewSQLStore(db *sql.DB) *SQLStore {
