@@ -104,13 +104,13 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 
 // ProcessRunningBatches applies finish to every running batch and reports how many succeeded.
 func (s *Service) ProcessRunningBatches(ctx context.Context) (int, error) {
-	pending, err := s.store.ListBatchesByStatus(ctx, BatchStatusRunning)
+	open, err := s.store.ListBatchesByStatus(ctx, BatchStatusRunning)
 	if err != nil {
 		return 0, fmt.Errorf("query running batches: %w", err)
 	}
 
 	processed := 0
-	for _, batch := range pending {
+	for _, batch := range open {
 		_, err := s.FinishBatch(ctx, batch.ID)
 		if err != nil {
 			s.log.Error("finish batch failed", "id", batch.ID, "err", err)
