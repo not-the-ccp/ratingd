@@ -30,21 +30,11 @@ func (s *SQLStore) ListQuotesByStatus(ctx context.Context, status QuoteStatus) (
 	return quotes, rows.Err()
 }
 
-func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([]*Surcharge, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, fmt.Errorf("failed to list surcharges: %w", err)
+func (s *SQLStore) InsertSurcharge(ctx context.Context, surcharge *Surcharge) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (code, quote_id, description, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
+		return fmt.Errorf("failed to insert surcharge: %w", err)
 	}
-	defer rows.Close()
-	var surcharges []*Surcharge
-	for rows.Next() {
-		var surcharge Surcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.ShortCode, &surcharge.QuoteID, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan surcharge: %w", err)
-		}
-		surcharges = append(surcharges, &surcharge)
-	}
-	return surcharges, rows.Err()
+	return nil
 }
 
 // UpdateQuote implements Store.
@@ -125,11 +115,21 @@ func (s *SQLStore) LoadSurcharge(ctx context.Context, id int64) (*Surcharge, err
 	return &surcharge, nil
 }
 
-func (s *SQLStore) InsertSurcharge(ctx context.Context, surcharge *Surcharge) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO surcharges (code, quote_id, description, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.CreatedAt, surcharge.UpdatedAt).Scan(&surcharge.ID); err != nil {
-		return fmt.Errorf("failed to insert surcharge: %w", err)
+func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([]*Surcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list surcharges: %w", err)
 	}
-	return nil
+	defer rows.Close()
+	var surcharges []*Surcharge
+	for rows.Next() {
+		var surcharge Surcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.ShortCode, &surcharge.QuoteID, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan surcharge: %w", err)
+		}
+		surcharges = append(surcharges, &surcharge)
+	}
+	return surcharges, rows.Err()
 }
 
 func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {

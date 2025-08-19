@@ -696,6 +696,8 @@ components:
           type: string
         city:
           type: string
+        region:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -705,28 +707,28 @@ components:
       properties:
         id:
           type: number
-        approved_at:
-          type: number
-        status:
-          type: string
-        country:
-          type: string
         suspended_at:
-          type: number
-        payment_term_days:
-          type: number
-        name:
-          type: string
-        code:
-          type: string
-        vat_number:
-          type: string
-        insurance_valid_until:
-          type: number
-        fleet_size:
           type: number
         iban:
           type: string
+        code:
+          type: string
+        payment_term_days:
+          type: number
+        status:
+          type: string
+        insurance_valid_until:
+          type: number
+        name:
+          type: string
+        approved_at:
+          type: number
+        country:
+          type: string
+        vat_number:
+          type: string
+        fleet_size:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -736,23 +738,23 @@ components:
       properties:
         id:
           type: number
-        status:
-          type: string
-        rounding_mode:
-          type: string
         code:
-          type: string
-        valid_from:
-          type: number
-        currency:
-          type: string
-        retired_at:
-          type: number
-        description:
           type: string
         published_at:
           type: number
+        currency:
+          type: string
+        status:
+          type: string
         valid_to:
+          type: number
+        rounding_mode:
+          type: string
+        valid_from:
+          type: number
+        description:
+          type: string
+        retired_at:
           type: number
         created_at:
           type: number
@@ -765,18 +767,18 @@ components:
           type: number
         tariff_id:
           type: number
-        to_kg:
+        loading_meter_rate:
           type: number
         minimum_amount:
           type: number
-        loading_meter_rate:
+        to_kg:
           type: number
+        zone:
+          type: string
         from_kg:
           type: number
         rate_per_kg:
           type: number
-        zone:
-          type: string
         created_at:
           type: number
         updated_at:
@@ -786,18 +788,18 @@ components:
       properties:
         id:
           type: number
-        floor:
-          type: number
         diesel_price:
-          type: number
-        valid_from:
           type: number
         tariff_id:
           type: number
-        percent:
+        valid_from:
           type: number
         source:
           type: string
+        percent:
+          type: number
+        floor:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -807,25 +809,25 @@ components:
       properties:
         id:
           type: number
-        valid_to:
+        valid_from:
           type: number
+        reference:
+          type: string
         minimum_charge:
           type: number
-        status:
-          type: string
         signed_at:
           type: number
         discount_percent:
           type: number
-        reference:
+        status:
           type: string
         customer_id:
           type: number
-        valid_from:
+        terminated_at:
+          type: number
+        valid_to:
           type: number
         tariff_id:
-          type: number
-        terminated_at:
           type: number
         signed_by:
           type: string
@@ -838,34 +840,34 @@ components:
       properties:
         id:
           type: number
-        pallets:
-          type: number
         origin_country:
           type: string
-        cancelled_at:
-          type: number
         origin_zip:
           type: string
-        pickup_at:
-          type: number
-        picked_up_at:
-          type: number
         customer_id:
-          type: number
-        weight_kg:
-          type: number
-        delivered_at:
-          type: number
-        reference:
-          type: string
-        status:
-          type: string
-        loading_meters:
           type: number
         carrier_id:
           type: number
+        reference:
+          type: string
+        pallets:
+          type: number
+        status:
+          type: string
         destination_zip:
           type: string
+        cancelled_at:
+          type: number
+        picked_up_at:
+          type: number
+        weight_kg:
+          type: number
+        loading_meters:
+          type: number
+        delivered_at:
+          type: number
+        pickup_at:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -892,27 +894,27 @@ components:
       properties:
         id:
           type: number
-        discount_amount:
+        accepted_at:
           type: number
         currency:
           type: string
-        toll_amount:
+        expires_at:
           type: number
         status:
           type: string
-        fuel_amount:
-          type: number
-        superseded_at:
-          type: number
-        shipment_id:
-          type: number
         contract_id:
           type: number
-        expires_at:
+        fuel_amount:
+          type: number
+        discount_amount:
           type: number
         net_amount:
           type: number
-        accepted_at:
+        superseded_at:
+          type: number
+        toll_amount:
+          type: number
+        shipment_id:
           type: number
         created_at:
           type: number
@@ -971,20 +973,20 @@ components:
       properties:
         id:
           type: number
+        unit_price:
+          type: number
         amount:
           type: number
+        invoice_id:
+          type: number
         discount_amount:
+          type: number
+        quantity:
           type: number
         shipment_id:
           type: number
         description:
           type: string
-        unit_price:
-          type: number
-        quantity:
-          type: number
-        invoice_id:
-          type: number
         created_at:
           type: number
         updated_at:
@@ -1015,21 +1017,21 @@ components:
       properties:
         id:
           type: number
-        carrier_id:
-          type: number
         period_start:
           type: number
+        released_at:
+          type: number
         period_end:
-          type: number
-        gross_amount:
-          type: number
-        deductions:
           type: number
         status:
           type: string
         reviewed_at:
           type: number
-        released_at:
+        deductions:
+          type: number
+        carrier_id:
+          type: number
+        gross_amount:
           type: number
         created_at:
           type: number
@@ -1059,20 +1061,20 @@ components:
       properties:
         id:
           type: number
-        invoice_id:
-          type: number
-        level:
-          type: number
-        dispatched_at:
-          type: number
         sent_at:
           type: number
-        status:
-          type: string
-        resolved_at:
+        invoice_id:
           type: number
         fee_amount:
           type: number
+        dispatched_at:
+          type: number
+        resolved_at:
+          type: number
+        level:
+          type: number
+        status:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -1082,17 +1084,17 @@ components:
       properties:
         id:
           type: number
-        kind:
-          type: string
         file_name:
+          type: string
+        status:
           type: string
         row_count:
           type: number
-        started_at:
-          type: number
-        status:
+        kind:
           type: string
         finished_at:
+          type: number
+        started_at:
           type: number
         failed_at:
           type: number
