@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.0
+
+- reorder functions in store_sql.go
+- OPS-1157 rename pending to open
+- refresh openapi spec
+- Move things around in store_sql.go
+
 ## 1.3.4
 
 - OPS-882 release 1.3.3
