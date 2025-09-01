@@ -192,3 +192,20 @@ func (s *Settlement) CanReview() bool {
 type ShipmentService interface {
 	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }
+
+func (s *Service) CalculateSettlementItemTotalGross(ctx context.Context, settlementID int64) (money.Amount, error) {
+	// list settlement items first so we fail early
+	items, err := s.store.ListSettlementItemsForSettlement(ctx, settlementID)
+	if err != nil {
+		return 0, err
+	}
+
+	var total money.Amount
+
+	for _, item := range items {
+
+		total = total.Add(item.Amount)
+	}
+
+	return total, nil
+}
