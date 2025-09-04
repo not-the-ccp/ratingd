@@ -55,3 +55,7 @@ func (s *Settlement) IsPeriodEndPassed(now time.Time) bool {
 func (s *Settlement) HasDeductions() bool {
 	return s.Deductions > 0
 }
+
+func (s *Settlement) HasGrossAmount() bool {
+	return s.GrossAmount > 0
+}

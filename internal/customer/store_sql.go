@@ -31,12 +31,20 @@ func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]
 	return customers, rows.Err()
 }
 
-// InsertCustomer implements Store.
-func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, billing_email, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`, customer.PaymentTermDays, customer.ActivatedAt, customer.DisplayName, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.BillingEmail, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
-		return fmt.Errorf("failed to insert customer: %w", err)
+func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
+	// update customer first so we fail early
+	res, err := s.db.ExecContext(ctx, `UPDATE customers SET payment_term_days = $2, activated_at = $3, name = $4, number = $5, closed_at = $6, credit_limit = $7, status = $8, vat_number = $9, blocked_at = $10, external_ref = $11, country = $12, billing_email = $13, updated_at = $14 WHERE id = $1`, customer.ID, customer.PaymentTermDays, customer.ActivatedAt, customer.DisplayName, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.BillingEmail, customer.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update customer: %w", err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
 	}
 
+	if rows == 0 {
+		return ErrNotFound
+	}
 	return nil
 }
 
@@ -56,20 +64,12 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
-	// update customer first so we fail early
-	res, err := s.db.ExecContext(ctx, `UPDATE customers SET payment_term_days = $2, activated_at = $3, name = $4, number = $5, closed_at = $6, credit_limit = $7, status = $8, vat_number = $9, blocked_at = $10, external_ref = $11, country = $12, billing_email = $13, updated_at = $14 WHERE id = $1`, customer.ID, customer.PaymentTermDays, customer.ActivatedAt, customer.DisplayName, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.BillingEmail, customer.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update customer: %w", err)
-	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
+// InsertCustomer implements Store.
+func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO customers (payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, billing_email, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING id`, customer.PaymentTermDays, customer.ActivatedAt, customer.DisplayName, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.BillingEmail, customer.CreatedAt, customer.UpdatedAt).Scan(&customer.ID); err != nil {
+		return fmt.Errorf("failed to insert customer: %w", err)
 	}
 
-	if rows == 0 {
-		return ErrNotFound
-	}
 	return nil
 }
 

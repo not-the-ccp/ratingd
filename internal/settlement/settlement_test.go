@@ -15,3 +15,8 @@ func TestSettlement_CanReview(t *testing.T) {
 	settlement := &Settlement{}
 	require.False(t, settlement.CanReview())
 }
+
+func TestSettlement_HasDeductions(t *testing.T) {
+	settlement := &Settlement{}
+	require.False(t, settlement.HasDeductions())
+}

@@ -38,11 +38,11 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 
 	result, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch shipment: %w", err)
+		return nil, fmt.Errorf("cannot fetch shipment: %w", err)
 	}
 	cust, err := s.customers.GetCustomer(ctx, result.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("read customer %d: %w", result.CustomerID, err)
+		return nil, fmt.Errorf("cannot read customer %d: %w", result.CustomerID, err)
 	}
 	// TODO(ml): das sollte in den Store
 	if cust.Status == customer.CustomerStatusClosed {
@@ -55,7 +55,7 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 // CreateShipment runs the create shipment step.
 func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest) (*Shipment, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -77,11 +77,11 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 	}
 
 	if err := s.store.InsertShipment(ctx, shipment); err != nil {
-		return nil, fmt.Errorf("failed to insert shipment: %w", err)
+		return nil, fmt.Errorf("cannot insert shipment: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "shipment.created", shipment.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	return shipment, nil
@@ -92,7 +92,7 @@ func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*
 	// TODO(mw): Teilfehler behandeln
 	result, err := s.store.ListShipments(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list shipments: %w", err)
+		return nil, fmt.Errorf("cannot list shipments: %w", err)
 	}
 
 	return result, nil
@@ -102,7 +102,7 @@ func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*
 func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read shipment id=%d: %w", id, err)
+		return nil, fmt.Errorf("cannot read shipment id=%d: %w", id, err)
 	}
 	s.log.Info("processing shipment", "id", shipment.ID)
 
@@ -119,7 +119,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	}
 	// TODO(ay): this should live in the store
 	if err := s.audit.Record(ctx, "shipment.picked_up", shipment.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	s.log.Info("shipment picked up", "id", shipment.ID)
@@ -130,11 +130,11 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, error) {
 	shipment, err := s.store.FindShipment(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load shipment id=%d: %w", id, err)
+		return nil, fmt.Errorf("cannot load shipment id=%d: %w", id, err)
 	}
 	cust, err := s.customers.GetCustomer(ctx, shipment.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("load customer id=%d: %w", shipment.CustomerID, err)
+		return nil, fmt.Errorf("cannot read customer id=%d: %w", shipment.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
 		return nil, fmt.Errorf("%w: customer id=%d is closed", ErrInvalidState, cust.ID)
@@ -151,11 +151,11 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	shipment.DeliveredAt = &now
 	shipment.UpdatedAt = now
 	if err := s.store.UpdateShipment(ctx, shipment); err != nil {
-		return nil, fmt.Errorf("failed to update shipment: %w", err)
+		return nil, fmt.Errorf("cannot update shipment: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "shipment.delivered", shipment.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	return shipment, nil
@@ -170,7 +170,7 @@ func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEven
 	event, err := s.store.FindTrackingEvent(ctx, id)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch tracking event %d: %w", id, err)
+		return nil, fmt.Errorf("cannot fetch tracking event %d: %w", id, err)
 	}
 	return event, nil
 }
@@ -178,7 +178,7 @@ func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEven
 // CreateTrackingEvent performs the create tracking event step.
 func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEventRequest) (*TrackingEvent, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 	now := s.clock.Now()
 	event := &TrackingEvent{
@@ -191,7 +191,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 	}
 
 	if err := s.store.InsertTrackingEvent(ctx, event); err != nil {
-		return nil, fmt.Errorf("failed to create tracking event: %w", err)
+		return nil, fmt.Errorf("cannot create tracking event: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "tracking_event.created", event.ID); err != nil {
@@ -205,7 +205,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
 	trackingEvent, err := s.store.ListTrackingEvents(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query tracking events: %w", err)
+		return nil, fmt.Errorf("cannot query tracking events: %w", err)
 	}
 
 	return trackingEvent, nil
@@ -215,7 +215,7 @@ func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int)
 func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
 	open, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusBooked)
 	if err != nil {
-		return 0, fmt.Errorf("failed to list booked shipments: %w", err)
+		return 0, fmt.Errorf("cannot list booked shipments: %w", err)
 	}
 
 	processed := 0
@@ -239,7 +239,7 @@ func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
 
 	if err != nil {
-		return 0, fmt.Errorf("query picked up shipments: %w", err)
+		return 0, fmt.Errorf("cannot query picked up shipments: %w", err)
 	}
 
 	processed := 0
@@ -254,10 +254,11 @@ func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 	return processed, nil
 }
 
+// ProcessPickedUpShipmentsGross handles the process picked up shipments gross step.
 func (s *Service) ProcessPickedUpShipmentsGross(ctx context.Context) (int, error) {
 	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
 	if err != nil {
-		return 0, fmt.Errorf("query picked up shipments: %w", err)
+		return 0, fmt.Errorf("cannot query picked up shipments: %w", err)
 	}
 
 	processed := 0

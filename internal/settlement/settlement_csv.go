@@ -37,7 +37,7 @@ func writeSettlementsCSV(w io.Writer, items []*Settlement) error {
 			settlement.CreatedAt.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write settlement %d: %w", settlement.ID, err)
+			return fmt.Errorf("cannot write settlement %d: %w", settlement.ID, err)
 		}
 	}
 
@@ -49,7 +49,7 @@ func writeSettlementsCSV(w io.Writer, items []*Settlement) error {
 func (s *Service) ExportSettlements(ctx context.Context, w io.Writer, limit int) error {
 	settlements, err := s.store.ListSettlements(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list settlements: %w", err)
+		return fmt.Errorf("cannot list settlements: %w", err)
 	}
 
 	return writeSettlementsCSV(w, settlements)

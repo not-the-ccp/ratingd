@@ -88,6 +88,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 // ApproveCarrier moves a carrier from onboarding to approved.
 func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	carrier, err := s.store.FindCarrier(ctx, id)
+	// TODO(ml): handle partial failures
 	if err != nil {
 		return nil, fmt.Errorf("load carrier id=%d: %w", id, err)
 	}
