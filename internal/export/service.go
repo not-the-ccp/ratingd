@@ -94,7 +94,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	batch.FinishedAt = &now
 	batch.UpdatedAt = now
 	if err := s.store.UpdateBatch(ctx, batch); err != nil {
-		return nil, fmt.Errorf("update batch: %w", err)
+		return nil, fmt.Errorf("save batch: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "batch.finished", batch.ID); err != nil {
