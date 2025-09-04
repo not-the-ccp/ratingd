@@ -3,6 +3,7 @@ package dunning
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/invoice"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
@@ -100,8 +101,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
 	}
 	now := s.clock.Now()
-	notice.Status = NoticeStatusSent
-	notice.DispatchedAt = &now
+	updateNoticeStatus(notice, now)
 	notice.UpdatedAt = now
 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
@@ -111,6 +111,11 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 		s.log.Warn("audit entry failed", "action", "notice.sent", "error", err)
 	}
 	return notice, nil
+}
+
+func updateNoticeStatus(notice *Notice, now time.Time) {
+	notice.Status = NoticeStatusSent
+	notice.DispatchedAt = &now
 }
 
 // ResolveNotice moves a notice from sent to resolved.

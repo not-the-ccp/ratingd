@@ -61,17 +61,17 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 	now := s.clock.Now()
 
 	shipment := &Shipment{
-		OriginZip:      req.OriginZip,
-		OriginCountry:  req.OriginCountry,
-		PickupAt:       req.PickupAt,
-		Reference:      req.Reference,
-		Pallets:        req.Pallets,
 		LoadingMeters:  req.LoadingMeters,
+		Pallets:        req.Pallets,
+		PickupAt:       req.PickupAt,
+		OriginZip:      req.OriginZip,
 		WeightKg:       req.WeightKg,
-		DestinationZip: req.DestinationZip,
-		CarrierID:      req.CarrierID,
-		CustomerID:     req.CustomerID,
+		OriginCountry:  req.OriginCountry,
 		Status:         ShipmentStatusBooked,
+		DestinationZip: req.DestinationZip,
+		CustomerID:     req.CustomerID,
+		CarrierID:      req.CarrierID,
+		Reference:      req.Reference,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}

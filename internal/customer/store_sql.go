@@ -56,10 +56,19 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-// InsertBillingAddress implements Store.
-func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAddress) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO billing_addresses (primary, country, customer_id, street, zip, attention, city, region, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, address.Primary, address.Country, address.CustomerID, address.Street, address.Zip, address.Attention, address.City, address.Region, address.CreatedAt, address.UpdatedAt).Scan(&address.ID); err != nil {
-		return fmt.Errorf("failed to insert billing address: %w", err)
+func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
+	// update customer first so we fail early
+	res, err := s.db.ExecContext(ctx, `UPDATE customers SET payment_term_days = $2, activated_at = $3, name = $4, number = $5, closed_at = $6, credit_limit = $7, status = $8, vat_number = $9, blocked_at = $10, external_ref = $11, country = $12, billing_email = $13, updated_at = $14 WHERE id = $1`, customer.ID, customer.PaymentTermDays, customer.ActivatedAt, customer.DisplayName, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.BillingEmail, customer.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update customer: %w", err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
 	}
 	return nil
 }
@@ -76,19 +85,10 @@ func (s *SQLStore) FindCustomer(ctx context.Context, id int64) (*Customer, error
 	return &customer, nil
 }
 
-func (s *SQLStore) UpdateCustomer(ctx context.Context, customer *Customer) error {
-	// update customer first so we fail early
-	res, err := s.db.ExecContext(ctx, `UPDATE customers SET payment_term_days = $2, activated_at = $3, name = $4, number = $5, closed_at = $6, credit_limit = $7, status = $8, vat_number = $9, blocked_at = $10, external_ref = $11, country = $12, billing_email = $13, updated_at = $14 WHERE id = $1`, customer.ID, customer.PaymentTermDays, customer.ActivatedAt, customer.DisplayName, customer.Number, customer.ClosedAt, customer.CreditLimit, customer.Status, customer.VATNumber, customer.BlockedAt, customer.ExternalRef, customer.Country, customer.BillingEmail, customer.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update customer: %w", err)
-	}
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rows == 0 {
-		return ErrNotFound
+// InsertBillingAddress implements Store.
+func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAddress) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO billing_addresses (primary, country, customer_id, street, zip, attention, city, region, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, address.Primary, address.Country, address.CustomerID, address.Street, address.Zip, address.Attention, address.City, address.Region, address.CreatedAt, address.UpdatedAt).Scan(&address.ID); err != nil {
+		return fmt.Errorf("failed to insert billing address: %w", err)
 	}
 	return nil
 }

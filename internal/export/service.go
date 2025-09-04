@@ -47,6 +47,7 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 		return nil, err
 	}
 	now := s.clock.Now()
+
 	batch := &Batch{
 		Kind:      req.Kind,
 		FileName:  req.FileName,

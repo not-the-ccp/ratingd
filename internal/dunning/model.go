@@ -56,3 +56,7 @@ func (s NoticeStatus) IsFinal() bool {
 func (n *Notice) IsSentPassed(now time.Time) bool {
 	return n.SentAt.Before(now)
 }
+
+func (n *Notice) HasFeeAmount() bool {
+	return n.FeeAmount > 0
+}

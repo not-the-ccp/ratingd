@@ -95,7 +95,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	}
 	trf, err := s.tariffs.GetTariff(ctx, contract.TariffID)
 	if err != nil {
-		return nil, fmt.Errorf("load tariff %d: %w", contract.TariffID, err)
+		return nil, fmt.Errorf("load tariff id=%d: %w", contract.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
 		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
