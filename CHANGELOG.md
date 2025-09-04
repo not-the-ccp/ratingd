@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1
+
+- refresh openapi spec
+- Move things around in store_sql.go
+- Prepare 1.4.0
+- OPS-1177 add calculate settlement item total gross
+- OPS-1178 add check for tariff to SignContract
+
 ## 1.4.0
 
 - reorder functions in store_sql.go
