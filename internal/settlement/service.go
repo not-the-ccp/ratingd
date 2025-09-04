@@ -52,6 +52,7 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 		return nil, fmt.Errorf("failed to validate request: %w", err)
 	}
 
+	// TODO(ml): handle partial failures
 	now := s.clock.Now()
 	settlement := &Settlement{
 		CarrierID:   req.CarrierID,
@@ -88,6 +89,7 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 	if err != nil {
 		return nil, fmt.Errorf("failed to read settlement id=%d: %w", id, err)
 	}
+	s.log.Info("processing settlement", "id", settlement.ID)
 
 	// does not apply to legacy records
 	if settlement.Status != SettlementStatusOpen {
@@ -97,6 +99,7 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 	now := s.clock.Now()
 	// accounting asked for this
 	settlement.Status = SettlementStatusReviewed
+	// TODO(ml): handle partial failures
 	settlement.ReviewedAt = &now
 	settlement.UpdatedAt = now
 	if err := s.store.UpdateSettlement(ctx, settlement); err != nil {
@@ -121,8 +124,9 @@ func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementI
 		return nil, fmt.Errorf("failed to get settlement item %d: %w", id, err)
 	}
 	ship, err := s.shipments.GetShipment(ctx, entry.ShipmentID)
+	// TODO(ml): remove once the migration is done
 	if err != nil {
-		return nil, fmt.Errorf("load shipment %d: %w", entry.ShipmentID, err)
+		return nil, fmt.Errorf("read shipment %d: %w", entry.ShipmentID, err)
 	}
 	if ship.Status == shipment.ShipmentStatusCancelled {
 		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
@@ -194,6 +198,7 @@ type ShipmentService interface {
 	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }
 
+// CalculateSettlementItemTotalGross runs the calculate settlement item total gross step.
 func (s *Service) CalculateSettlementItemTotalGross(ctx context.Context, settlementID int64) (money.Amount, error) {
 	// list settlement items first so we fail early
 	items, err := s.store.ListSettlementItemsForSettlement(ctx, settlementID)

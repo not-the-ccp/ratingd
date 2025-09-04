@@ -53,7 +53,7 @@ func (s *SQLStore) ListInvoicesByStatus(ctx context.Context, status InvoiceStatu
 }
 
 func (s *SQLStore) ListCreditNotes(ctx context.Context, limit int, offset int) ([]*CreditNote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, status, invoice_id, reason, applied_at, amount, number, created_at, updated_at FROM credit_notes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, reason, status, applied_at, number, invoice_id, amount, created_at, updated_at FROM credit_notes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list credit notes: %w", err)
 	}
@@ -61,7 +61,7 @@ func (s *SQLStore) ListCreditNotes(ctx context.Context, limit int, offset int) (
 	var notes []*CreditNote
 	for rows.Next() {
 		var note CreditNote
-		if err := rows.Scan(&note.ID, &note.Status, &note.InvoiceID, &note.Reason, &note.AppliedAt, &note.Amount, &note.Number, &note.CreatedAt, &note.UpdatedAt); err != nil {
+		if err := rows.Scan(&note.ID, &note.Reason, &note.Status, &note.AppliedAt, &note.Number, &note.InvoiceID, &note.Amount, &note.CreatedAt, &note.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan credit note: %w", err)
 		}
 		notes = append(notes, &note)
@@ -78,7 +78,7 @@ func (s *SQLStore) InsertInvoice(ctx context.Context, invoice *Invoice) error {
 }
 
 func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNoteStatus) ([]*CreditNote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, status, invoice_id, reason, applied_at, amount, number, created_at, updated_at FROM credit_notes WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, reason, status, applied_at, number, invoice_id, amount, created_at, updated_at FROM credit_notes WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list credit notes: %w", err)
 	}
@@ -88,7 +88,7 @@ func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNot
 	var notes []*CreditNote
 	for rows.Next() {
 		var note CreditNote
-		if err := rows.Scan(&note.ID, &note.Status, &note.InvoiceID, &note.Reason, &note.AppliedAt, &note.Amount, &note.Number, &note.CreatedAt, &note.UpdatedAt); err != nil {
+		if err := rows.Scan(&note.ID, &note.Reason, &note.Status, &note.AppliedAt, &note.Number, &note.InvoiceID, &note.Amount, &note.CreatedAt, &note.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan credit note: %w", err)
 		}
 		notes = append(notes, &note)
@@ -97,9 +97,9 @@ func (s *SQLStore) ListCreditNotesByStatus(ctx context.Context, status CreditNot
 }
 
 func (s *SQLStore) LoadCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, status, invoice_id, reason, applied_at, amount, number, created_at, updated_at FROM credit_notes WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, reason, status, applied_at, number, invoice_id, amount, created_at, updated_at FROM credit_notes WHERE id = $1`, id)
 	var creditNote CreditNote
-	if err := row.Scan(&creditNote.ID, &creditNote.Status, &creditNote.InvoiceID, &creditNote.Reason, &creditNote.AppliedAt, &creditNote.Amount, &creditNote.Number, &creditNote.CreatedAt, &creditNote.UpdatedAt); err != nil {
+	if err := row.Scan(&creditNote.ID, &creditNote.Reason, &creditNote.Status, &creditNote.AppliedAt, &creditNote.Number, &creditNote.InvoiceID, &creditNote.Amount, &creditNote.CreatedAt, &creditNote.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -148,7 +148,7 @@ func (s *SQLStore) ListInvoiceLinesForInvoice(ctx context.Context, invoiceID int
 }
 
 func (s *SQLStore) ListCreditNotesForInvoice(ctx context.Context, invoiceID int64) ([]*CreditNote, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, status, invoice_id, reason, applied_at, amount, number, created_at, updated_at FROM credit_notes WHERE invoice_id = $1 ORDER BY id`, invoiceID)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, reason, status, applied_at, number, invoice_id, amount, created_at, updated_at FROM credit_notes WHERE invoice_id = $1 ORDER BY id`, invoiceID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to list credit notes: %w", err)
 	}
@@ -158,7 +158,7 @@ func (s *SQLStore) ListCreditNotesForInvoice(ctx context.Context, invoiceID int6
 	var creditNotes []*CreditNote
 	for rows.Next() {
 		var note CreditNote
-		if err := rows.Scan(&note.ID, &note.Status, &note.InvoiceID, &note.Reason, &note.AppliedAt, &note.Amount, &note.Number, &note.CreatedAt, &note.UpdatedAt); err != nil {
+		if err := rows.Scan(&note.ID, &note.Reason, &note.Status, &note.AppliedAt, &note.Number, &note.InvoiceID, &note.Amount, &note.CreatedAt, &note.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("failed to scan credit note: %w", err)
 		}
 		creditNotes = append(creditNotes, &note)
@@ -187,7 +187,7 @@ func (s *SQLStore) InsertInvoiceLine(ctx context.Context, line *InvoiceLine) err
 }
 
 func (s *SQLStore) InsertCreditNote(ctx context.Context, note *CreditNote) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO credit_notes (status, invoice_id, reason, applied_at, amount, number, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, note.Status, note.InvoiceID, note.Reason, note.AppliedAt, note.Amount, note.Number, note.CreatedAt, note.UpdatedAt).Scan(&note.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO credit_notes (reason, status, applied_at, number, invoice_id, amount, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, note.Reason, note.Status, note.AppliedAt, note.Number, note.InvoiceID, note.Amount, note.CreatedAt, note.UpdatedAt).Scan(&note.ID); err != nil {
 		return fmt.Errorf("failed to insert credit note: %w", err)
 	}
 
@@ -241,7 +241,7 @@ func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
 }
 
 func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE credit_notes SET status = $2, invoice_id = $3, reason = $4, applied_at = $5, amount = $6, number = $7, updated_at = $8 WHERE id = $1`, note.ID, note.Status, note.InvoiceID, note.Reason, note.AppliedAt, note.Amount, note.Number, note.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE credit_notes SET reason = $2, status = $3, applied_at = $4, number = $5, invoice_id = $6, amount = $7, updated_at = $8 WHERE id = $1`, note.ID, note.Reason, note.Status, note.AppliedAt, note.Number, note.InvoiceID, note.Amount, note.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("failed to update credit note: %w", err)
 	}

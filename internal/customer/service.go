@@ -33,7 +33,7 @@ func (s *Service) GetCustomer(ctx context.Context, id int64) (*Customer, error) 
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	customer, err := s.store.FindCustomer(ctx, id)
+	customer, err := s.store.GetCustomer(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch customer %d: %w", id, err)
 	}
@@ -79,7 +79,7 @@ func (s *Service) ListCustomers(ctx context.Context, limit int, offset int) ([]*
 
 // ActivateCustomer performs the activate customer step.
 func (s *Service) ActivateCustomer(ctx context.Context, id int64) (*Customer, error) {
-	customer, err := s.store.FindCustomer(ctx, id)
+	customer, err := s.store.GetCustomer(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read customer id=%d: %w", id, err)
 	}
@@ -107,7 +107,7 @@ func (s *Service) GetBillingAddress(ctx context.Context, id int64) (*BillingAddr
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	return s.store.FindBillingAddress(ctx, id)
+	return s.store.GetBillingAddress(ctx, id)
 }
 
 // CreateBillingAddress handles the create billing address step.

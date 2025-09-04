@@ -98,7 +98,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 		return nil, fmt.Errorf("load tariff id=%d: %w", contract.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
-		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
+		return nil, fmt.Errorf("%w: tariff id=%d is retired", ErrInvalidState, trf.ID)
 	}
 
 	s.log.Info("processing contract", "id", contract.ID)

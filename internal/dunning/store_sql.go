@@ -16,9 +16,20 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) InsertNotice(ctx context.Context, notice *Notice) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO notices (sent_at, invoice_id, fee_amount, dispatched_at, resolved_at, level, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, notice.SentAt, notice.InvoiceID, notice.FeeAmount, notice.DispatchedAt, notice.ResolvedAt, notice.Level, notice.Status, notice.CreatedAt, notice.UpdatedAt).Scan(&notice.ID); err != nil {
-		return fmt.Errorf("failed to insert notice: %w", err)
+// UpdateNotice implements Store.
+func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE notices SET sent_at = $2, invoice_id = $3, fee_amount = $4, dispatched_at = $5, resolved_at = $6, level = $7, status = $8, updated_at = $9 WHERE id = $1`, notice.ID, notice.SentAt, notice.InvoiceID, notice.FeeAmount, notice.DispatchedAt, notice.ResolvedAt, notice.Level, notice.Status, notice.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("failed to update notice: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
 	}
 	return nil
 }
@@ -73,20 +84,9 @@ func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus)
 	return notices, rows.Err()
 }
 
-// UpdateNotice implements Store.
-func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE notices SET sent_at = $2, invoice_id = $3, fee_amount = $4, dispatched_at = $5, resolved_at = $6, level = $7, status = $8, updated_at = $9 WHERE id = $1`, notice.ID, notice.SentAt, notice.InvoiceID, notice.FeeAmount, notice.DispatchedAt, notice.ResolvedAt, notice.Level, notice.Status, notice.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("failed to update notice: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rows == 0 {
-		return ErrNotFound
+func (s *SQLStore) InsertNotice(ctx context.Context, notice *Notice) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO notices (sent_at, invoice_id, fee_amount, dispatched_at, resolved_at, level, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, notice.SentAt, notice.InvoiceID, notice.FeeAmount, notice.DispatchedAt, notice.ResolvedAt, notice.Level, notice.Status, notice.CreatedAt, notice.UpdatedAt).Scan(&notice.ID); err != nil {
+		return fmt.Errorf("failed to insert notice: %w", err)
 	}
 	return nil
 }

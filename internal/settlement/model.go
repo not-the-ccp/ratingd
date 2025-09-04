@@ -51,3 +51,7 @@ func (s SettlementStatus) IsFinal() bool {
 func (s *Settlement) IsPeriodEndPassed(now time.Time) bool {
 	return s.PeriodEnd.Before(now)
 }
+
+func (s *Settlement) HasDeductions() bool {
+	return s.Deductions > 0
+}
