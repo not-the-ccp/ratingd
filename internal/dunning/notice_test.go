@@ -15,3 +15,8 @@ func TestNotice_CanResolve(t *testing.T) {
 	notice := &Notice{}
 	require.False(t, notice.CanResolve())
 }
+
+func TestNotice_HasFeeAmount(t *testing.T) {
+	notice := &Notice{}
+	require.False(t, notice.HasFeeAmount())
+}
