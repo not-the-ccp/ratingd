@@ -788,17 +788,17 @@ components:
       properties:
         id:
           type: number
-        diesel_price:
-          type: number
-        tariff_id:
-          type: number
-        valid_from:
-          type: number
         source:
           type: string
         percent:
           type: number
+        tariff_id:
+          type: number
+        diesel_price:
+          type: number
         floor:
+          type: number
+        valid_from:
           type: number
         created_at:
           type: number
@@ -1084,20 +1084,20 @@ components:
       properties:
         id:
           type: number
-        file_name:
-          type: string
-        status:
-          type: string
+        failed_at:
+          type: number
         row_count:
           type: number
-        kind:
+        status:
           type: string
         finished_at:
           type: number
+        kind:
+          type: string
         started_at:
           type: number
-        failed_at:
-          type: number
+        file_name:
+          type: string
         created_at:
           type: number
         updated_at:
