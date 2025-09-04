@@ -31,6 +31,7 @@ func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging
 	}
 }
 
+// GetSettlement handles the get settlement step.
 func (s *Service) GetSettlement(ctx context.Context, id int64) (*Settlement, error) {
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)

@@ -20,3 +20,8 @@ func TestInvoice_HasTaxAmount(t *testing.T) {
 	invoice := &Invoice{}
 	require.False(t, invoice.HasTaxAmount())
 }
+
+func TestInvoice_HasNetAmount(t *testing.T) {
+	invoice := &Invoice{}
+	require.False(t, invoice.HasNetAmount())
+}

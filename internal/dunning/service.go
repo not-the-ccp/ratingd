@@ -44,6 +44,7 @@ func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
 	return notice, nil
 }
 
+// CreateNotice runs the create notice step.
 func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*Notice, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err

@@ -8,23 +8,26 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
+	"git.tarven.internal/billing/ratingd/internal/tariff"
 )
 
 // Service implements the contract use cases.
 type Service struct {
-	store Store
-	clock clock.Clock
-	audit audit.Recorder
-	log   logging.Logger
+	store   Store
+	clock   clock.Clock
+	audit   audit.Recorder
+	log     logging.Logger
+	tariffs TariffService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, tariffSvc TariffService) *Service {
 	return &Service{
-		store: store,
-		clock: clk,
-		audit: rec,
-		log:   logger,
+		store:   store,
+		clock:   clk,
+		audit:   rec,
+		log:     logger,
+		tariffs: tariffSvc,
 	}
 }
 
@@ -90,6 +93,14 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load contract id=%d: %w", id, err)
 	}
+	trf, err := s.tariffs.GetTariff(ctx, contract.TariffID)
+	if err != nil {
+		return nil, fmt.Errorf("load tariff %d: %w", contract.TariffID, err)
+	}
+	if trf.Status == tariff.TariffStatusRetired {
+		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
+	}
+
 	s.log.Info("processing contract", "id", contract.ID)
 
 	if contract.Status != ContractStatusDraft {
@@ -140,4 +151,8 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 
 	s.log.Info("contract terminated", "id", contract.ID)
 	return contract, nil
+}
+
+type TariffService interface {
+	GetTariff(ctx context.Context, id int64) (*tariff.Tariff, error)
 }

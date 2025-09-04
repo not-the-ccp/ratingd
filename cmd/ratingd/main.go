@@ -43,7 +43,7 @@ func main() {
 	tariffSvc := tariff.NewService(tariff.NewSQLStore(db), clk, rec, logger)
 	tariff.NewHandler(tariffSvc).Routes(mux)
 
-	contractSvc := contract.NewService(contract.NewSQLStore(db), clk, rec, logger)
+	contractSvc := contract.NewService(contract.NewSQLStore(db), clk, rec, logger, tariffSvc)
 	contract.NewHandler(contractSvc).Routes(mux)
 
 	shipmentSvc := shipment.NewService(shipment.NewSQLStore(db), clk, rec, logger, customerSvc)

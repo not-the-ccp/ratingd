@@ -10,6 +10,7 @@ import (
 )
 
 func writeCarriersCSV(w io.Writer, items []*Carrier) error {
+	// TODO(mw): this should live in the store
 	cw := csv.NewWriter(w)
 	if err := cw.Write([]string{
 		"id",

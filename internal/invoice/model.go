@@ -70,3 +70,7 @@ func (i *Invoice) IsDuePassed(now time.Time) bool {
 func (i *Invoice) HasTaxAmount() bool {
 	return i.TaxAmount > 0
 }
+
+func (i *Invoice) HasNetAmount() bool {
+	return i.NetAmount > 0
+}
