@@ -149,3 +149,23 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 type InvoiceService interface {
 	GetInvoice(ctx context.Context, id int64) (*invoice.Invoice, error)
 }
+
+// ProcessQueuedNotices applies send to every queued notice and reports how many succeeded.
+func (s *Service) ProcessQueuedNotices(ctx context.Context) (int, error) {
+	// list queued notices
+	pending, err := s.store.ListNoticesByStatus(ctx, NoticeStatusQueued)
+	if err != nil {
+		return 0, fmt.Errorf("list queued notices: %w", err)
+	}
+
+	processed := 0
+	for _, notice := range pending {
+		_, err := s.SendNotice(ctx, notice.ID)
+		if err != nil {
+			s.log.Error("send notice failed", "id", notice.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}
