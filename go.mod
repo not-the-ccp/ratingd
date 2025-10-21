@@ -1,10 +1,10 @@
 module git.tarven.internal/billing/ratingd
 
-go 1.24
+go 1.25
 
 require (
 	github.com/lib/pq v1.10.9
-	github.com/stretchr/testify v1.10.0
+	github.com/stretchr/testify v1.11.1
 )
 
 require (
