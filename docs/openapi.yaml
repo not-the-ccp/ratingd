@@ -996,18 +996,18 @@ components:
       properties:
         id:
           type: number
-        status:
-          type: string
-        invoice_id:
-          type: number
         reason:
+          type: string
+        status:
           type: string
         applied_at:
           type: number
-        amount:
-          type: number
         number:
           type: string
+        invoice_id:
+          type: number
+        amount:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -1042,15 +1042,15 @@ components:
       properties:
         id:
           type: number
-        shipment_id:
-          type: number
-        disputed:
-          type: number
-        settlement_id:
+        amount:
           type: number
         note:
           type: string
-        amount:
+        settlement_id:
+          type: number
+        disputed:
+          type: number
+        shipment_id:
           type: number
         created_at:
           type: number
@@ -1061,20 +1061,20 @@ components:
       properties:
         id:
           type: number
-        sent_at:
-          type: number
-        invoice_id:
-          type: number
         fee_amount:
-          type: number
-        dispatched_at:
-          type: number
-        resolved_at:
           type: number
         level:
           type: number
+        invoice_id:
+          type: number
+        dispatched_at:
+          type: number
         status:
           type: string
+        resolved_at:
+          type: number
+        sent_at:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -1084,20 +1084,20 @@ components:
       properties:
         id:
           type: number
+        row_count:
+          type: number
         failed_at:
           type: number
-        row_count:
+        finished_at:
           type: number
         status:
           type: string
-        finished_at:
-          type: number
+        file_name:
+          type: string
         kind:
           type: string
         started_at:
           type: number
-        file_name:
-          type: string
         created_at:
           type: number
         updated_at:
