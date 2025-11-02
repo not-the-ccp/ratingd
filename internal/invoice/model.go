@@ -1,6 +1,7 @@
 package invoice
 
 import (
+	"sort"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -73,4 +74,10 @@ func (i *Invoice) HasTaxAmount() bool {
 
 func (i *Invoice) HasNetAmount() bool {
 	return i.NetAmount > 0
+}
+
+func sortInvoicesByDueAt(items []*Invoice) {
+	sort.Slice(items, func(i int, j int) bool {
+		return items[i].DueAt.Before(items[j].DueAt)
+	})
 }
