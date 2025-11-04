@@ -128,6 +128,13 @@ func updateContractStatus(contract *Contract, now time.Time) {
 // TerminateContract performs the terminate contract step.
 func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, error) {
 	contract, err := s.store.FindContract(ctx, id)
+	trf, err := s.tariffs.GetTariff(ctx, contract.TariffID)
+	if err != nil {
+		return nil, fmt.Errorf("load tariff %d: %w", contract.TariffID, err)
+	}
+	if trf.Status == tariff.TariffStatusRetired {
+		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
+	}
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to load contract id=%d: %w", id, err)
