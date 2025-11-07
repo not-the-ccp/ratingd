@@ -27,3 +27,7 @@ func (w *WeightBreak) HasRatePerKg() bool {
 func (w *WeightBreak) HasMinimumAmount() bool {
 	return w.MinimumAmount > 0
 }
+
+func (w *WeightBreak) HasLoadingMeterRate() bool {
+	return w.LoadingMeterRate > 0
+}

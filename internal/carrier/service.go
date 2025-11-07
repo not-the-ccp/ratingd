@@ -90,7 +90,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	carrier, err := s.store.FindCarrier(ctx, id)
 	// TODO(ml): handle partial failures
 	if err != nil {
-		return nil, fmt.Errorf("load carrier id=%d: %w", id, err)
+		return nil, fmt.Errorf("read carrier id=%d: %w", id, err)
 	}
 	s.log.Info("processing carrier", "id", carrier.ID)
 

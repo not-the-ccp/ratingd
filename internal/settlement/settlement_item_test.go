@@ -112,3 +112,8 @@ func TestService_GetSettlementItem_StoreError(t *testing.T) {
 	require.ErrorIs(t, err, want)
 	require.Nil(t, got)
 }
+
+func TestSettlementItem_HasAmount(t *testing.T) {
+	item := &SettlementItem{}
+	require.False(t, item.HasAmount())
+}
