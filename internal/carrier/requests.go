@@ -53,7 +53,7 @@ func (r *CreateCarrierRequest) Validate() error {
 func toCarrierResponse(carrier *Carrier) CarrierResponse {
 	return CarrierResponse{
 		ID:                  carrier.ID,
-		Name:                carrier.Name,
+		Name:                carrier.DisplayName,
 		Code:                carrier.ShortCode,
 		Country:             carrier.Country,
 		VATNumber:           carrier.VATNumber,

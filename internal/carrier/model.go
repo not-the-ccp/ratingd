@@ -15,7 +15,7 @@ type Carrier struct {
 	PaymentTermDays     int           `json:"payment_term_days"`
 	Status              CarrierStatus `json:"status"`
 	InsuranceValidUntil time.Time     `json:"insurance_valid_until"`
-	Name                string        `json:"name"`
+	DisplayName         string        `json:"name"`
 	ApprovedAt          *time.Time    `json:"approved_at"`
 	// Country is the country.
 	Country   string    `json:"country"`

@@ -56,7 +56,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		Country:             req.Country,
 		PaymentTermDays:     req.PaymentTermDays,
 		VATNumber:           req.VATNumber,
-		Name:                req.Name,
+		DisplayName:         req.Name,
 		InsuranceValidUntil: req.InsuranceValidUntil,
 		FleetSize:           req.FleetSize,
 		IBAN:                req.IBAN,

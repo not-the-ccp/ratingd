@@ -30,7 +30,7 @@ func writeCarriersCSV(w io.Writer, items []*Carrier) error {
 			strconv.FormatInt(carrier.ID, 10),
 			carrier.Country,
 			carrier.ShortCode,
-			carrier.Name,
+			carrier.DisplayName,
 			carrier.VATNumber,
 			string(carrier.Status),
 			strconv.Itoa(carrier.PaymentTermDays),
