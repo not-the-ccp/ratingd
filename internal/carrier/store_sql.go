@@ -19,17 +19,8 @@ func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {
 	return nil
 }
 
-// FindCarrier implements Store.
-func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, suspended_at, iban, code, payment_term_days, status, insurance_valid_until, name, approved_at, country, vat_number, fleet_size, created_at, updated_at FROM carriers WHERE id = $1`, id)
-	var carrier Carrier
-	if err := row.Scan(&carrier.ID, &carrier.SuspendedAt, &carrier.IBAN, &carrier.ShortCode, &carrier.PaymentTermDays, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.DisplayName, &carrier.ApprovedAt, &carrier.Country, &carrier.VATNumber, &carrier.FleetSize, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query carrier %d: %w", id, err)
-	}
-	return &carrier, nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
@@ -68,8 +59,17 @@ func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatu
 	return carriers, rows.Err()
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+// FindCarrier implements Store.
+func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, suspended_at, iban, code, payment_term_days, status, insurance_valid_until, name, approved_at, country, vat_number, fleet_size, created_at, updated_at FROM carriers WHERE id = $1`, id)
+	var carrier Carrier
+	if err := row.Scan(&carrier.ID, &carrier.SuspendedAt, &carrier.IBAN, &carrier.ShortCode, &carrier.PaymentTermDays, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.DisplayName, &carrier.ApprovedAt, &carrier.Country, &carrier.VATNumber, &carrier.FleetSize, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("query carrier %d: %w", id, err)
+	}
+	return &carrier, nil
 }
 
 func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
