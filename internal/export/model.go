@@ -48,3 +48,7 @@ func (s BatchStatus) IsFinal() bool {
 		return false
 	}
 }
+
+func (b *Batch) IsStartedPassed(now time.Time) bool {
+	return b.StartedAt.Before(now)
+}

@@ -15,3 +15,8 @@ func TestWeightBreak_HasMinimumAmount(t *testing.T) {
 	breakVal := &WeightBreak{}
 	require.False(t, breakVal.HasMinimumAmount())
 }
+
+func TestWeightBreak_HasLoadingMeterRate(t *testing.T) {
+	breakVal := &WeightBreak{}
+	require.False(t, breakVal.HasLoadingMeterRate())
+}
