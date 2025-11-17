@@ -133,7 +133,7 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 		return nil, fmt.Errorf("load tariff id=%d: %w", contract.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
-		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
+		return nil, fmt.Errorf("%w: tariff id=%d is retired", ErrInvalidState, trf.ID)
 	}
 
 	if err != nil {

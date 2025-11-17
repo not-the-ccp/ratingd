@@ -44,7 +44,7 @@ func (s *Service) GetInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	}
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("load customer %d: %w", invoice.CustomerID, err)
+		return nil, fmt.Errorf("read customer %d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
 		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
