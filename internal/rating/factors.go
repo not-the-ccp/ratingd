@@ -82,3 +82,20 @@ func palletFactor(pallets float64) float64 {
 		return 0.50
 	}
 }
+
+func seasonFactor4(week float64) float64 {
+	switch {
+	case week < 50:
+		return 1.54
+	case week < 100:
+		return 1.25
+	case week < 2500:
+		return 0.98
+	case week < 5000:
+		return 0.86
+	case week < 10000:
+		return 0.71
+	default:
+		return 0.50
+	}
+}
