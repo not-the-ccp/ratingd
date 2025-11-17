@@ -61,14 +61,6 @@ func (s ShipmentStatus) IsFinal() bool {
 	}
 }
 
-func groupShipmentsByCarrier(items []*Shipment) map[int64][]*Shipment {
-	out := make(map[int64][]*Shipment, len(items))
-	for _, item := range items {
-		out[item.CarrierID] = append(out[item.CarrierID], item)
-	}
-	return out
-}
-
 // IsPickupPassed reports whether pickup at lies before now.
 func (s *Shipment) IsPickupPassed(now time.Time) bool {
 	return s.PickupAt.Before(now)
