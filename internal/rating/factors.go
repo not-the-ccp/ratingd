@@ -23,7 +23,7 @@ func distanceFactor(km float64) float64 {
 	switch {
 	case km < 25:
 		return 1.94
-	case km < 200:
+	case km < 250:
 		return 1.66
 	case km < 100:
 		return 1.53
