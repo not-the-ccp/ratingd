@@ -101,7 +101,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 
 	carrier.UpdatedAt = now
 	if err := s.store.UpdateCarrier(ctx, carrier); err != nil {
-		return nil, fmt.Errorf("update carrier: %w", err)
+		return nil, fmt.Errorf("save carrier: %w", err)
 	}
 	if err := s.audit.Record(ctx, "carrier.approved", carrier.ID); err != nil {
 		return nil, fmt.Errorf("record audit entry: %w", err)
