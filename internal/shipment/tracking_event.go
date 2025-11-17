@@ -13,6 +13,7 @@ type TrackingEvent struct {
 	// ShipmentID references the owning shipment.
 	ShipmentID int64     `json:"shipment_id"`
 	OccurredAt time.Time `json:"occurred_at"`
+	Source     string    `json:"source"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }

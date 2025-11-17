@@ -91,6 +91,7 @@ type CreateTrackingEventRequest struct {
 	Code       string    `json:"code,omitempty"`
 	Location   string    `json:"location,omitempty"`
 	OccurredAt time.Time `json:"occurred_at"`
+	Source     string    `json:"source"`
 }
 
 type TrackingEventResponse struct {
@@ -101,6 +102,7 @@ type TrackingEventResponse struct {
 	OccurredAt time.Time `json:"occurred_at"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
+	Source     string    `json:"source"`
 }
 
 func (r *CreateTrackingEventRequest) Validate() error {
@@ -122,5 +124,6 @@ func toTrackingEventResponse(trackingEvent *TrackingEvent) TrackingEventResponse
 		OccurredAt: trackingEvent.OccurredAt,
 		CreatedAt:  trackingEvent.CreatedAt,
 		UpdatedAt:  trackingEvent.UpdatedAt,
+		Source:     trackingEvent.Source,
 	}
 }

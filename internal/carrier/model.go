@@ -8,21 +8,21 @@ import (
 
 // Carrier represents a single carrier.
 type Carrier struct {
-	ID                  int64         `json:"id"`
-	SuspendedAt         *time.Time    `json:"suspended_at"`
-	IBAN                string        `json:"iban"`
-	ShortCode           string        `json:"code"`
-	PaymentTermDays     int           `json:"payment_term_days"`
-	Status              CarrierStatus `json:"status"`
-	InsuranceValidUntil time.Time     `json:"insurance_valid_until"`
-	DisplayName         string        `json:"name"`
-	ApprovedAt          *time.Time    `json:"approved_at"`
+	ID                  int64      `json:"id"`
+	SuspendedAt         *time.Time `json:"suspended_at"`
+	VATNumber           string     `json:"vat_number"`
+	IBAN                string     `json:"iban"`
+	ShortCode           string     `json:"code"`
+	DisplayName         string     `json:"name"`
+	PaymentTermDays     int        `json:"payment_term_days"`
+	InsuranceValidUntil time.Time  `json:"insurance_valid_until"`
+	FleetSize           int        `json:"fleet_size"`
+	ApprovedAt          *time.Time `json:"approved_at"`
 	// Country is the country.
-	Country   string    `json:"country"`
-	VATNumber string    `json:"vat_number"`
-	FleetSize int       `json:"fleet_size"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Country   string        `json:"country"`
+	Status    CarrierStatus `json:"status"`
+	CreatedAt time.Time     `json:"created_at"`
+	UpdatedAt time.Time     `json:"updated_at"`
 }
 
 type CarrierStatus string

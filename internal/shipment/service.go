@@ -186,6 +186,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 		Code:       req.Code,
 		Location:   req.Location,
 		OccurredAt: req.OccurredAt,
+		Source:     req.Source,
 		CreatedAt:  now,
 		UpdatedAt:  now,
 	}

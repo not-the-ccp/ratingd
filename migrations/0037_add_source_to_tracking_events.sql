@@ -1,0 +1,1 @@
+ALTER TABLE tracking_events ADD COLUMN source TEXT NOT NULL DEFAULT '';
