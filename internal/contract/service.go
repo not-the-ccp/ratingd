@@ -146,9 +146,7 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 	}
 	now := s.clock.Now()
 	contract.Status = ContractStatusTerminated
-	contract.TerminatedAt = &now
-	contract.UpdatedAt = now
-
+	touchContract(contract, now)
 	if err := s.store.UpdateContract(ctx, contract); err != nil {
 		return nil, fmt.Errorf("failed to update contract: %w", err)
 	}
@@ -158,6 +156,12 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 
 	s.log.Info("contract terminated", "id", contract.ID)
 	return contract, nil
+}
+
+func touchContract(contract *Contract, now time.Time) {
+	contract.TerminatedAt = &now
+	contract.UpdatedAt = now
+
 }
 
 type TariffService interface {
