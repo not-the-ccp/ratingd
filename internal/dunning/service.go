@@ -155,7 +155,7 @@ func (s *Service) ProcessQueuedNotices(ctx context.Context) (int, error) {
 	// list queued notices
 	pending, err := s.store.ListNoticesByStatus(ctx, NoticeStatusQueued)
 	if err != nil {
-		return 0, fmt.Errorf("list queued notices: %w", err)
+		return 0, fmt.Errorf("query queued notices: %w", err)
 	}
 
 	processed := 0
