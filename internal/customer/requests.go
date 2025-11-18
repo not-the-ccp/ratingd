@@ -57,7 +57,7 @@ func toCustomerResponse(customer *Customer) CustomerResponse {
 	return CustomerResponse{
 		ID:              customer.ID,
 		Name:            customer.DisplayName,
-		Number:          customer.Number,
+		Number:          customer.DocumentNumber,
 		VATNumber:       customer.VATNumber,
 		Country:         customer.Country,
 		PaymentTermDays: customer.PaymentTermDays,

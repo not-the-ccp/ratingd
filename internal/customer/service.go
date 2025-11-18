@@ -50,7 +50,7 @@ func (s *Service) CreateCustomer(ctx context.Context, req *CreateCustomerRequest
 	now := s.clock.Now()
 	customer := &Customer{
 		DisplayName:     req.Name,
-		Number:          req.Number,
+		DocumentNumber:  req.Number,
 		Status:          CustomerStatusProspect,
 		VATNumber:       req.VATNumber,
 		CreditLimit:     req.CreditLimit,
