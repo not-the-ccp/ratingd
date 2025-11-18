@@ -709,26 +709,26 @@ components:
           type: number
         suspended_at:
           type: number
+        vat_number:
+          type: string
         iban:
           type: string
         code:
           type: string
-        payment_term_days:
-          type: number
-        status:
-          type: string
-        insurance_valid_until:
-          type: number
         name:
           type: string
+        payment_term_days:
+          type: number
+        insurance_valid_until:
+          type: number
+        fleet_size:
+          type: number
         approved_at:
           type: number
         country:
           type: string
-        vat_number:
+        status:
           type: string
-        fleet_size:
-          type: number
         created_at:
           type: number
         updated_at:
@@ -840,34 +840,34 @@ components:
       properties:
         id:
           type: number
-        origin_country:
-          type: string
         origin_zip:
-          type: string
-        customer_id:
-          type: number
-        carrier_id:
-          type: number
-        reference:
           type: string
         pallets:
           type: number
-        status:
-          type: string
-        destination_zip:
-          type: string
-        cancelled_at:
+        pickup_at:
           type: number
         picked_up_at:
           type: number
+        origin_country:
+          type: string
+        carrier_id:
+          type: number
         weight_kg:
           type: number
+        destination_zip:
+          type: string
+        status:
+          type: string
         loading_meters:
+          type: number
+        cancelled_at:
           type: number
         delivered_at:
           type: number
-        pickup_at:
+        customer_id:
           type: number
+        reference:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -885,6 +885,8 @@ components:
           type: number
         occurred_at:
           type: number
+        source:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -942,27 +944,27 @@ components:
       properties:
         id:
           type: number
-        customer_id:
-          type: number
-        tax_amount:
+        status:
+          type: string
+        due_at:
           type: number
         currency:
           type: string
-        status:
-          type: string
+        issued_at:
+          type: number
+        customer_id:
+          type: number
+        net_amount:
+          type: number
+        paid_at:
+          type: number
+        tax_amount:
+          type: number
         voided_at:
           type: number
         number:
           type: string
-        paid_at:
-          type: number
-        due_at:
-          type: number
-        issued_at:
-          type: number
         issued_on:
-          type: number
-        net_amount:
           type: number
         created_at:
           type: number
@@ -996,18 +998,18 @@ components:
       properties:
         id:
           type: number
-        reason:
-          type: string
-        status:
-          type: string
         applied_at:
           type: number
-        number:
-          type: string
         invoice_id:
           type: number
         amount:
           type: number
+        number:
+          type: string
+        reason:
+          type: string
+        status:
+          type: string
         created_at:
           type: number
         updated_at:
