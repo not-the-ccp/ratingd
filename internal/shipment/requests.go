@@ -8,34 +8,34 @@ import (
 type CreateShipmentRequest struct {
 	CustomerID     int64     `json:"customer_id"`
 	CarrierID      int64     `json:"carrier_id"`
-	Reference      string    `json:"reference,omitempty"`
-	OriginZip      string    `json:"origin_zip,omitempty"`
-	DestinationZip string    `json:"destination_zip,omitempty"`
-	WeightKg       float64   `json:"weight_kg,omitempty"`
-	LoadingMeters  float64   `json:"loading_meters,omitempty"`
-	Pallets        int       `json:"pallets,omitempty"`
+	Reference      string    `json:"reference"`
+	OriginZip      string    `json:"origin_zip"`
+	DestinationZip string    `json:"destination_zip"`
+	WeightKg       float64   `json:"weight_kg"`
+	LoadingMeters  float64   `json:"loading_meters"`
+	Pallets        int       `json:"pallets"`
 	PickupAt       time.Time `json:"pickup_at"`
-	OriginCountry  string    `json:"origin_country,omitempty"`
+	OriginCountry  string    `json:"origin_country"`
 }
 
 type ShipmentResponse struct {
 	ID             int64          `json:"id"`
 	CustomerID     int64          `json:"customer_id"`
 	CarrierID      int64          `json:"carrier_id"`
-	Reference      string         `json:"reference,omitempty"`
-	OriginZip      string         `json:"origin_zip,omitempty"`
-	DestinationZip string         `json:"destination_zip,omitempty"`
-	WeightKg       float64        `json:"weight_kg,omitempty"`
-	LoadingMeters  float64        `json:"loading_meters,omitempty"`
-	Pallets        int            `json:"pallets,omitempty"`
+	Reference      string         `json:"reference"`
+	OriginZip      string         `json:"origin_zip"`
+	DestinationZip string         `json:"destination_zip"`
+	WeightKg       float64        `json:"weight_kg"`
+	LoadingMeters  float64        `json:"loading_meters"`
+	Pallets        int            `json:"pallets"`
 	PickupAt       time.Time      `json:"pickup_at"`
-	Status         ShipmentStatus `json:"status,omitempty"`
+	Status         ShipmentStatus `json:"status"`
 	PickedUpAt     *time.Time     `json:"picked_up_at"`
 	DeliveredAt    *time.Time     `json:"delivered_at"`
 	CancelledAt    *time.Time     `json:"cancelled_at"`
 	CreatedAt      time.Time      `json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
-	OriginCountry  string         `json:"origin_country,omitempty"`
+	OriginCountry  string         `json:"origin_country"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -88,8 +88,8 @@ func toShipmentResponse(shipment *Shipment) ShipmentResponse {
 
 type CreateTrackingEventRequest struct {
 	ShipmentID int64     `json:"shipment_id"`
-	Code       string    `json:"code,omitempty"`
-	Location   string    `json:"location,omitempty"`
+	Code       string    `json:"code"`
+	Location   string    `json:"location"`
 	OccurredAt time.Time `json:"occurred_at"`
 	Source     string    `json:"source"`
 }
@@ -97,8 +97,8 @@ type CreateTrackingEventRequest struct {
 type TrackingEventResponse struct {
 	ID         int64     `json:"id"`
 	ShipmentID int64     `json:"shipment_id"`
-	Code       string    `json:"code,omitempty"`
-	Location   string    `json:"location,omitempty"`
+	Code       string    `json:"code"`
+	Location   string    `json:"location"`
 	OccurredAt time.Time `json:"occurred_at"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`

@@ -9,7 +9,7 @@ import (
 
 type CreateNoticeRequest struct {
 	InvoiceID int64        `json:"invoice_id"`
-	Level     int          `json:"level,omitempty"`
+	Level     int          `json:"level"`
 	FeeAmount money.Amount `json:"fee_amount"`
 	SentAt    time.Time    `json:"sent_at"`
 }
@@ -17,10 +17,10 @@ type CreateNoticeRequest struct {
 type NoticeResponse struct {
 	ID           int64        `json:"id"`
 	InvoiceID    int64        `json:"invoice_id"`
-	Level        int          `json:"level,omitempty"`
+	Level        int          `json:"level"`
 	FeeAmount    money.Amount `json:"fee_amount"`
 	SentAt       time.Time    `json:"sent_at"`
-	Status       NoticeStatus `json:"status,omitempty"`
+	Status       NoticeStatus `json:"status"`
 	DispatchedAt *time.Time   `json:"dispatched_at"`
 	ResolvedAt   *time.Time   `json:"resolved_at"`
 	CreatedAt    time.Time    `json:"created_at"`

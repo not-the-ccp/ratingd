@@ -9,8 +9,8 @@ import (
 
 type CreateInvoiceRequest struct {
 	CustomerID int64        `json:"customer_id"`
-	Number     string       `json:"number,omitempty"`
-	Currency   string       `json:"currency,omitempty"`
+	Number     string       `json:"number"`
+	Currency   string       `json:"currency"`
 	IssuedAt   time.Time    `json:"issued_at"`
 	DueAt      time.Time    `json:"due_at"`
 	NetAmount  money.Amount `json:"net_amount"`
@@ -20,13 +20,13 @@ type CreateInvoiceRequest struct {
 type InvoiceResponse struct {
 	ID         int64         `json:"id"`
 	CustomerID int64         `json:"customer_id"`
-	Number     string        `json:"number,omitempty"`
-	Currency   string        `json:"currency,omitempty"`
+	Number     string        `json:"number"`
+	Currency   string        `json:"currency"`
 	IssuedAt   time.Time     `json:"issued_at"`
 	DueAt      time.Time     `json:"due_at"`
 	NetAmount  money.Amount  `json:"net_amount"`
 	TaxAmount  money.Amount  `json:"tax_amount"`
-	Status     InvoiceStatus `json:"status,omitempty"`
+	Status     InvoiceStatus `json:"status"`
 	IssuedOn   *time.Time    `json:"issued_on"`
 	PaidAt     *time.Time    `json:"paid_at"`
 	VoidedAt   *time.Time    `json:"voided_at"`
@@ -67,8 +67,8 @@ func toInvoiceResponse(invoice *Invoice) InvoiceResponse {
 type CreateInvoiceLineRequest struct {
 	InvoiceID      int64        `json:"invoice_id"`
 	ShipmentID     int64        `json:"shipment_id"`
-	Description    string       `json:"description,omitempty"`
-	Quantity       int          `json:"quantity,omitempty"`
+	Description    string       `json:"description"`
+	Quantity       int          `json:"quantity"`
 	UnitPrice      money.Amount `json:"unit_price"`
 	Amount         money.Amount `json:"amount"`
 	DiscountAmount money.Amount `json:"discount_amount"`
@@ -78,8 +78,8 @@ type InvoiceLineResponse struct {
 	ID             int64        `json:"id"`
 	InvoiceID      int64        `json:"invoice_id"`
 	ShipmentID     int64        `json:"shipment_id"`
-	Description    string       `json:"description,omitempty"`
-	Quantity       int          `json:"quantity,omitempty"`
+	Description    string       `json:"description"`
+	Quantity       int          `json:"quantity"`
 	UnitPrice      money.Amount `json:"unit_price"`
 	Amount         money.Amount `json:"amount"`
 	CreatedAt      time.Time    `json:"created_at"`
@@ -114,18 +114,18 @@ func toInvoiceLineResponse(invoiceLine *InvoiceLine) InvoiceLineResponse {
 
 type CreateCreditNoteRequest struct {
 	InvoiceID int64        `json:"invoice_id"`
-	Number    string       `json:"number,omitempty"`
-	Reason    string       `json:"reason,omitempty"`
+	Number    string       `json:"number"`
+	Reason    string       `json:"reason"`
 	Amount    money.Amount `json:"amount"`
 }
 
 type CreditNoteResponse struct {
 	ID        int64            `json:"id"`
 	InvoiceID int64            `json:"invoice_id"`
-	Number    string           `json:"number,omitempty"`
-	Reason    string           `json:"reason,omitempty"`
+	Number    string           `json:"number"`
+	Reason    string           `json:"reason"`
 	Amount    money.Amount     `json:"amount"`
-	Status    CreditNoteStatus `json:"status,omitempty"`
+	Status    CreditNoteStatus `json:"status"`
 	AppliedAt *time.Time       `json:"applied_at"`
 	CreatedAt time.Time        `json:"created_at"`
 	UpdatedAt time.Time        `json:"updated_at"`

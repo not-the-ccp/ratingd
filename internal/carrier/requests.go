@@ -6,31 +6,31 @@ import (
 )
 
 type CreateCarrierRequest struct {
-	Name                string    `json:"name,omitempty"`
-	Code                string    `json:"code,omitempty"`
-	Country             string    `json:"country,omitempty"`
-	VATNumber           string    `json:"vat_number,omitempty"`
-	PaymentTermDays     int       `json:"payment_term_days,omitempty"`
+	Name                string    `json:"name"`
+	Code                string    `json:"code"`
+	Country             string    `json:"country"`
+	VATNumber           string    `json:"vat_number"`
+	PaymentTermDays     int       `json:"payment_term_days"`
 	InsuranceValidUntil time.Time `json:"insurance_valid_until"`
-	FleetSize           int       `json:"fleet_size,omitempty"`
-	IBAN                string    `json:"iban,omitempty"`
+	FleetSize           int       `json:"fleet_size"`
+	IBAN                string    `json:"iban"`
 }
 
 type CarrierResponse struct {
 	ID                  int64         `json:"id"`
-	Name                string        `json:"name,omitempty"`
-	Code                string        `json:"code,omitempty"`
-	Country             string        `json:"country,omitempty"`
-	VATNumber           string        `json:"vat_number,omitempty"`
-	PaymentTermDays     int           `json:"payment_term_days,omitempty"`
-	Status              CarrierStatus `json:"status,omitempty"`
+	Name                string        `json:"name"`
+	Code                string        `json:"code"`
+	Country             string        `json:"country"`
+	VATNumber           string        `json:"vat_number"`
+	PaymentTermDays     int           `json:"payment_term_days"`
+	Status              CarrierStatus `json:"status"`
 	ApprovedAt          *time.Time    `json:"approved_at"`
 	SuspendedAt         *time.Time    `json:"suspended_at"`
 	CreatedAt           time.Time     `json:"created_at"`
 	UpdatedAt           time.Time     `json:"updated_at"`
 	InsuranceValidUntil time.Time     `json:"insurance_valid_until"`
-	FleetSize           int           `json:"fleet_size,omitempty"`
-	IBAN                string        `json:"iban,omitempty"`
+	FleetSize           int           `json:"fleet_size"`
+	IBAN                string        `json:"iban"`
 }
 
 // Validate checks the request before it reaches the service.
