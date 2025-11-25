@@ -169,3 +169,21 @@ func (s *Service) ProcessQueuedNotices(ctx context.Context) (int, error) {
 	}
 	return processed, nil
 }
+
+// ProcessSentNotices applies resolve to every sent notice and reports how many succeeded.
+func (s *Service) ProcessSentNotices(ctx context.Context) (int, error) {
+	pending, err := s.store.ListNoticesByStatus(ctx, NoticeStatusSent)
+	if err != nil {
+		return 0, err
+	}
+	processed := 0
+	for _, notice := range pending {
+		_, err := s.ResolveNotice(ctx, notice.ID)
+		if err != nil {
+			s.log.Error("resolve notice failed", "id", notice.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}

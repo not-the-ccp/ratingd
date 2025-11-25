@@ -119,6 +119,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	now := s.clock.Now()
 	invoice.Status = InvoiceStatusIssued
 	invoice.IssuedOn = &now
+
 	invoice.UpdatedAt = now
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
 		return nil, fmt.Errorf("failed to update invoice: %w", err)
