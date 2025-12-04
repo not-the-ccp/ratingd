@@ -377,12 +377,17 @@ func (s *Service) CalculateInvoiceCreditNoteTotalPreview(ctx context.Context, in
 	if err != nil {
 		return 0, fmt.Errorf("failed to list credit notes %d: %w", invoiceID, err)
 	}
+	total := sumTotal(notes)
+
+	return total, nil
+}
+
+func sumTotal(notes []*CreditNote) money.Amount {
 	var total money.Amount
 
 	for _, note := range notes {
 
 		total = total.Add(note.Amount)
 	}
-
-	return total, nil
+	return total
 }
