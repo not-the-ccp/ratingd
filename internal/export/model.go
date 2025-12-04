@@ -1,6 +1,8 @@
 package export
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -51,4 +53,19 @@ func (s BatchStatus) IsFinal() bool {
 
 func (b *Batch) IsStartedPassed(now time.Time) bool {
 	return b.StartedAt.Before(now)
+}
+
+// ParseBatchStatus converts a raw status string, ignoring case and surrounding space.
+func ParseBatchStatus(s string) (BatchStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "running":
+		return BatchStatusRunning, nil
+	case "finished":
+		return BatchStatusFinished, nil
+	case "failed":
+		return BatchStatusFailed, nil
+	default:
+		return "", fmt.Errorf("unknown batch status %q", s)
+	}
 }
