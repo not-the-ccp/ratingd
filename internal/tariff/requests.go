@@ -14,6 +14,7 @@ type CreateTariffRequest struct {
 	ValidFrom    time.Time `json:"valid_from"`
 	ValidTo      time.Time `json:"valid_to"`
 	RoundingMode string    `json:"rounding_mode"`
+	BaseZone     string    `json:"base_zone"`
 }
 
 type TariffResponse struct {
@@ -29,6 +30,7 @@ type TariffResponse struct {
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
 	RoundingMode string       `json:"rounding_mode"`
+	BaseZone     string       `json:"base_zone"`
 }
 
 func (r *CreateTariffRequest) Validate() error {
@@ -55,6 +57,7 @@ func toTariffResponse(tariff *Tariff) TariffResponse {
 		CreatedAt:    tariff.CreatedAt,
 		UpdatedAt:    tariff.UpdatedAt,
 		RoundingMode: tariff.RoundingMode,
+		BaseZone:     tariff.BaseZone,
 	}
 }
 

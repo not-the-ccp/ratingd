@@ -17,6 +17,7 @@ type Tariff struct {
 	ValidFrom    time.Time    `json:"valid_from"`
 	Description  string       `json:"description"`
 	RetiredAt    *time.Time   `json:"retired_at"`
+	BaseZone     string       `json:"base_zone"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
 }

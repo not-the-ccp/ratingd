@@ -1,0 +1,1 @@
+ALTER TABLE tariffs ADD COLUMN base_zone TEXT NOT NULL DEFAULT '';
