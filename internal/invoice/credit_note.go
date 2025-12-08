@@ -44,3 +44,7 @@ func (s CreditNoteStatus) IsFinal() bool {
 		return false
 	}
 }
+
+func (c *CreditNote) HasAmount() bool {
+	return c.Amount > 0
+}

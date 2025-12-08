@@ -131,3 +131,8 @@ func TestCreditNote_CanApply(t *testing.T) {
 	note := &CreditNote{}
 	require.False(t, note.CanApply())
 }
+
+func TestCreditNote_HasAmount(t *testing.T) {
+	note := &CreditNote{}
+	require.False(t, note.HasAmount())
+}
