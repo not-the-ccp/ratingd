@@ -756,6 +756,8 @@ components:
           type: string
         retired_at:
           type: number
+        base_zone:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -1063,20 +1065,20 @@ components:
       properties:
         id:
           type: number
-        fee_amount:
+        resolved_at:
           type: number
         level:
           type: number
-        invoice_id:
+        sent_at:
+          type: number
+        fee_amount:
           type: number
         dispatched_at:
           type: number
+        invoice_id:
+          type: number
         status:
           type: string
-        resolved_at:
-          type: number
-        sent_at:
-          type: number
         created_at:
           type: number
         updated_at:
