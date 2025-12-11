@@ -10,16 +10,16 @@ import (
 type Notice struct {
 	ID         int64      `json:"id"`
 	ResolvedAt *time.Time `json:"resolved_at"`
-	Level      int        `json:"level"`
-	SentAt     time.Time  `json:"sent_at"`
+	// InvoiceID references the owning invoice.
+	InvoiceID int64 `json:"invoice_id"`
 	// FeeAmount is in minor units.
 	FeeAmount    money.Amount `json:"fee_amount"`
+	SentAt       time.Time    `json:"sent_at"`
+	Level        int          `json:"level"`
+	Status       NoticeStatus `json:"status"`
 	DispatchedAt *time.Time   `json:"dispatched_at"`
-	// InvoiceID references the owning invoice.
-	InvoiceID int64        `json:"invoice_id"`
-	Status    NoticeStatus `json:"status"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
 }
 
 type NoticeStatus string
