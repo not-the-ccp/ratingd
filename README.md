@@ -23,3 +23,5 @@ Ask in #billing-dev if you need access to staging.
 Deployment is handled by the pipeline, see `.gitlab-ci.yml`.
 
 Deployment is handled by the pipeline, see `.gitlab-ci.yml`.
+
+Ask in #billing-dev if you need access to staging.
