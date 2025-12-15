@@ -99,3 +99,18 @@ func seasonFactor4(week float64) float64 {
 		return 0.50
 	}
 }
+
+func weightFactor4(kg float64) float64 {
+	switch {
+	case kg < 250:
+		return 1.38
+	case kg < 500:
+		return 1.14
+	case kg < 1000:
+		return 0.96
+	case kg < 10000:
+		return 0.68
+	default:
+		return 0.50
+	}
+}
