@@ -20,7 +20,6 @@ func NewHandler(svc *Service) *Handler {
 func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/customer", h.getCustomer)
 	mux.HandleFunc("/api/v1/customers", h.listCustomers)
-	mux.HandleFunc("/api/v1/customer/activate", h.activateCustomer)
 	mux.HandleFunc("/api/v1/billing-address", h.getBillingAddress)
 	mux.HandleFunc("/api/v1/billing-addresses", h.listBillingAddresses)
 }
@@ -64,21 +63,6 @@ func (h *Handler) listCustomers(w http.ResponseWriter, r *http.Request) {
 		out = append(out, toCustomerResponse(item))
 	}
 	httpx.JSON(w, http.StatusOK, out)
-}
-
-func (h *Handler) activateCustomer(w http.ResponseWriter, r *http.Request) {
-	id, err := httpx.Int64Param(r, "id")
-	if err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	customer, err := h.svc.ActivateCustomer(r.Context(), id)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	httpx.JSON(w, http.StatusOK, toCustomerResponse(customer))
 }
 
 // getBillingAddress handles requests to /api/v1/billing-address.
