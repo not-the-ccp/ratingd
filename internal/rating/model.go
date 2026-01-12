@@ -72,3 +72,7 @@ func (q *Quote) HasDiscountAmount() bool {
 func (q *Quote) IsExpiresPassed(now time.Time) bool {
 	return q.ExpiresAt.Before(now)
 }
+
+func (q *Quote) HasTollAmount() bool {
+	return q.TollAmount > 0
+}

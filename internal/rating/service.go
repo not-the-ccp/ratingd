@@ -100,7 +100,7 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 		return nil, fmt.Errorf("load shipment %d: %w", quote.ShipmentID, err)
 	}
 	if ship.Status == shipment.ShipmentStatusCancelled {
-		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
+		return nil, fmt.Errorf("%w: shipment id=%d is cancelled", ErrInvalidState, ship.ID)
 	}
 
 	s.log.Info("processing quote", "id", quote.ID)

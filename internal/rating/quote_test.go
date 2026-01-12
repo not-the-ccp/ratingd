@@ -30,3 +30,8 @@ func TestQuote_HasDiscountAmount(t *testing.T) {
 	quote := &Quote{}
 	require.False(t, quote.HasDiscountAmount())
 }
+
+func TestQuote_HasTollAmount(t *testing.T) {
+	quote := &Quote{}
+	require.False(t, quote.HasTollAmount())
+}

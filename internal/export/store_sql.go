@@ -12,16 +12,22 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func (s *SQLStore) FindBatch(ctx context.Context, id int64) (*Batch, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE id = $1`, id)
-	var batch Batch
-	if err := row.Scan(&batch.ID, &batch.RowCount, &batch.FailedAt, &batch.FinishedAt, &batch.Status, &batch.FileName, &batch.Kind, &batch.StartedAt, &batch.CreatedAt, &batch.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query batch %d: %w", id, err)
+func (s *SQLStore) ListBatchesByStatus(ctx context.Context, status BatchStatus) ([]*Batch, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE status = $1 ORDER BY id`, status)
+	if err != nil {
+		return nil, fmt.Errorf("list batches: %w", err)
 	}
-	return &batch, nil
+	defer rows.Close()
+
+	var batches []*Batch
+	for rows.Next() {
+		var batch Batch
+		if err := rows.Scan(&batch.ID, &batch.RowCount, &batch.FailedAt, &batch.FinishedAt, &batch.Status, &batch.FileName, &batch.Kind, &batch.StartedAt, &batch.CreatedAt, &batch.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan batch: %w", err)
+		}
+		batches = append(batches, &batch)
+	}
+	return batches, rows.Err()
 }
 
 func (s *SQLStore) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
@@ -46,22 +52,16 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) ListBatchesByStatus(ctx context.Context, status BatchStatus) ([]*Batch, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE status = $1 ORDER BY id`, status)
-	if err != nil {
-		return nil, fmt.Errorf("list batches: %w", err)
-	}
-	defer rows.Close()
-
-	var batches []*Batch
-	for rows.Next() {
-		var batch Batch
-		if err := rows.Scan(&batch.ID, &batch.RowCount, &batch.FailedAt, &batch.FinishedAt, &batch.Status, &batch.FileName, &batch.Kind, &batch.StartedAt, &batch.CreatedAt, &batch.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan batch: %w", err)
+func (s *SQLStore) FindBatch(ctx context.Context, id int64) (*Batch, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE id = $1`, id)
+	var batch Batch
+	if err := row.Scan(&batch.ID, &batch.RowCount, &batch.FailedAt, &batch.FinishedAt, &batch.Status, &batch.FileName, &batch.Kind, &batch.StartedAt, &batch.CreatedAt, &batch.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
 		}
-		batches = append(batches, &batch)
+		return nil, fmt.Errorf("query batch %d: %w", id, err)
 	}
-	return batches, rows.Err()
+	return &batch, nil
 }
 
 func (s *SQLStore) UpdateBatch(ctx context.Context, batch *Batch) error {

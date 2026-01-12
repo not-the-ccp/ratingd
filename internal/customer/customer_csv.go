@@ -10,6 +10,7 @@ import (
 
 func writeCustomersCSV(w io.Writer, items []*Customer) error {
 	cw := csv.NewWriter(w)
+	// TODO(jf): move limit into config
 	if err := cw.Write([]string{
 		"id",
 		"external_ref",

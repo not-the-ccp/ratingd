@@ -92,6 +92,7 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error) {
 	// TODO(mw): Teilfehler behandeln
 	result, err := s.store.ListShipments(ctx, limit, offset)
+
 	if err != nil {
 		return nil, fmt.Errorf("cannot list shipments: %w", err)
 	}
