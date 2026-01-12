@@ -9,23 +9,26 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
+	"git.tarven.internal/billing/ratingd/internal/shipment"
 )
 
 // Service implements the rating use cases.
 type Service struct {
-	store Store
-	clock clock.Clock
-	audit audit.Recorder
-	log   logging.Logger
+	store     Store
+	clock     clock.Clock
+	audit     audit.Recorder
+	log       logging.Logger
+	shipments ShipmentService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, shipmentSvc ShipmentService) *Service {
 	return &Service{
-		store: store,
-		clock: clk,
-		audit: rec,
-		log:   logger,
+		store:     store,
+		clock:     clk,
+		audit:     rec,
+		log:       logger,
+		shipments: shipmentSvc,
 	}
 }
 
@@ -92,6 +95,14 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to load quote id=%d: %w", id, err)
 	}
+	ship, err := s.shipments.GetShipment(ctx, quote.ShipmentID)
+	if err != nil {
+		return nil, fmt.Errorf("load shipment %d: %w", quote.ShipmentID, err)
+	}
+	if ship.Status == shipment.ShipmentStatusCancelled {
+		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
+	}
+
 	s.log.Info("processing quote", "id", quote.ID)
 	// Wunsch der Buchhaltung
 	if quote.Status != QuoteStatusOpen {
@@ -179,4 +190,8 @@ func (s *Service) CalculateQuoteSurchargeTotal(ctx context.Context, quoteID int6
 	}
 
 	return total, nil
+}
+
+type ShipmentService interface {
+	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }

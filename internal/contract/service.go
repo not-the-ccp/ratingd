@@ -40,7 +40,7 @@ func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) 
 	result, err := s.store.FindContract(ctx, id)
 	trf, err := s.tariffs.GetTariff(ctx, result.TariffID)
 	if err != nil {
-		return nil, fmt.Errorf("load tariff %d: %w", result.TariffID, err)
+		return nil, fmt.Errorf("load tariff id=%d: %w", result.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
 		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
