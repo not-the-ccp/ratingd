@@ -3,6 +3,7 @@ package shipment
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/customer"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
@@ -147,9 +148,7 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	}
 
 	now := s.clock.Now()
-	shipment.Status = ShipmentStatusDelivered
-	shipment.DeliveredAt = &now
-	shipment.UpdatedAt = now
+	updateShipmentStatus(now, shipment)
 	if err := s.store.UpdateShipment(ctx, shipment); err != nil {
 		return nil, fmt.Errorf("cannot update shipment: %w", err)
 	}
@@ -159,6 +158,12 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	}
 
 	return shipment, nil
+}
+
+func updateShipmentStatus(now time.Time, shipment *Shipment) {
+	shipment.Status = ShipmentStatusDelivered
+	shipment.DeliveredAt = &now
+	shipment.UpdatedAt = now
 }
 
 // GetTrackingEvent performs the get tracking event step.
