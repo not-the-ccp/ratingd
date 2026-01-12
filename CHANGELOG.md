@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.4.2
+
+- OPS-1351 add base zone to tariff
+- update limit in ListSettlements
+- add tests for HasAmount
+- regenerate openapi
+- OPS-1376 add check for tariff to GetContract
+- OPS-1381 add weight factor table
+- update readme
+- remove old ActivateCustomer
+- add check for shipment to AcceptQuote
+
 ## 1.4.1
 
 - refresh openapi spec
