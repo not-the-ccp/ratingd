@@ -205,6 +205,12 @@ func (s *Service) CalculateSettlementItemTotalGross(ctx context.Context, settlem
 	if err != nil {
 		return 0, err
 	}
+	total := sumTotal(items)
+
+	return total, nil
+}
+
+func sumTotal(items []*SettlementItem) money.Amount {
 
 	var total money.Amount
 
@@ -212,6 +218,5 @@ func (s *Service) CalculateSettlementItemTotalGross(ctx context.Context, settlem
 
 		total = total.Add(item.Amount)
 	}
-
-	return total, nil
+	return total
 }
