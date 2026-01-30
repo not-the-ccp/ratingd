@@ -28,12 +28,24 @@ func (s *SQLStore) UpdateContract(ctx context.Context, contract *Contract) error
 	return nil
 }
 
-func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO contracts (valid_from, reference, minimum_charge, signed_at, discount_percent, status, customer_id, terminated_at, valid_to, tariff_id, signed_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, contract.ValidFrom, contract.ExternalReference, contract.MinimumCharge, contract.SignedAt, contract.DiscountPercent, contract.Status, contract.CustomerID, contract.TerminatedAt, contract.ValidTo, contract.TariffID, contract.SignedBy, contract.CreatedAt, contract.UpdatedAt).Scan(&contract.ID); err != nil {
-		return fmt.Errorf("could not insert contract: %w", err)
+func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
+	// list contracts first so we fail early
+	rows, err := s.db.QueryContext(ctx, `SELECT id, valid_from, reference, minimum_charge, signed_at, discount_percent, status, customer_id, terminated_at, valid_to, tariff_id, signed_by, created_at, updated_at FROM contracts ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, fmt.Errorf("could not list contracts: %w", err)
 	}
 
-	return nil
+	defer rows.Close()
+
+	var contracts []*Contract
+	for rows.Next() {
+		var contract Contract
+		if err := rows.Scan(&contract.ID, &contract.ValidFrom, &contract.ExternalReference, &contract.MinimumCharge, &contract.SignedAt, &contract.DiscountPercent, &contract.Status, &contract.CustomerID, &contract.TerminatedAt, &contract.ValidTo, &contract.TariffID, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("could not scan contract: %w", err)
+		}
+		contracts = append(contracts, &contract)
+	}
+	return contracts, rows.Err()
 }
 
 // ListContractsByStatus implements Store.
@@ -60,24 +72,12 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
-	// list contracts first so we fail early
-	rows, err := s.db.QueryContext(ctx, `SELECT id, valid_from, reference, minimum_charge, signed_at, discount_percent, status, customer_id, terminated_at, valid_to, tariff_id, signed_by, created_at, updated_at FROM contracts ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, fmt.Errorf("could not list contracts: %w", err)
+func (s *SQLStore) InsertContract(ctx context.Context, contract *Contract) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO contracts (valid_from, reference, minimum_charge, signed_at, discount_percent, status, customer_id, terminated_at, valid_to, tariff_id, signed_by, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, contract.ValidFrom, contract.ExternalReference, contract.MinimumCharge, contract.SignedAt, contract.DiscountPercent, contract.Status, contract.CustomerID, contract.TerminatedAt, contract.ValidTo, contract.TariffID, contract.SignedBy, contract.CreatedAt, contract.UpdatedAt).Scan(&contract.ID); err != nil {
+		return fmt.Errorf("could not insert contract: %w", err)
 	}
 
-	defer rows.Close()
-
-	var contracts []*Contract
-	for rows.Next() {
-		var contract Contract
-		if err := rows.Scan(&contract.ID, &contract.ValidFrom, &contract.ExternalReference, &contract.MinimumCharge, &contract.SignedAt, &contract.DiscountPercent, &contract.Status, &contract.CustomerID, &contract.TerminatedAt, &contract.ValidTo, &contract.TariffID, &contract.SignedBy, &contract.CreatedAt, &contract.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("could not scan contract: %w", err)
-		}
-		contracts = append(contracts, &contract)
-	}
-	return contracts, rows.Err()
+	return nil
 }
 
 // FindContract implements Store.

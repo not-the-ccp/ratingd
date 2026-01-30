@@ -26,6 +26,7 @@ type Shipment struct {
 	DeliveredAt   *time.Time `json:"delivered_at"`
 	CustomerID    int64      `json:"customer_id"`
 	Reference     string     `json:"reference"`
+	HazardClass   string     `json:"hazard_class"`
 	CreatedAt     time.Time  `json:"created_at"`
 	UpdatedAt     time.Time  `json:"updated_at"`
 }

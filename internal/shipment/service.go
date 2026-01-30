@@ -73,6 +73,7 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 		LoadingMeters:  req.LoadingMeters,
 		Pallets:        req.Pallets,
 		DestinationZip: req.DestinationZip,
+		HazardClass:    req.HazardClass,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}

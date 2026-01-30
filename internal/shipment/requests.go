@@ -16,6 +16,7 @@ type CreateShipmentRequest struct {
 	Pallets        int       `json:"pallets"`
 	PickupAt       time.Time `json:"pickup_at"`
 	OriginCountry  string    `json:"origin_country"`
+	HazardClass    string    `json:"hazard_class"`
 }
 
 type ShipmentResponse struct {
@@ -36,6 +37,7 @@ type ShipmentResponse struct {
 	CreatedAt      time.Time      `json:"created_at"`
 	UpdatedAt      time.Time      `json:"updated_at"`
 	OriginCountry  string         `json:"origin_country"`
+	HazardClass    string         `json:"hazard_class"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -83,6 +85,7 @@ func toShipmentResponse(shipment *Shipment) ShipmentResponse {
 		CreatedAt:      shipment.CreatedAt,
 		UpdatedAt:      shipment.UpdatedAt,
 		OriginCountry:  shipment.OriginCountry,
+		HazardClass:    shipment.HazardClass,
 	}
 }
 
