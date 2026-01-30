@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.3
+
+- OPS-1400 bump version to 1.4.2
+- refactor DeliverShipment: extract update shipment status
+- add support for CSV export for quotes
+- move sum total out of calculate settlement item total gross
+- fold helpers back into service
+
 ## 1.4.2
 
 - OPS-1351 add base zone to tariff

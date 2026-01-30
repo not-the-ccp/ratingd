@@ -47,7 +47,7 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 	}
 	// TODO(ml): das sollte in den Store
 	if cust.Status == customer.CustomerStatusClosed {
-		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
+		return nil, fmt.Errorf("%w: customer id=%d is closed", ErrInvalidState, cust.ID)
 	}
 
 	return result, nil
