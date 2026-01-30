@@ -116,7 +116,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 		return nil, fmt.Errorf("load customer %d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
-		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
+		return nil, fmt.Errorf("%w: customer id=%d is closed", ErrInvalidState, cust.ID)
 	}
 
 	s.log.Info("processing invoice", "id", invoice.ID)

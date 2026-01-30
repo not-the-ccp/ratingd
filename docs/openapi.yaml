@@ -790,15 +790,15 @@ components:
       properties:
         id:
           type: number
-        source:
-          type: string
-        percent:
-          type: number
-        tariff_id:
-          type: number
         diesel_price:
           type: number
         floor:
+          type: number
+        percent:
+          type: number
+        source:
+          type: string
+        tariff_id:
           type: number
         valid_from:
           type: number
@@ -1021,21 +1021,21 @@ components:
       properties:
         id:
           type: number
-        period_start:
-          type: number
-        released_at:
-          type: number
-        period_end:
-          type: number
-        status:
-          type: string
-        reviewed_at:
+        gross_amount:
           type: number
         deductions:
           type: number
+        reviewed_at:
+          type: number
         carrier_id:
           type: number
-        gross_amount:
+        status:
+          type: string
+        period_end:
+          type: number
+        period_start:
+          type: number
+        released_at:
           type: number
         created_at:
           type: number
@@ -1067,18 +1067,18 @@ components:
           type: number
         resolved_at:
           type: number
-        level:
-          type: number
-        sent_at:
+        invoice_id:
           type: number
         fee_amount:
           type: number
-        dispatched_at:
+        sent_at:
           type: number
-        invoice_id:
+        level:
           type: number
         status:
           type: string
+        dispatched_at:
+          type: number
         created_at:
           type: number
         updated_at:
