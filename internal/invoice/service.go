@@ -60,7 +60,7 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 	}
 
 	now := s.clock.Now()
-	invoice := makeInvoice(now, req)
+	invoice := buildInvoice(now, req)
 	// Defaults setzt die DB
 	if err := s.store.InsertInvoice(ctx, invoice); err != nil {
 		return nil, fmt.Errorf("could not insert invoice: %w", err)
@@ -71,7 +71,7 @@ func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) 
 	return invoice, nil
 }
 
-func makeInvoice(now time.Time, req *CreateInvoiceRequest) *Invoice {
+func buildInvoice(now time.Time, req *CreateInvoiceRequest) *Invoice {
 	// TODO(mw): bei großen Kunden langsam
 
 	invoice := &Invoice{
