@@ -111,6 +111,14 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
 	}
+	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
+	if err != nil {
+		return nil, fmt.Errorf("load customer %d: %w", invoice.CustomerID, err)
+	}
+	if cust.Status == customer.CustomerStatusClosed {
+		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
+	}
+
 	s.log.Info("processing invoice", "id", invoice.ID)
 	if invoice.Status != InvoiceStatusDraft {
 		return nil, fmt.Errorf("%w: invoice %d is %s", ErrInvalidState, id, invoice.Status)
