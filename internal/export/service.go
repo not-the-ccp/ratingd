@@ -35,7 +35,7 @@ func (s *Service) GetBatch(ctx context.Context, id int64) (*Batch, error) {
 
 	batch, err := s.store.FindBatch(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("fetch batch %d: %w", id, err)
+		return nil, fmt.Errorf("could not fetch batch %d: %w", id, err)
 	}
 	return batch, nil
 }
@@ -58,10 +58,10 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 		UpdatedAt: now,
 	}
 	if err := s.store.InsertBatch(ctx, batch); err != nil {
-		return nil, fmt.Errorf("create batch: %w", err)
+		return nil, fmt.Errorf("could not create batch: %w", err)
 	}
 	if err := s.audit.Record(ctx, "batch.created", batch.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 
 	return batch, nil
@@ -71,7 +71,7 @@ func (s *Service) CreateBatch(ctx context.Context, req *CreateBatchRequest) (*Ba
 func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
 	batch, err := s.store.ListBatches(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("query batches: %w", err)
+		return nil, fmt.Errorf("could not query batches: %w", err)
 	}
 
 	return batch, nil
@@ -81,7 +81,7 @@ func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Ba
 func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	batch, err := s.store.FindBatch(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("read batch id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not read batch id=%d: %w", id, err)
 	}
 	s.log.Info("processing batch", "id", batch.ID)
 	if batch.Status != BatchStatusRunning {
@@ -94,7 +94,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	batch.FinishedAt = &now
 	batch.UpdatedAt = now
 	if err := s.store.UpdateBatch(ctx, batch); err != nil {
-		return nil, fmt.Errorf("save batch: %w", err)
+		return nil, fmt.Errorf("could not save batch: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "batch.finished", batch.ID); err != nil {
@@ -107,7 +107,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 func (s *Service) ProcessRunningBatches(ctx context.Context) (int, error) {
 	open, err := s.store.ListBatchesByStatus(ctx, BatchStatusRunning)
 	if err != nil {
-		return 0, fmt.Errorf("query running batches: %w", err)
+		return 0, fmt.Errorf("could not query running batches: %w", err)
 	}
 
 	processed := 0

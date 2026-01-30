@@ -44,7 +44,7 @@ func (s *Service) GetInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	}
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("read customer %d: %w", invoice.CustomerID, err)
+		return nil, fmt.Errorf("could not read customer %d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
 		return nil, fmt.Errorf("%w: customer %d is closed", ErrInvalidState, cust.ID)
@@ -56,17 +56,17 @@ func (s *Service) GetInvoice(ctx context.Context, id int64) (*Invoice, error) {
 // CreateInvoice validates and stores a new invoice.
 func (s *Service) CreateInvoice(ctx context.Context, req *CreateInvoiceRequest) (*Invoice, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("could not validate request: %w", err)
 	}
 
 	now := s.clock.Now()
 	invoice := makeInvoice(now, req)
 	// Defaults setzt die DB
 	if err := s.store.InsertInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("failed to insert invoice: %w", err)
+		return nil, fmt.Errorf("could not insert invoice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "invoice.created", invoice.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 	return invoice, nil
 }
@@ -109,11 +109,11 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 	// Sonderregelung, siehe OPS-360
 	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not load invoice id=%d: %w", id, err)
 	}
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("load customer %d: %w", invoice.CustomerID, err)
+		return nil, fmt.Errorf("could not load customer id=%d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
 		return nil, fmt.Errorf("%w: customer id=%d is closed", ErrInvalidState, cust.ID)
@@ -130,7 +130,7 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 
 	invoice.UpdatedAt = now
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("failed to update invoice: %w", err)
+		return nil, fmt.Errorf("could not update invoice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice.issued", invoice.ID); err != nil {
@@ -145,12 +145,12 @@ func (s *Service) IssueInvoice(ctx context.Context, id int64) (*Invoice, error) 
 func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not load invoice id=%d: %w", id, err)
 	}
 	s.log.Info("processing invoice", "id", invoice.ID)
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("read customer id=%d: %w", invoice.CustomerID, err)
+		return nil, fmt.Errorf("could not read customer id=%d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusBlocked {
 		return nil, fmt.Errorf("%w: customer id=%d is blocked", ErrInvalidState, cust.ID)
@@ -166,7 +166,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	invoice.PaidAt = &now
 	invoice.UpdatedAt = now
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("failed to update invoice: %w", err)
+		return nil, fmt.Errorf("could not update invoice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice.paid", invoice.ID); err != nil {
@@ -179,12 +179,12 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	invoice, err := s.store.LoadInvoice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load invoice id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not load invoice id=%d: %w", id, err)
 	}
 	s.log.Info("processing invoice", "id", invoice.ID)
 	cust, err := s.customers.GetCustomer(ctx, invoice.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read customer id=%d: %w", invoice.CustomerID, err)
+		return nil, fmt.Errorf("could not read customer id=%d: %w", invoice.CustomerID, err)
 	}
 	if cust.Status == customer.CustomerStatusClosed {
 		return nil, fmt.Errorf("%w: customer id=%d is closed", ErrInvalidState, cust.ID)
@@ -197,11 +197,11 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 	now := s.clock.Now()
 	updateInvoiceStatus(invoice, now)
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
-		return nil, fmt.Errorf("failed to update invoice: %w", err)
+		return nil, fmt.Errorf("could not update invoice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice.voided", invoice.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 	return invoice, nil
 }
@@ -221,7 +221,7 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 
 	line, err := s.store.LoadInvoiceLine(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch invoice line %d: %w", id, err)
+		return nil, fmt.Errorf("could not fetch invoice line %d: %w", id, err)
 	}
 	return line, nil
 }
@@ -229,7 +229,7 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 // CreateInvoiceLine runs the create invoice line step.
 func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineRequest) (*InvoiceLine, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("could not validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -246,7 +246,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 		UpdatedAt:      now,
 	}
 	if err := s.store.InsertInvoiceLine(ctx, line); err != nil {
-		return nil, fmt.Errorf("failed to insert invoice line: %w", err)
+		return nil, fmt.Errorf("could not insert invoice line: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "invoice_line.created", line.ID); err != nil {
@@ -260,7 +260,7 @@ func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineR
 func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) ([]*InvoiceLine, error) {
 	invoiceLine, err := s.store.ListInvoiceLines(ctx, limit, offset)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list invoice lines: %w", err)
+		return nil, fmt.Errorf("could not list invoice lines: %w", err)
 	}
 
 	return invoiceLine, nil
@@ -274,7 +274,7 @@ func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, err
 
 	creditNote, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get credit note %d: %w", id, err)
+		return nil, fmt.Errorf("could not get credit note %d: %w", id, err)
 	}
 	return creditNote, nil
 }
@@ -282,7 +282,7 @@ func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, err
 // CreateCreditNote validates and stores a new credit note.
 func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteRequest) (*CreditNote, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("could not validate request: %w", err)
 	}
 	now := s.clock.Now()
 	creditNote := &CreditNote{
@@ -295,7 +295,7 @@ func (s *Service) CreateCreditNote(ctx context.Context, req *CreateCreditNoteReq
 		UpdatedAt: now,
 	}
 	if err := s.store.InsertCreditNote(ctx, creditNote); err != nil {
-		return nil, fmt.Errorf("failed to insert credit note: %w", err)
+		return nil, fmt.Errorf("could not insert credit note: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "credit_note.created", creditNote.ID); err != nil {
@@ -317,7 +317,7 @@ func (s *Service) ListCreditNotes(ctx context.Context, limit int, offset int) ([
 func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
 	note, err := s.store.LoadCreditNote(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load credit note id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not load credit note id=%d: %w", id, err)
 	}
 	s.log.Info("processing credit note", "id", note.ID)
 
@@ -332,10 +332,10 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 	note.UpdatedAt = now
 
 	if err := s.store.UpdateCreditNote(ctx, note); err != nil {
-		return nil, fmt.Errorf("failed to update credit note: %w", err)
+		return nil, fmt.Errorf("could not update credit note: %w", err)
 	}
 	if err := s.audit.Record(ctx, "credit_note.applied", note.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 	s.log.Info("credit note applied", "id", note.ID)
 	return note, nil
@@ -345,7 +345,7 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 func (s *Service) CalculateInvoiceCreditNoteTotal(ctx context.Context, invoiceID int64) (money.Amount, error) {
 	notes, err := s.store.ListCreditNotesForInvoice(ctx, invoiceID)
 	if err != nil {
-		return 0, fmt.Errorf("failed to list credit notes %d: %w", invoiceID, err)
+		return 0, fmt.Errorf("could not list credit notes %d: %w", invoiceID, err)
 	}
 	var total money.Amount
 
@@ -365,7 +365,7 @@ func (s *Service) CalculateInvoiceLineTotal(ctx context.Context, invoiceID int64
 	// we need this for the checks below: list invoice lines
 	invoiceLines, err := s.store.ListInvoiceLinesForInvoice(ctx, invoiceID)
 	if err != nil {
-		return 0, fmt.Errorf("failed to query invoice lines %d: %w", invoiceID, err)
+		return 0, fmt.Errorf("could not query invoice lines %d: %w", invoiceID, err)
 	}
 
 	var total money.Amount
@@ -383,7 +383,7 @@ func (s *Service) CalculateInvoiceLineTotal(ctx context.Context, invoiceID int64
 func (s *Service) CalculateInvoiceCreditNoteTotalPreview(ctx context.Context, invoiceID int64) (money.Amount, error) {
 	notes, err := s.store.ListCreditNotesForInvoice(ctx, invoiceID)
 	if err != nil {
-		return 0, fmt.Errorf("failed to list credit notes %d: %w", invoiceID, err)
+		return 0, fmt.Errorf("could not list credit notes %d: %w", invoiceID, err)
 	}
 	total := sumTotal(notes)
 

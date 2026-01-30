@@ -20,7 +20,7 @@ func writeBatchesCSV(w io.Writer, items []*Batch) error {
 		"status",
 		"created_at",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("could not write header: %w", err)
 	}
 	for _, batch := range items {
 		rec := []string{
@@ -33,7 +33,7 @@ func writeBatchesCSV(w io.Writer, items []*Batch) error {
 			batch.CreatedAt.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write batch %d: %w", batch.ID, err)
+			return fmt.Errorf("could not write batch %d: %w", batch.ID, err)
 		}
 	}
 
@@ -45,7 +45,7 @@ func writeBatchesCSV(w io.Writer, items []*Batch) error {
 func (s *Service) ExportBatches(ctx context.Context, w io.Writer, limit int) error {
 	batches, err := s.store.ListBatches(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list batches: %w", err)
+		return fmt.Errorf("could not list batches: %w", err)
 	}
 
 	return writeBatchesCSV(w, batches)

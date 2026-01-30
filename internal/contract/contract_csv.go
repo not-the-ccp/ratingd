@@ -21,7 +21,7 @@ func writeContractsCSV(w io.Writer, items []*Contract) error {
 		"customer_id",
 		"valid_from",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("could not write header: %w", err)
 	}
 
 	for _, contract := range items {
@@ -36,7 +36,7 @@ func writeContractsCSV(w io.Writer, items []*Contract) error {
 			contract.ValidFrom.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write contract %d: %w", contract.ID, err)
+			return fmt.Errorf("could not write contract %d: %w", contract.ID, err)
 		}
 	}
 	cw.Flush()
@@ -47,7 +47,7 @@ func writeContractsCSV(w io.Writer, items []*Contract) error {
 func (s *Service) ExportContracts(ctx context.Context, w io.Writer, limit int) error {
 	contracts, err := s.store.ListContracts(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list contracts: %w", err)
+		return fmt.Errorf("could not list contracts: %w", err)
 	}
 
 	return writeContractsCSV(w, contracts)

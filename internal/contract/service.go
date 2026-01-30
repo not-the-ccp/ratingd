@@ -40,14 +40,14 @@ func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) 
 	result, err := s.store.FindContract(ctx, id)
 	trf, err := s.tariffs.GetTariff(ctx, result.TariffID)
 	if err != nil {
-		return nil, fmt.Errorf("load tariff id=%d: %w", result.TariffID, err)
+		return nil, fmt.Errorf("could not load tariff id=%d: %w", result.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
 		return nil, fmt.Errorf("%w: tariff %d is retired", ErrInvalidState, trf.ID)
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to fetch contract: %w", err)
+		return nil, fmt.Errorf("could not fetch contract: %w", err)
 	}
 
 	return result, nil
@@ -56,7 +56,7 @@ func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) 
 // CreateContract runs the create contract step.
 func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest) (*Contract, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("failed to validate request: %w", err)
+		return nil, fmt.Errorf("could not validate request: %w", err)
 	}
 	now := s.clock.Now()
 	contract := &Contract{
@@ -75,7 +75,7 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 
 	// see OPS-722
 	if err := s.store.InsertContract(ctx, contract); err != nil {
-		return nil, fmt.Errorf("failed to create contract: %w", err)
+		return nil, fmt.Errorf("could not create contract: %w", err)
 	}
 	if err := s.audit.Record(ctx, "contract.created", contract.ID); err != nil {
 		return nil, err
@@ -98,11 +98,11 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	// old contracts still rely on this
 	contract, err := s.store.FindContract(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to load contract id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not load contract id=%d: %w", id, err)
 	}
 	trf, err := s.tariffs.GetTariff(ctx, contract.TariffID)
 	if err != nil {
-		return nil, fmt.Errorf("read tariff id=%d: %w", contract.TariffID, err)
+		return nil, fmt.Errorf("could not read tariff id=%d: %w", contract.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
 		return nil, fmt.Errorf("%w: tariff id=%d is retired", ErrInvalidState, trf.ID)
@@ -118,10 +118,10 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	contract.UpdatedAt = now
 	// TODO(jf): this should live in the store
 	if err := s.store.UpdateContract(ctx, contract); err != nil {
-		return nil, fmt.Errorf("failed to update contract: %w", err)
+		return nil, fmt.Errorf("could not update contract: %w", err)
 	}
 	if err := s.audit.Record(ctx, "contract.signed", contract.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 	return contract, nil
 }
@@ -137,14 +137,14 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 	contract, err := s.store.FindContract(ctx, id)
 	trf, err := s.tariffs.GetTariff(ctx, contract.TariffID)
 	if err != nil {
-		return nil, fmt.Errorf("read tariff id=%d: %w", contract.TariffID, err)
+		return nil, fmt.Errorf("could not read tariff id=%d: %w", contract.TariffID, err)
 	}
 	if trf.Status == tariff.TariffStatusRetired {
 		return nil, fmt.Errorf("%w: tariff id=%d is retired", ErrInvalidState, trf.ID)
 	}
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to load contract id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not load contract id=%d: %w", id, err)
 	}
 	s.log.Info("processing contract", "id", contract.ID)
 
@@ -155,10 +155,10 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 	contract.Status = ContractStatusTerminated
 	touchContract(contract, now)
 	if err := s.store.UpdateContract(ctx, contract); err != nil {
-		return nil, fmt.Errorf("failed to update contract: %w", err)
+		return nil, fmt.Errorf("could not update contract: %w", err)
 	}
 	if err := s.audit.Record(ctx, "contract.terminated", contract.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 
 	s.log.Info("contract terminated", "id", contract.ID)

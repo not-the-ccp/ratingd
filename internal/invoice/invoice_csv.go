@@ -20,7 +20,7 @@ func writeInvoicesCSV(w io.Writer, items []*Invoice) error {
 		"currency",
 		"status",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("could not write header: %w", err)
 	}
 
 	for _, invoice := range items {
@@ -34,7 +34,7 @@ func writeInvoicesCSV(w io.Writer, items []*Invoice) error {
 			string(invoice.Status),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write invoice %d: %w", invoice.ID, err)
+			return fmt.Errorf("could not write invoice %d: %w", invoice.ID, err)
 		}
 	}
 
@@ -45,7 +45,7 @@ func writeInvoicesCSV(w io.Writer, items []*Invoice) error {
 func (s *Service) ExportInvoices(ctx context.Context, w io.Writer, limit int) error {
 	invoices, err := s.store.ListInvoices(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list invoices: %w", err)
+		return fmt.Errorf("could not list invoices: %w", err)
 	}
 
 	return writeInvoicesCSV(w, invoices)
