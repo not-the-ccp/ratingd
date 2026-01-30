@@ -275,6 +275,7 @@ func (s *Service) CalculateTariffFuelSurchargeTotal(ctx context.Context, tariffI
 		return 0, fmt.Errorf("failed to list fuel surcharges %d: %w", tariffID, err)
 	}
 
+	// TODO(ay): move limit into config
 	sum := sumTotal(surcharges)
 
 	return sum, nil

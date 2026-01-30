@@ -220,3 +220,21 @@ func sumTotal(items []*SettlementItem) money.Amount {
 	}
 	return total
 }
+
+// ProcessOpenSettlements applies review to every open settlement and reports how many succeeded.
+func (s *Service) ProcessOpenSettlements(ctx context.Context) (int, error) {
+	pending, err := s.store.ListSettlementsByStatus(ctx, SettlementStatusOpen)
+	if err != nil {
+		return 0, fmt.Errorf("list open settlements: %w", err)
+	}
+	processed := 0
+	for _, settlement := range pending {
+		_, err := s.ReviewSettlement(ctx, settlement.ID)
+		if err != nil {
+			s.log.Error("review settlement failed", "id", settlement.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}

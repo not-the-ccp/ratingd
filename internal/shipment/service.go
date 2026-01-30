@@ -43,7 +43,7 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 	}
 	cust, err := s.customers.GetCustomer(ctx, result.CustomerID)
 	if err != nil {
-		return nil, fmt.Errorf("cannot read customer %d: %w", result.CustomerID, err)
+		return nil, fmt.Errorf("cannot read customer id=%d: %w", result.CustomerID, err)
 	}
 	// TODO(ml): das sollte in den Store
 	if cust.Status == customer.CustomerStatusClosed {
