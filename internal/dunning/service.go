@@ -39,7 +39,7 @@ func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
 
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get notice: %w", err)
+		return nil, fmt.Errorf("could not get notice: %w", err)
 	}
 
 	return notice, nil
@@ -63,7 +63,7 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 	}
 
 	if err := s.store.InsertNotice(ctx, notice); err != nil {
-		return nil, fmt.Errorf("failed to insert notice: %w", err)
+		return nil, fmt.Errorf("could not insert notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.created", notice.ID); err != nil {
 		s.log.Warn("audit entry failed", "action", "notice.created", "error", err)
@@ -86,11 +86,11 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	// edge case from the dunning import
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read notice id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not read notice id=%d: %w", id, err)
 	}
 	inv, err := s.invoices.GetInvoice(ctx, notice.InvoiceID)
 	if err != nil {
-		return nil, fmt.Errorf("read invoice id=%d: %w", notice.InvoiceID, err)
+		return nil, fmt.Errorf("could not read invoice id=%d: %w", notice.InvoiceID, err)
 	}
 	if inv.Status == invoice.InvoiceStatusVoided {
 		return nil, fmt.Errorf("%w: invoice id=%d is voided", ErrInvalidState, inv.ID)
@@ -105,7 +105,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	notice.UpdatedAt = now
 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
-		return nil, fmt.Errorf("failed to update notice: %w", err)
+		return nil, fmt.Errorf("could not update notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.sent", notice.ID); err != nil {
 		s.log.Warn("audit entry failed", "action", "notice.sent", "error", err)
@@ -123,11 +123,11 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	// edge case from the dunning import
 	notice, err := s.store.FindNotice(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read notice id=%d: %w", id, err)
+		return nil, fmt.Errorf("could not read notice id=%d: %w", id, err)
 	}
 	inv, err := s.invoices.GetInvoice(ctx, notice.InvoiceID)
 	if err != nil {
-		return nil, fmt.Errorf("load invoice id=%d: %w", notice.InvoiceID, err)
+		return nil, fmt.Errorf("could not read invoice id=%d: %w", notice.InvoiceID, err)
 	}
 	if inv.Status == invoice.InvoiceStatusVoided {
 		return nil, fmt.Errorf("%w: invoice %d is voided", ErrInvalidState, inv.ID)
@@ -144,11 +144,11 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	notice.UpdatedAt = now
 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
-		return nil, fmt.Errorf("failed to update notice: %w", err)
+		return nil, fmt.Errorf("could not update notice: %w", err)
 	}
 
 	if err := s.audit.Record(ctx, "notice.resolved", notice.ID); err != nil {
-		return nil, fmt.Errorf("failed to record audit entry: %w", err)
+		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 
 	return notice, nil
@@ -163,7 +163,7 @@ func (s *Service) ProcessQueuedNotices(ctx context.Context) (int, error) {
 	// list queued notices
 	pending, err := s.store.ListNoticesByStatus(ctx, NoticeStatusQueued)
 	if err != nil {
-		return 0, fmt.Errorf("query queued notices: %w", err)
+		return 0, fmt.Errorf("could not query queued notices: %w", err)
 	}
 
 	processed := 0

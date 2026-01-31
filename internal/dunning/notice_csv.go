@@ -20,7 +20,7 @@ func writeNoticesCSV(w io.Writer, items []*Notice) error {
 		"sent_at",
 		"created_at",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("could not write header: %w", err)
 	}
 	for _, notice := range items {
 		rec := []string{
@@ -33,7 +33,7 @@ func writeNoticesCSV(w io.Writer, items []*Notice) error {
 			notice.CreatedAt.Format(time.RFC3339),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write notice %d: %w", notice.ID, err)
+			return fmt.Errorf("could not write notice %d: %w", notice.ID, err)
 		}
 	}
 
@@ -46,7 +46,7 @@ func (s *Service) ExportNotices(ctx context.Context, w io.Writer, limit int) err
 	// list notices, errors are passed up unchanged
 	notices, err := s.store.ListNotices(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list notices: %w", err)
+		return fmt.Errorf("could not list notices: %w", err)
 	}
 
 	return writeNoticesCSV(w, notices)

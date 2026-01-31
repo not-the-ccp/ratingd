@@ -155,6 +155,7 @@ func (s *Service) ListBillingAddresses(ctx context.Context, limit int, offset in
 
 // ProcessProspectCustomersForPeriod is like ProcessProspectCustomers but only considers records for the current period.
 func (s *Service) ProcessProspectCustomersForPeriod(ctx context.Context) (int, error) {
+	// TODO(jf): handle partial failures
 	open, err := s.store.ListCustomersByStatus(ctx, CustomerStatusProspect)
 	if err != nil {
 		return 0, fmt.Errorf("failed to list prospect customers: %w", err)
