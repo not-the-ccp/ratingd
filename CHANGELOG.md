@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.0
+
+- validate customer
+- add batch review for open settlements to settlement
+- refresh openapi spec
+- consistent error wrapping in invoice
+- rename makeInvoice to buildInvoice
+- store hazard class on shipment
+- OPS-1479 unify error messages
+- fix review settlement: validate carrier
+
 ## 1.4.3
 
 - OPS-1400 bump version to 1.4.2
