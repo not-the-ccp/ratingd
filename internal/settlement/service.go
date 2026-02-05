@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"git.tarven.internal/billing/ratingd/internal/carrier"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
@@ -18,16 +19,18 @@ type Service struct {
 	audit     audit.Recorder
 	log       logging.Logger
 	shipments ShipmentService
+	carriers  CarrierService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, shipmentSvc ShipmentService) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, shipmentSvc ShipmentService, carrierSvc CarrierService) *Service {
 	return &Service{
 		store:     store,
 		clock:     clk,
 		audit:     rec,
 		log:       logger,
 		shipments: shipmentSvc,
+		carriers:  carrierSvc,
 	}
 }
 
@@ -89,6 +92,14 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 	if err != nil {
 		return nil, fmt.Errorf("cannot read settlement id=%d: %w", id, err)
 	}
+	car, err := s.carriers.GetCarrier(ctx, settlement.CarrierID)
+	if err != nil {
+		return nil, fmt.Errorf("load carrier %d: %w", settlement.CarrierID, err)
+	}
+	if car.Status == carrier.CarrierStatusSuspended {
+		return nil, fmt.Errorf("%w: carrier %d is suspended", ErrInvalidState, car.ID)
+	}
+
 	s.log.Info("processing settlement", "id", settlement.ID)
 
 	// does not apply to legacy records
@@ -237,4 +248,8 @@ func (s *Service) ProcessOpenSettlements(ctx context.Context) (int, error) {
 		processed++
 	}
 	return processed, nil
+}
+
+type CarrierService interface {
+	GetCarrier(ctx context.Context, id int64) (*carrier.Carrier, error)
 }

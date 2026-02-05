@@ -96,6 +96,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 		return nil, fmt.Errorf("%w: invoice id=%d is voided", ErrInvalidState, inv.ID)
 	}
 
+	// TODO(mw): nach der Migration entfernen
 	s.log.Info("processing notice", "id", notice.ID)
 	if notice.Status != NoticeStatusQueued {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)

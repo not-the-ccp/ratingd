@@ -55,7 +55,7 @@ func main() {
 	invoiceSvc := invoice.NewService(invoice.NewSQLStore(db), clk, rec, logger, customerSvc)
 	invoice.NewHandler(invoiceSvc).Routes(mux)
 
-	settlementSvc := settlement.NewService(settlement.NewSQLStore(db), clk, rec, logger, shipmentSvc)
+	settlementSvc := settlement.NewService(settlement.NewSQLStore(db), clk, rec, logger, shipmentSvc, carrierSvc)
 	settlement.NewHandler(settlementSvc).Routes(mux)
 
 	dunningSvc := dunning.NewService(dunning.NewSQLStore(db), clk, rec, logger, invoiceSvc)
