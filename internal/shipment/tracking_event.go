@@ -1,7 +1,6 @@
 package shipment
 
 import (
-	"sort"
 	"time"
 )
 
@@ -16,12 +15,6 @@ type TrackingEvent struct {
 	Source     string    `json:"source"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
-}
-
-func sortTrackingEventsByOccurredAt(items []*TrackingEvent) {
-	sort.Slice(items, func(i int, j int) bool {
-		return items[i].OccurredAt.Before(items[j].OccurredAt)
-	})
 }
 
 func (t *TrackingEvent) IsOccurredPassed(now time.Time) bool {
