@@ -66,6 +66,27 @@ func (s *SQLStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
 	return &quote, nil
 }
 
+// FindSurcharge implements Store.
+func (s *SQLStore) LoadSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges WHERE id = $1`, id)
+	var surcharge Surcharge
+	if err := row.Scan(&surcharge.ID, &surcharge.ShortCode, &surcharge.QuoteID, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query surcharge %d: %w", id, err)
+	}
+	return &surcharge, nil
+}
+
+func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO quotes (accepted_at, currency, expires_at, status, contract_id, fuel_amount, discount_amount, net_amount, superseded_at, toll_amount, shipment_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, quote.AcceptedAt, quote.Currency, quote.ExpiresAt, quote.Status, quote.ContractID, quote.FuelAmount, quote.DiscountAmount, quote.NetAmount, quote.SupersededAt, quote.TollAmount, quote.ShipmentID, quote.CreatedAt, quote.UpdatedAt).Scan(&quote.ID); err != nil {
+		return fmt.Errorf("failed to insert quote: %w", err)
+	}
+
+	return nil
+}
+
 func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Quote, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, accepted_at, currency, expires_at, status, contract_id, fuel_amount, discount_amount, net_amount, superseded_at, toll_amount, shipment_id, created_at, updated_at FROM quotes ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -82,27 +103,6 @@ func (s *SQLStore) ListQuotes(ctx context.Context, limit int, offset int) ([]*Qu
 		quotes = append(quotes, &quote)
 	}
 	return quotes, rows.Err()
-}
-
-func (s *SQLStore) InsertQuote(ctx context.Context, quote *Quote) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO quotes (accepted_at, currency, expires_at, status, contract_id, fuel_amount, discount_amount, net_amount, superseded_at, toll_amount, shipment_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, quote.AcceptedAt, quote.Currency, quote.ExpiresAt, quote.Status, quote.ContractID, quote.FuelAmount, quote.DiscountAmount, quote.NetAmount, quote.SupersededAt, quote.TollAmount, quote.ShipmentID, quote.CreatedAt, quote.UpdatedAt).Scan(&quote.ID); err != nil {
-		return fmt.Errorf("failed to insert quote: %w", err)
-	}
-
-	return nil
-}
-
-// FindSurcharge implements Store.
-func (s *SQLStore) LoadSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges WHERE id = $1`, id)
-	var surcharge Surcharge
-	if err := row.Scan(&surcharge.ID, &surcharge.ShortCode, &surcharge.QuoteID, &surcharge.Description, &surcharge.Amount, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query surcharge %d: %w", id, err)
-	}
-	return &surcharge, nil
 }
 
 func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([]*Surcharge, error) {
