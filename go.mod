@@ -3,7 +3,7 @@ module git.tarven.internal/billing/ratingd
 go 1.25
 
 require (
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.11.2
 	github.com/stretchr/testify v1.11.1
 )
 
