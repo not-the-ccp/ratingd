@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.5.1
+
+- OPS-1498 bump version to 1.5.0
+- docs: refresh openapi spec
+- remove dead code
+- bump testify to v1.11.1
+- OPS-1518 move things around in store_sql.go
+- bump go to 1.26
+- retry flaky job
+- add support for sorting of weight breaks
+
 ## 1.5.0
 
 - validate customer
