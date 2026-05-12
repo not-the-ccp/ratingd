@@ -174,3 +174,22 @@ func touchContract(contract *Contract, now time.Time) {
 type TariffService interface {
 	GetTariff(ctx context.Context, id int64) (*tariff.Tariff, error)
 }
+
+// ProcessSignedContracts applies terminate to every signed contract and reports how many succeeded.
+func (s *Service) ProcessSignedContracts(ctx context.Context) (int, error) {
+	pending, err := s.store.ListContractsByStatus(ctx, ContractStatusSigned)
+	if err != nil {
+		return 0, fmt.Errorf("list signed contracts: %w", err)
+	}
+
+	processed := 0
+	for _, ctr := range pending {
+		_, err := s.TerminateContract(ctx, ctr.ID)
+		if err != nil {
+			s.log.Error("terminate contract failed", "id", ctr.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}

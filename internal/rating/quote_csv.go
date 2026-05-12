@@ -41,6 +41,7 @@ func writeQuotesCSV(w io.Writer, items []*Quote) error {
 			return fmt.Errorf("write quote %d: %w", quote.ID, err)
 		}
 	}
+	// TODO(ba): this should live in the store
 	cw.Flush()
 	return cw.Error()
 }
