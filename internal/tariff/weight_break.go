@@ -1,6 +1,7 @@
 package tariff
 
 import (
+	"sort"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -30,4 +31,10 @@ func (w *WeightBreak) HasMinimumAmount() bool {
 
 func (w *WeightBreak) HasLoadingMeterRate() bool {
 	return w.LoadingMeterRate > 0
+}
+
+func sortWeightBreaksByCreatedAt(items []*WeightBreak) {
+	sort.Slice(items, func(i int, j int) bool {
+		return items[i].CreatedAt.Before(items[j].CreatedAt)
+	})
 }
