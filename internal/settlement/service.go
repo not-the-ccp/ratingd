@@ -236,7 +236,7 @@ func sumTotal(items []*SettlementItem) money.Amount {
 func (s *Service) ProcessOpenSettlements(ctx context.Context) (int, error) {
 	pending, err := s.store.ListSettlementsByStatus(ctx, SettlementStatusOpen)
 	if err != nil {
-		return 0, fmt.Errorf("list open settlements: %w", err)
+		return 0, fmt.Errorf("query open settlements: %w", err)
 	}
 	processed := 0
 	for _, settlement := range pending {
