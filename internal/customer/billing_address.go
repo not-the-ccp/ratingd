@@ -8,15 +8,15 @@ import (
 type BillingAddress struct {
 	ID      int64 `json:"id"`
 	Primary bool  `json:"primary"`
-	// Country is the country.
-	Country string `json:"country"`
 	// CustomerID references the owning customer.
-	CustomerID int64     `json:"customer_id"`
-	Street     string    `json:"street"`
-	Zip        string    `json:"zip"`
-	Attention  string    `json:"attention"`
-	City       string    `json:"city"`
-	Region     string    `json:"region"`
-	CreatedAt  time.Time `json:"created_at"`
-	UpdatedAt  time.Time `json:"updated_at"`
+	CustomerID int64  `json:"customer_id"`
+	Zip        string `json:"zip"`
+	Region     string `json:"region"`
+	Street     string `json:"street"`
+	// Country is the country.
+	Country   string    `json:"country"`
+	City      string    `json:"city"`
+	Attention string    `json:"attention"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
