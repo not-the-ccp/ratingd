@@ -131,7 +131,7 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 		return nil, fmt.Errorf("could not read invoice id=%d: %w", notice.InvoiceID, err)
 	}
 	if inv.Status == invoice.InvoiceStatusVoided {
-		return nil, fmt.Errorf("%w: invoice %d is voided", ErrInvalidState, inv.ID)
+		return nil, fmt.Errorf("%w: invoice id=%d is voided", ErrInvalidState, inv.ID)
 	}
 
 	s.log.Info("processing notice", "id", notice.ID)
