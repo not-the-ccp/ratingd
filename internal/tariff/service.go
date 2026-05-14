@@ -324,3 +324,21 @@ func (s *Service) ProcessPublishedTariffs(ctx context.Context) (int, error) {
 	}
 	return processed, nil
 }
+
+func (s *Service) ProcessDraftTariffs(ctx context.Context) (int, error) {
+	pending, err := s.store.ListTariffsByStatus(ctx, TariffStatusDraft)
+	if err != nil {
+		return 0, fmt.Errorf("list draft tariffs: %w", err)
+	}
+
+	processed := 0
+	for _, tariff := range pending {
+		_, err := s.PublishTariff(ctx, tariff.ID)
+		if err != nil {
+			s.log.Error("publish tariff failed", "id", tariff.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}
