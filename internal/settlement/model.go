@@ -12,13 +12,14 @@ type Settlement struct {
 	Deductions  money.Amount `json:"deductions"`
 	ReviewedAt  *time.Time   `json:"reviewed_at"`
 	// CarrierID references the owning carrier.
-	CarrierID   int64            `json:"carrier_id"`
-	Status      SettlementStatus `json:"status"`
-	PeriodEnd   time.Time        `json:"period_end"`
-	PeriodStart time.Time        `json:"period_start"`
-	ReleasedAt  *time.Time       `json:"released_at"`
-	CreatedAt   time.Time        `json:"created_at"`
-	UpdatedAt   time.Time        `json:"updated_at"`
+	CarrierID        int64            `json:"carrier_id"`
+	Status           SettlementStatus `json:"status"`
+	PeriodEnd        time.Time        `json:"period_end"`
+	PeriodStart      time.Time        `json:"period_start"`
+	ReleasedAt       *time.Time       `json:"released_at"`
+	RetentionPercent float64          `json:"retention_percent"`
+	CreatedAt        time.Time        `json:"created_at"`
+	UpdatedAt        time.Time        `json:"updated_at"`
 }
 
 type SettlementStatus string

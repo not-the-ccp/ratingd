@@ -33,7 +33,7 @@ func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlem
 
 // UpdateSettlement implements Store.
 func (s *SQLStore) UpdateSettlement(ctx context.Context, settlement *Settlement) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE settlements SET gross_amount = $2, deductions = $3, reviewed_at = $4, carrier_id = $5, status = $6, period_end = $7, period_start = $8, released_at = $9, updated_at = $10 WHERE id = $1`, settlement.ID, settlement.GrossAmount, settlement.Deductions, settlement.ReviewedAt, settlement.CarrierID, settlement.Status, settlement.PeriodEnd, settlement.PeriodStart, settlement.ReleasedAt, settlement.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE settlements SET gross_amount = $2, deductions = $3, reviewed_at = $4, carrier_id = $5, status = $6, period_end = $7, period_start = $8, released_at = $9, retention_percent = $10, updated_at = $11 WHERE id = $1`, settlement.ID, settlement.GrossAmount, settlement.Deductions, settlement.ReviewedAt, settlement.CarrierID, settlement.Status, settlement.PeriodEnd, settlement.PeriodStart, settlement.ReleasedAt, settlement.RetentionPercent, settlement.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("cannot update settlement: %w", err)
 	}
@@ -73,7 +73,7 @@ func (s *SQLStore) ListSettlementItems(ctx context.Context, limit int, offset in
 }
 
 func (s *SQLStore) InsertSettlement(ctx context.Context, settlement *Settlement) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlements (gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, settlement.GrossAmount, settlement.Deductions, settlement.ReviewedAt, settlement.CarrierID, settlement.Status, settlement.PeriodEnd, settlement.PeriodStart, settlement.ReleasedAt, settlement.CreatedAt, settlement.UpdatedAt).Scan(&settlement.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlements (gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`, settlement.GrossAmount, settlement.Deductions, settlement.ReviewedAt, settlement.CarrierID, settlement.Status, settlement.PeriodEnd, settlement.PeriodStart, settlement.ReleasedAt, settlement.RetentionPercent, settlement.CreatedAt, settlement.UpdatedAt).Scan(&settlement.ID); err != nil {
 		return fmt.Errorf("cannot insert settlement: %w", err)
 	}
 
@@ -81,7 +81,7 @@ func (s *SQLStore) InsertSettlement(ctx context.Context, settlement *Settlement)
 }
 
 func (s *SQLStore) ListSettlements(ctx context.Context, limit int, offset int) ([]*Settlement, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, created_at, updated_at FROM settlements ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at FROM settlements ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list settlements: %w", err)
 	}
@@ -91,7 +91,7 @@ func (s *SQLStore) ListSettlements(ctx context.Context, limit int, offset int) (
 	var settlements []*Settlement
 	for rows.Next() {
 		var settlement Settlement
-		if err := rows.Scan(&settlement.ID, &settlement.GrossAmount, &settlement.Deductions, &settlement.ReviewedAt, &settlement.CarrierID, &settlement.Status, &settlement.PeriodEnd, &settlement.PeriodStart, &settlement.ReleasedAt, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
+		if err := rows.Scan(&settlement.ID, &settlement.GrossAmount, &settlement.Deductions, &settlement.ReviewedAt, &settlement.CarrierID, &settlement.Status, &settlement.PeriodEnd, &settlement.PeriodStart, &settlement.ReleasedAt, &settlement.RetentionPercent, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("cannot scan settlement: %w", err)
 		}
 		settlements = append(settlements, &settlement)
@@ -104,9 +104,9 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 func (s *SQLStore) FindSettlement(ctx context.Context, id int64) (*Settlement, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, created_at, updated_at FROM settlements WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at FROM settlements WHERE id = $1`, id)
 	var settlement Settlement
-	if err := row.Scan(&settlement.ID, &settlement.GrossAmount, &settlement.Deductions, &settlement.ReviewedAt, &settlement.CarrierID, &settlement.Status, &settlement.PeriodEnd, &settlement.PeriodStart, &settlement.ReleasedAt, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
+	if err := row.Scan(&settlement.ID, &settlement.GrossAmount, &settlement.Deductions, &settlement.ReviewedAt, &settlement.CarrierID, &settlement.Status, &settlement.PeriodEnd, &settlement.PeriodStart, &settlement.ReleasedAt, &settlement.RetentionPercent, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -129,7 +129,7 @@ func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*Settlement
 }
 
 func (s *SQLStore) ListSettlementsByStatus(ctx context.Context, status SettlementStatus) ([]*Settlement, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, created_at, updated_at FROM settlements WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at FROM settlements WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("cannot list settlements: %w", err)
 	}
@@ -139,7 +139,7 @@ func (s *SQLStore) ListSettlementsByStatus(ctx context.Context, status Settlemen
 	var settlements []*Settlement
 	for rows.Next() {
 		var settlement Settlement
-		if err := rows.Scan(&settlement.ID, &settlement.GrossAmount, &settlement.Deductions, &settlement.ReviewedAt, &settlement.CarrierID, &settlement.Status, &settlement.PeriodEnd, &settlement.PeriodStart, &settlement.ReleasedAt, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
+		if err := rows.Scan(&settlement.ID, &settlement.GrossAmount, &settlement.Deductions, &settlement.ReviewedAt, &settlement.CarrierID, &settlement.Status, &settlement.PeriodEnd, &settlement.PeriodStart, &settlement.ReleasedAt, &settlement.RetentionPercent, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("cannot scan settlement: %w", err)
 		}
 		settlements = append(settlements, &settlement)

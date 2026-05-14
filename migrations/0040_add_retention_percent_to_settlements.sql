@@ -1,0 +1,1 @@
+ALTER TABLE settlements ADD COLUMN retention_percent DOUBLE PRECISION NOT NULL DEFAULT 0;

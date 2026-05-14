@@ -8,25 +8,27 @@ import (
 )
 
 type CreateSettlementRequest struct {
-	CarrierID   int64        `json:"carrier_id"`
-	PeriodStart time.Time    `json:"period_start"`
-	PeriodEnd   time.Time    `json:"period_end"`
-	GrossAmount money.Amount `json:"gross_amount"`
-	Deductions  money.Amount `json:"deductions"`
+	CarrierID        int64        `json:"carrier_id"`
+	PeriodStart      time.Time    `json:"period_start"`
+	PeriodEnd        time.Time    `json:"period_end"`
+	GrossAmount      money.Amount `json:"gross_amount"`
+	Deductions       money.Amount `json:"deductions"`
+	RetentionPercent float64      `json:"retention_percent"`
 }
 
 type SettlementResponse struct {
-	ID          int64            `json:"id"`
-	CarrierID   int64            `json:"carrier_id"`
-	PeriodStart time.Time        `json:"period_start"`
-	PeriodEnd   time.Time        `json:"period_end"`
-	GrossAmount money.Amount     `json:"gross_amount"`
-	Deductions  money.Amount     `json:"deductions"`
-	Status      SettlementStatus `json:"status"`
-	ReviewedAt  *time.Time       `json:"reviewed_at"`
-	ReleasedAt  *time.Time       `json:"released_at"`
-	CreatedAt   time.Time        `json:"created_at"`
-	UpdatedAt   time.Time        `json:"updated_at"`
+	ID               int64            `json:"id"`
+	CarrierID        int64            `json:"carrier_id"`
+	PeriodStart      time.Time        `json:"period_start"`
+	PeriodEnd        time.Time        `json:"period_end"`
+	GrossAmount      money.Amount     `json:"gross_amount"`
+	Deductions       money.Amount     `json:"deductions"`
+	Status           SettlementStatus `json:"status"`
+	ReviewedAt       *time.Time       `json:"reviewed_at"`
+	ReleasedAt       *time.Time       `json:"released_at"`
+	CreatedAt        time.Time        `json:"created_at"`
+	UpdatedAt        time.Time        `json:"updated_at"`
+	RetentionPercent float64          `json:"retention_percent"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -45,17 +47,18 @@ func (r *CreateSettlementRequest) Validate() error {
 
 func toSettlementResponse(settlement *Settlement) SettlementResponse {
 	return SettlementResponse{
-		ID:          settlement.ID,
-		CarrierID:   settlement.CarrierID,
-		PeriodStart: settlement.PeriodStart,
-		PeriodEnd:   settlement.PeriodEnd,
-		GrossAmount: settlement.GrossAmount,
-		Deductions:  settlement.Deductions,
-		Status:      settlement.Status,
-		ReviewedAt:  settlement.ReviewedAt,
-		ReleasedAt:  settlement.ReleasedAt,
-		CreatedAt:   settlement.CreatedAt,
-		UpdatedAt:   settlement.UpdatedAt,
+		ID:               settlement.ID,
+		CarrierID:        settlement.CarrierID,
+		PeriodStart:      settlement.PeriodStart,
+		PeriodEnd:        settlement.PeriodEnd,
+		GrossAmount:      settlement.GrossAmount,
+		Deductions:       settlement.Deductions,
+		Status:           settlement.Status,
+		ReviewedAt:       settlement.ReviewedAt,
+		ReleasedAt:       settlement.ReleasedAt,
+		CreatedAt:        settlement.CreatedAt,
+		UpdatedAt:        settlement.UpdatedAt,
+		RetentionPercent: settlement.RetentionPercent,
 	}
 }
 

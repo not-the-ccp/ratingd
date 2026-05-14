@@ -58,14 +58,15 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 	// TODO(ml): handle partial failures
 	now := s.clock.Now()
 	settlement := &Settlement{
-		CarrierID:   req.CarrierID,
-		Status:      SettlementStatusOpen,
-		GrossAmount: req.GrossAmount,
-		PeriodStart: req.PeriodStart,
-		PeriodEnd:   req.PeriodEnd,
-		Deductions:  req.Deductions,
-		CreatedAt:   now,
-		UpdatedAt:   now,
+		CarrierID:        req.CarrierID,
+		Status:           SettlementStatusOpen,
+		GrossAmount:      req.GrossAmount,
+		PeriodStart:      req.PeriodStart,
+		PeriodEnd:        req.PeriodEnd,
+		Deductions:       req.Deductions,
+		RetentionPercent: req.RetentionPercent,
+		CreatedAt:        now,
+		UpdatedAt:        now,
 	}
 
 	if err := s.store.InsertSettlement(ctx, settlement); err != nil {
