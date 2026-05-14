@@ -11,21 +11,21 @@ import (
 type Invoice struct {
 	ID     int64         `json:"id"`
 	Status InvoiceStatus `json:"status"`
-	// DueAt is stored in UTC.
-	DueAt time.Time `json:"due_at"`
-	// Currency is the currency.
-	Currency string `json:"currency"`
 	// IssuedAt is stored in UTC.
-	IssuedAt   time.Time    `json:"issued_at"`
+	IssuedAt time.Time  `json:"issued_at"`
+	PaidAt   *time.Time `json:"paid_at"`
+	// Currency is the currency.
+	Currency   string       `json:"currency"`
 	CustomerID int64        `json:"customer_id"`
 	NetAmount  money.Amount `json:"net_amount"`
-	PaidAt     *time.Time   `json:"paid_at"`
-	TaxAmount  money.Amount `json:"tax_amount"`
-	VoidedAt   *time.Time   `json:"voided_at"`
 	Number     string       `json:"number"`
-	IssuedOn   *time.Time   `json:"issued_on"`
-	CreatedAt  time.Time    `json:"created_at"`
-	UpdatedAt  time.Time    `json:"updated_at"`
+	// DueAt is stored in UTC.
+	DueAt     time.Time    `json:"due_at"`
+	IssuedOn  *time.Time   `json:"issued_on"`
+	TaxAmount money.Amount `json:"tax_amount"`
+	VoidedAt  *time.Time   `json:"voided_at"`
+	CreatedAt time.Time    `json:"created_at"`
+	UpdatedAt time.Time    `json:"updated_at"`
 }
 
 type InvoiceStatus string

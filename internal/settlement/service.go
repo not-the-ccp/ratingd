@@ -97,7 +97,7 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 		return nil, fmt.Errorf("load carrier id=%d: %w", settlement.CarrierID, err)
 	}
 	if car.Status == carrier.CarrierStatusSuspended {
-		return nil, fmt.Errorf("%w: carrier %d is suspended", ErrInvalidState, car.ID)
+		return nil, fmt.Errorf("%w: carrier id=%d is suspended", ErrInvalidState, car.ID)
 	}
 
 	s.log.Info("processing settlement", "id", settlement.ID)
@@ -132,7 +132,7 @@ func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementI
 
 	entry, err := s.store.GetSettlementItem(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("cannot get settlement item %d: %w", id, err)
+		return nil, fmt.Errorf("cannot get settlement item id=%d: %w", id, err)
 	}
 	ship, err := s.shipments.GetShipment(ctx, entry.ShipmentID)
 	// TODO(ml): remove once the migration is done

@@ -12,10 +12,6 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
-}
-
 // UpdateNotice implements Store.
 func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
 	res, err := s.db.ExecContext(ctx, `UPDATE notices SET resolved_at = $2, invoice_id = $3, fee_amount = $4, sent_at = $5, level = $6, status = $7, dispatched_at = $8, updated_at = $9 WHERE id = $1`, notice.ID, notice.ResolvedAt, notice.InvoiceID, notice.FeeAmount, notice.SentAt, notice.Level, notice.Status, notice.DispatchedAt, notice.UpdatedAt)
@@ -32,6 +28,10 @@ func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
 		return ErrNotFound
 	}
 	return nil
+}
+
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 // FindNotice implements Store.

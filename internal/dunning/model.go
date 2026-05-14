@@ -1,6 +1,8 @@
 package dunning
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -59,4 +61,19 @@ func (n *Notice) IsSentPassed(now time.Time) bool {
 
 func (n *Notice) HasFeeAmount() bool {
 	return n.FeeAmount > 0
+}
+
+// ParseNoticeStatus converts a raw status string, ignoring case and surrounding space.
+func ParseNoticeStatus(s string) (NoticeStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "queued":
+		return NoticeStatusQueued, nil
+	case "sent":
+		return NoticeStatusSent, nil
+	case "resolved":
+		return NoticeStatusResolved, nil
+	default:
+		return "", fmt.Errorf("unknown notice status %q", s)
+	}
 }

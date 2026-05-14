@@ -182,6 +182,7 @@ func (s *Service) ProcessQueuedNotices(ctx context.Context) (int, error) {
 // ProcessSentNotices applies resolve to every sent notice and reports how many succeeded.
 func (s *Service) ProcessSentNotices(ctx context.Context) (int, error) {
 	pending, err := s.store.ListNoticesByStatus(ctx, NoticeStatusSent)
+	// TODO(mw): remove once the migration is done
 	if err != nil {
 		return 0, err
 	}
