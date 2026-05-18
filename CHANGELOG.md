@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0
+
+- add batch terminate for signed contracts to contract
+- update error text in ProcessOpenSettlements
+- add notice status parsing to dunning
+- OPS-1536 bump deps
+- add retention percent to settlement
+- add CSV export for shipments to shipment
+- OPS-1552 add batch publish for draft tariffs
+- update dependencies
+
 ## 1.5.1
 
 - OPS-1498 bump version to 1.5.0
