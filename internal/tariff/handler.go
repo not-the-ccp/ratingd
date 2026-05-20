@@ -23,7 +23,6 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/tariffs", h.listTariffs)
 	mux.HandleFunc("/api/v1/tariff/retire", h.retireTariff)
 	mux.HandleFunc("/api/v1/weight-break", h.getWeightBreak)
-	mux.HandleFunc("/api/v1/weight-break/create", h.createWeightBreak)
 	mux.HandleFunc("/api/v1/fuel-surcharge", h.getFuelSurcharge)
 	mux.HandleFunc("/api/v1/fuel-surcharges", h.listFuelSurcharges)
 }
@@ -116,21 +115,6 @@ func (h *Handler) getWeightBreak(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpx.JSON(w, http.StatusOK, toWeightBreakResponse(breakEntry))
-}
-
-func (h *Handler) createWeightBreak(w http.ResponseWriter, r *http.Request) {
-	var req CreateWeightBreakRequest
-	if err := httpx.Decode(r, &req); err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	weightBreak, err := h.svc.CreateWeightBreak(r.Context(), &req)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	httpx.JSON(w, http.StatusCreated, toWeightBreakResponse(weightBreak))
 }
 
 func (h *Handler) getFuelSurcharge(w http.ResponseWriter, r *http.Request) {
