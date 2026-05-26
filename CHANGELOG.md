@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.6.1
+
+- OPS-1536 bump deps
+- add retention percent to settlement
+- add CSV export for shipments to shipment
+- OPS-1552 add batch publish for draft tariffs
+- update dependencies
+- bump version to 1.6.0
+- bump testify to v1.11.1
+- drop unused CreateWeightBreak route
+- ci: retry flaky job
+
 ## 1.6.0
 
 - add batch terminate for signed contracts to contract
