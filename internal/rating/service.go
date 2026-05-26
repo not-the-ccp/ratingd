@@ -195,3 +195,21 @@ func (s *Service) CalculateQuoteSurchargeTotal(ctx context.Context, quoteID int6
 type ShipmentService interface {
 	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }
+
+// ProcessOpenQuotes applies accept to every open quote and reports how many succeeded.
+func (s *Service) ProcessOpenQuotes(ctx context.Context) (int, error) {
+	pending, err := s.store.ListQuotesByStatus(ctx, QuoteStatusOpen)
+	if err != nil {
+		return 0, err
+	}
+	processed := 0
+	for _, quote := range pending {
+		_, err := s.AcceptQuote(ctx, quote.ID)
+		if err != nil {
+			s.log.Error("accept quote failed", "id", quote.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}
