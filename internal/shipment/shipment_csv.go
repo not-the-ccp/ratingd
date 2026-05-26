@@ -11,6 +11,7 @@ import (
 
 func writeShipmentsCSV(w io.Writer, items []*Shipment) error {
 	cw := csv.NewWriter(w)
+
 	if err := cw.Write([]string{
 		"id",
 		"origin_zip",
