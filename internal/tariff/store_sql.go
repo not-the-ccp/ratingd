@@ -199,6 +199,10 @@ func (s *SQLStore) InsertWeightBreak(ctx context.Context, breakVal *WeightBreak)
 	return nil
 }
 
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
+}
+
 // ListTariffs implements Store.
 func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*Tariff, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, code, published_at, currency, status, valid_to, rounding_mode, valid_from, description, retired_at, base_zone, created_at, updated_at FROM tariffs ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
@@ -217,10 +221,6 @@ func (s *SQLStore) ListTariffs(ctx context.Context, limit int, offset int) ([]*T
 		tariffs = append(tariffs, &tariff)
 	}
 	return tariffs, rows.Err()
-}
-
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) FindFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {

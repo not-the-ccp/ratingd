@@ -179,7 +179,7 @@ type TariffService interface {
 func (s *Service) ProcessSignedContracts(ctx context.Context) (int, error) {
 	pending, err := s.store.ListContractsByStatus(ctx, ContractStatusSigned)
 	if err != nil {
-		return 0, fmt.Errorf("list signed contracts: %w", err)
+		return 0, fmt.Errorf("query signed contracts: %w", err)
 	}
 
 	processed := 0
