@@ -684,19 +684,19 @@ components:
           type: number
         primary:
           type: number
-        country:
-          type: string
         customer_id:
           type: number
-        street:
-          type: string
         zip:
           type: string
-        attention:
+        region:
+          type: string
+        street:
+          type: string
+        country:
           type: string
         city:
           type: string
-        region:
+        attention:
           type: string
         created_at:
           type: number
@@ -707,27 +707,27 @@ components:
       properties:
         id:
           type: number
-        suspended_at:
+        approved_at:
           type: number
         vat_number:
           type: string
-        iban:
-          type: string
-        code:
-          type: string
-        name:
+        status:
           type: string
         payment_term_days:
           type: number
-        insurance_valid_until:
+        suspended_at:
           type: number
         fleet_size:
           type: number
-        approved_at:
+        name:
+          type: string
+        insurance_valid_until:
           type: number
+        code:
+          type: string
         country:
           type: string
-        status:
+        iban:
           type: string
         created_at:
           type: number
@@ -811,26 +811,26 @@ components:
       properties:
         id:
           type: number
+        status:
+          type: string
+        customer_id:
+          type: number
+        valid_to:
+          type: number
         valid_from:
           type: number
-        reference:
-          type: string
-        minimum_charge:
+        terminated_at:
           type: number
         signed_at:
           type: number
         discount_percent:
           type: number
-        status:
-          type: string
-        customer_id:
-          type: number
-        terminated_at:
-          type: number
-        valid_to:
+        minimum_charge:
           type: number
         tariff_id:
           type: number
+        reference:
+          type: string
         signed_by:
           type: string
         created_at:
@@ -948,27 +948,27 @@ components:
       properties:
         id:
           type: number
-        status:
-          type: string
-        due_at:
-          type: number
         currency:
           type: string
-        issued_at:
-          type: number
-        customer_id:
-          type: number
-        net_amount:
-          type: number
-        paid_at:
-          type: number
         tax_amount:
           type: number
-        voided_at:
+        due_at:
+          type: number
+        issued_at:
+          type: number
+        issued_on:
           type: number
         number:
           type: string
-        issued_on:
+        net_amount:
+          type: number
+        voided_at:
+          type: number
+        customer_id:
+          type: number
+        status:
+          type: string
+        paid_at:
           type: number
         created_at:
           type: number
@@ -1038,6 +1038,8 @@ components:
         period_start:
           type: number
         released_at:
+          type: number
+        retention_percent:
           type: number
         created_at:
           type: number
