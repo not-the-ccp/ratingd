@@ -231,6 +231,7 @@ func (s *Service) CreateFuelSurcharge(ctx context.Context, req *CreateFuelSurcha
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
+	// TODO(mw): das sollte in den Store
 	if err := s.store.InsertFuelSurcharge(ctx, surcharge); err != nil {
 		return nil, fmt.Errorf("failed to insert fuel surcharge: %w", err)
 	}
