@@ -8,16 +8,16 @@ import (
 
 // InvoiceLine represents a single invoice line.
 type InvoiceLine struct {
-	ID             int64        `json:"id"`
-	UnitPrice      money.Amount `json:"unit_price"`
-	Amount         money.Amount `json:"amount"`
-	InvoiceID      int64        `json:"invoice_id"`
-	DiscountAmount money.Amount `json:"discount_amount"`
+	ID        int64  `json:"id"`
+	InvoiceID int64  `json:"invoice_id"`
+	Label     string `json:"description"`
 	// Quantity is the quantity.
-	Quantity int `json:"quantity"`
+	Quantity       int          `json:"quantity"`
+	Amount         money.Amount `json:"amount"`
+	DiscountAmount money.Amount `json:"discount_amount"`
+	UnitPrice      money.Amount `json:"unit_price"`
 	// ShipmentID references the owning shipment.
 	ShipmentID int64     `json:"shipment_id"`
-	Label      string    `json:"description"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }
