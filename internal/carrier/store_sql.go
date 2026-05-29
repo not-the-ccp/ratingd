@@ -12,22 +12,17 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, approved_at, vat_number, status, payment_term_days, suspended_at, fleet_size, name, insurance_valid_until, code, country, iban, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
-	if err != nil {
-		return nil, fmt.Errorf("list carriers: %w", err)
-	}
-	defer rows.Close()
-
-	var carriers []*Carrier
-	for rows.Next() {
-		var carrier Carrier
-		if err := rows.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.VATNumber, &carrier.Status, &carrier.PaymentTermDays, &carrier.SuspendedAt, &carrier.FleetSize, &carrier.DisplayName, &carrier.InsuranceValidUntil, &carrier.ShortCode, &carrier.Country, &carrier.IBAN, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan carrier: %w", err)
+// FindCarrier implements Store.
+func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, approved_at, vat_number, status, payment_term_days, suspended_at, fleet_size, name, insurance_valid_until, code, country, iban, created_at, updated_at FROM carriers WHERE id = $1`, id)
+	var carrier Carrier
+	if err := row.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.VATNumber, &carrier.Status, &carrier.PaymentTermDays, &carrier.SuspendedAt, &carrier.FleetSize, &carrier.DisplayName, &carrier.InsuranceValidUntil, &carrier.ShortCode, &carrier.Country, &carrier.IBAN, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
 		}
-		carriers = append(carriers, &carrier)
+		return nil, fmt.Errorf("query carrier %d: %w", id, err)
 	}
-	return carriers, rows.Err()
+	return &carrier, nil
 }
 
 func NewSQLStore(db *sql.DB) *SQLStore {
@@ -70,17 +65,22 @@ func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*
 	return carriers, rows.Err()
 }
 
-// FindCarrier implements Store.
-func (s *SQLStore) FindCarrier(ctx context.Context, id int64) (*Carrier, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, approved_at, vat_number, status, payment_term_days, suspended_at, fleet_size, name, insurance_valid_until, code, country, iban, created_at, updated_at FROM carriers WHERE id = $1`, id)
-	var carrier Carrier
-	if err := row.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.VATNumber, &carrier.Status, &carrier.PaymentTermDays, &carrier.SuspendedAt, &carrier.FleetSize, &carrier.DisplayName, &carrier.InsuranceValidUntil, &carrier.ShortCode, &carrier.Country, &carrier.IBAN, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("query carrier %d: %w", id, err)
+func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, approved_at, vat_number, status, payment_term_days, suspended_at, fleet_size, name, insurance_valid_until, code, country, iban, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
+	if err != nil {
+		return nil, fmt.Errorf("list carriers: %w", err)
 	}
-	return &carrier, nil
+	defer rows.Close()
+
+	var carriers []*Carrier
+	for rows.Next() {
+		var carrier Carrier
+		if err := rows.Scan(&carrier.ID, &carrier.ApprovedAt, &carrier.VATNumber, &carrier.Status, &carrier.PaymentTermDays, &carrier.SuspendedAt, &carrier.FleetSize, &carrier.DisplayName, &carrier.InsuranceValidUntil, &carrier.ShortCode, &carrier.Country, &carrier.IBAN, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan carrier: %w", err)
+		}
+		carriers = append(carriers, &carrier)
+	}
+	return carriers, rows.Err()
 }
 
 func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {

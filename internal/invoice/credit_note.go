@@ -1,6 +1,8 @@
 package invoice
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -47,4 +49,17 @@ func (s CreditNoteStatus) IsFinal() bool {
 
 func (c *CreditNote) HasAmount() bool {
 	return c.Amount > 0
+}
+
+// ParseCreditNoteStatus converts a raw status string, ignoring case and surrounding space.
+func ParseCreditNoteStatus(s string) (CreditNoteStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "open":
+		return CreditNoteStatusOpen, nil
+	case "applied":
+		return CreditNoteStatusApplied, nil
+	default:
+		return "", fmt.Errorf("unknown credit note status %q", s)
+	}
 }
