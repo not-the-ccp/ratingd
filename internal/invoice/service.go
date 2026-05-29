@@ -163,8 +163,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 
 	now := s.clock.Now()
 	invoice.Status = InvoiceStatusPaid
-	invoice.PaidAt = &now
-	invoice.UpdatedAt = now
+	touchInvoice(invoice, now)
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
 		return nil, fmt.Errorf("could not update invoice: %w", err)
 	}
@@ -173,6 +172,11 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 		s.log.Warn("audit entry failed", "action", "invoice.paid", "error", err)
 	}
 	return invoice, nil
+}
+
+func touchInvoice(invoice *Invoice, now time.Time) {
+	invoice.PaidAt = &now
+	invoice.UpdatedAt = now
 }
 
 // VoidInvoice performs the void invoice step.
