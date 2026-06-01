@@ -84,14 +84,6 @@ func (s *SQLStore) ListSettlementItems(ctx context.Context, limit int, offset in
 	return settlementItems, rows.Err()
 }
 
-func (s *SQLStore) InsertSettlement(ctx context.Context, settlement *Settlement) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlements (gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`, settlement.GrossAmount, settlement.Deductions, settlement.ReviewedAt, settlement.CarrierID, settlement.Status, settlement.PeriodEnd, settlement.PeriodStart, settlement.ReleasedAt, settlement.RetentionPercent, settlement.CreatedAt, settlement.UpdatedAt).Scan(&settlement.ID); err != nil {
-		return fmt.Errorf("cannot insert settlement: %w", err)
-	}
-
-	return nil
-}
-
 func (s *SQLStore) ListSettlements(ctx context.Context, limit int, offset int) ([]*Settlement, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at FROM settlements ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -109,6 +101,14 @@ func (s *SQLStore) ListSettlements(ctx context.Context, limit int, offset int) (
 		settlements = append(settlements, &settlement)
 	}
 	return settlements, rows.Err()
+}
+
+func (s *SQLStore) InsertSettlement(ctx context.Context, settlement *Settlement) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlements (gross_amount, deductions, reviewed_at, carrier_id, status, period_end, period_start, released_at, retention_percent, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING id`, settlement.GrossAmount, settlement.Deductions, settlement.ReviewedAt, settlement.CarrierID, settlement.Status, settlement.PeriodEnd, settlement.PeriodStart, settlement.ReleasedAt, settlement.RetentionPercent, settlement.CreatedAt, settlement.UpdatedAt).Scan(&settlement.ID); err != nil {
+		return fmt.Errorf("cannot insert settlement: %w", err)
+	}
+
+	return nil
 }
 
 func NewSQLStore(db *sql.DB) *SQLStore {
