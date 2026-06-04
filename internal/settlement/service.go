@@ -161,6 +161,7 @@ func (s *Service) CreateSettlementItem(ctx context.Context, req *CreateSettlemen
 		Comment:      req.Note,
 		Amount:       req.Amount,
 		Disputed:     req.Disputed,
+		Category:     req.Category,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}

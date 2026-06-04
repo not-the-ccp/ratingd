@@ -16,6 +16,7 @@ type SettlementItem struct {
 	SettlementID int64     `json:"settlement_id"`
 	Disputed     bool      `json:"disputed"`
 	ShipmentID   int64     `json:"shipment_id"`
+	Category     string    `json:"category"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
