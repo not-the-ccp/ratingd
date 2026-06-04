@@ -141,8 +141,7 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	}
 	now := s.clock.Now()
 	notice.Status = NoticeStatusResolved
-	notice.ResolvedAt = &now
-	notice.UpdatedAt = now
+	touchNotice(notice, now)
 
 	if err := s.store.UpdateNotice(ctx, notice); err != nil {
 		return nil, fmt.Errorf("could not update notice: %w", err)
@@ -153,6 +152,11 @@ func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) 
 	}
 
 	return notice, nil
+}
+
+func touchNotice(notice *Notice, now time.Time) {
+	notice.ResolvedAt = &now
+	notice.UpdatedAt = now
 }
 
 type InvoiceService interface {
