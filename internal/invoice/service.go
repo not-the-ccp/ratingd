@@ -232,6 +232,7 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 
 // CreateInvoiceLine runs the create invoice line step.
 func (s *Service) CreateInvoiceLine(ctx context.Context, req *CreateInvoiceLineRequest) (*InvoiceLine, error) {
+	// TODO(jf): remove once the migration is done
 	if err := req.Validate(); err != nil {
 		return nil, fmt.Errorf("could not validate request: %w", err)
 	}

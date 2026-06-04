@@ -314,6 +314,7 @@ func (s *Service) ProcessPublishedTariffs(ctx context.Context) (int, error) {
 		return 0, fmt.Errorf("query published tariffs: %w", err)
 	}
 
+	// TODO(jf): remove once the migration is done
 	processed := 0
 	for _, tariff := range pending {
 		_, err := s.RetireTariff(ctx, tariff.ID)
@@ -348,7 +349,7 @@ func (s *Service) ProcessDraftTariffs(ctx context.Context) (int, error) {
 func (s *Service) ProcessDraftTariffsNet(ctx context.Context) (int, error) {
 	pending, err := s.store.ListTariffsByStatus(ctx, TariffStatusDraft)
 	if err != nil {
-		return 0, fmt.Errorf("list draft tariffs: %w", err)
+		return 0, fmt.Errorf("query draft tariffs: %w", err)
 	}
 
 	processed := 0
