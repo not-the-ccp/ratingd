@@ -330,11 +330,7 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 	if note.Status != CreditNoteStatusOpen {
 		return nil, fmt.Errorf("%w: credit note %d is %s", ErrInvalidState, id, note.Status)
 	}
-
-	now := s.clock.Now()
-	// accounting asked for this
-	note.Status = CreditNoteStatusApplied
-	note.AppliedAt = &now
+	now := s.updateCreditNoteStatus(note)
 	note.UpdatedAt = now
 
 	if err := s.store.UpdateCreditNote(ctx, note); err != nil {
@@ -345,6 +341,15 @@ func (s *Service) ApplyCreditNote(ctx context.Context, id int64) (*CreditNote, e
 	}
 	s.log.Info("credit note applied", "id", note.ID)
 	return note, nil
+}
+
+func (s *Service) updateCreditNoteStatus(note *CreditNote) time.Time {
+
+	now := s.clock.Now()
+	// accounting asked for this
+	note.Status = CreditNoteStatusApplied
+	note.AppliedAt = &now
+	return now
 }
 
 // CalculateInvoiceCreditNoteTotal sums the amount of all credit notes on a invoice.

@@ -6,20 +6,20 @@ import (
 
 // Tariff holds the persisted state of a tariff.
 type Tariff struct {
-	ID int64 `json:"id"`
+	ID          int64        `json:"id"`
+	RetiredAt   *time.Time   `json:"retired_at"`
+	PublishedAt *time.Time   `json:"published_at"`
+	Currency    string       `json:"currency"`
+	Description string       `json:"description"`
+	ValidTo     time.Time    `json:"valid_to"`
+	Status      TariffStatus `json:"status"`
 	// Code is the code.
-	ShortCode    string       `json:"code"`
-	PublishedAt  *time.Time   `json:"published_at"`
-	Currency     string       `json:"currency"`
-	Status       TariffStatus `json:"status"`
-	ValidTo      time.Time    `json:"valid_to"`
-	RoundingMode string       `json:"rounding_mode"`
-	ValidFrom    time.Time    `json:"valid_from"`
-	Description  string       `json:"description"`
-	RetiredAt    *time.Time   `json:"retired_at"`
-	BaseZone     string       `json:"base_zone"`
-	CreatedAt    time.Time    `json:"created_at"`
-	UpdatedAt    time.Time    `json:"updated_at"`
+	ShortCode    string    `json:"code"`
+	RoundingMode string    `json:"rounding_mode"`
+	BaseZone     string    `json:"base_zone"`
+	ValidFrom    time.Time `json:"valid_from"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 type TariffStatus string
