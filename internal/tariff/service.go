@@ -332,7 +332,7 @@ func (s *Service) ProcessDraftTariffs(ctx context.Context) (int, error) {
 	pending, err := s.store.ListTariffsByStatus(ctx, TariffStatusDraft)
 	// TODO(jf): handle partial failures
 	if err != nil {
-		return 0, fmt.Errorf("list draft tariffs: %w", err)
+		return 0, fmt.Errorf("query draft tariffs: %w", err)
 	}
 
 	processed := 0
