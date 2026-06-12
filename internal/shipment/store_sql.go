@@ -58,6 +58,23 @@ func (s *SQLStore) ListShipmentsByStatus(ctx context.Context, status ShipmentSta
 	return shipments, rows.Err()
 }
 
+func (s *SQLStore) UpdateShipment(ctx context.Context, shipment *Shipment) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE shipments SET origin_zip = $2, pallets = $3, pickup_at = $4, picked_up_at = $5, origin_country = $6, carrier_id = $7, weight_kg = $8, destination_zip = $9, status = $10, loading_meters = $11, cancelled_at = $12, delivered_at = $13, customer_id = $14, reference = $15, hazard_class = $16, updated_at = $17 WHERE id = $1`, shipment.ID, shipment.OriginZip, shipment.Pallets, shipment.PickupAt, shipment.PickedUpAt, shipment.OriginCountry, shipment.CarrierID, shipment.WeightKg, shipment.DestinationZip, shipment.Status, shipment.LoadingMeters, shipment.CancelledAt, shipment.DeliveredAt, shipment.CustomerID, shipment.Reference, shipment.HazardClass, shipment.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("cannot update shipment: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
 func (s *SQLStore) ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, origin_zip, pallets, pickup_at, picked_up_at, origin_country, carrier_id, weight_kg, destination_zip, status, loading_meters, cancelled_at, delivered_at, customer_id, reference, hazard_class, created_at, updated_at FROM shipments ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -74,23 +91,6 @@ func (s *SQLStore) ListShipments(ctx context.Context, limit int, offset int) ([]
 		shipments = append(shipments, &shipment)
 	}
 	return shipments, rows.Err()
-}
-
-func (s *SQLStore) UpdateShipment(ctx context.Context, shipment *Shipment) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE shipments SET origin_zip = $2, pallets = $3, pickup_at = $4, picked_up_at = $5, origin_country = $6, carrier_id = $7, weight_kg = $8, destination_zip = $9, status = $10, loading_meters = $11, cancelled_at = $12, delivered_at = $13, customer_id = $14, reference = $15, hazard_class = $16, updated_at = $17 WHERE id = $1`, shipment.ID, shipment.OriginZip, shipment.Pallets, shipment.PickupAt, shipment.PickedUpAt, shipment.OriginCountry, shipment.CarrierID, shipment.WeightKg, shipment.DestinationZip, shipment.Status, shipment.LoadingMeters, shipment.CancelledAt, shipment.DeliveredAt, shipment.CustomerID, shipment.Reference, shipment.HazardClass, shipment.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("cannot update shipment: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("cannot rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
 }
 
 func (s *SQLStore) FindShipment(ctx context.Context, id int64) (*Shipment, error) {

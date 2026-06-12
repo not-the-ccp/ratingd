@@ -35,6 +35,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
+	// TODO(jf): this is slow for big customers
 	result, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("fetch carrier: %w", err)

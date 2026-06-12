@@ -102,6 +102,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 		return nil, fmt.Errorf("%w: notice %d is %s", ErrInvalidState, id, notice.Status)
 	}
 	now := s.clock.Now()
+
 	updateNoticeStatus(notice, now)
 	notice.UpdatedAt = now
 
