@@ -1,0 +1,1 @@
+ALTER TABLE invoices ADD COLUMN purchase_order TEXT NOT NULL DEFAULT '';

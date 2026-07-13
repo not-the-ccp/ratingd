@@ -16,16 +16,17 @@ type Invoice struct {
 	// DueAt is stored in UTC.
 	DueAt time.Time `json:"due_at"`
 	// IssuedAt is stored in UTC.
-	IssuedAt   time.Time     `json:"issued_at"`
-	IssuedOn   *time.Time    `json:"issued_on"`
-	Number     string        `json:"number"`
-	NetAmount  money.Amount  `json:"net_amount"`
-	VoidedAt   *time.Time    `json:"voided_at"`
-	CustomerID int64         `json:"customer_id"`
-	Status     InvoiceStatus `json:"status"`
-	PaidAt     *time.Time    `json:"paid_at"`
-	CreatedAt  time.Time     `json:"created_at"`
-	UpdatedAt  time.Time     `json:"updated_at"`
+	IssuedAt      time.Time     `json:"issued_at"`
+	IssuedOn      *time.Time    `json:"issued_on"`
+	Number        string        `json:"number"`
+	NetAmount     money.Amount  `json:"net_amount"`
+	VoidedAt      *time.Time    `json:"voided_at"`
+	CustomerID    int64         `json:"customer_id"`
+	Status        InvoiceStatus `json:"status"`
+	PaidAt        *time.Time    `json:"paid_at"`
+	PurchaseOrder string        `json:"purchase_order"`
+	CreatedAt     time.Time     `json:"created_at"`
+	UpdatedAt     time.Time     `json:"updated_at"`
 }
 
 type InvoiceStatus string
