@@ -12,22 +12,23 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-// UpdateNotice implements Store.
-func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE notices SET resolved_at = $2, invoice_id = $3, fee_amount = $4, sent_at = $5, level = $6, status = $7, dispatched_at = $8, updated_at = $9 WHERE id = $1`, notice.ID, notice.ResolvedAt, notice.InvoiceID, notice.FeeAmount, notice.SentAt, notice.Level, notice.Status, notice.DispatchedAt, notice.UpdatedAt)
+// ListNoticesByStatus implements Store.
+func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
-		return fmt.Errorf("could not update notice: %w", err)
+		return nil, fmt.Errorf("could not list notices: %w", err)
 	}
+	defer rows.Close()
 
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
+	var notices []*Notice
+	for rows.Next() {
+		var notice Notice
+		if err := rows.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("could not scan notice: %w", err)
+		}
+		notices = append(notices, &notice)
 	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return notices, rows.Err()
 }
 
 func NewSQLStore(db *sql.DB) *SQLStore {
@@ -65,23 +66,22 @@ func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*N
 	return notices, rows.Err()
 }
 
-// ListNoticesByStatus implements Store.
-func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
+// UpdateNotice implements Store.
+func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE notices SET resolved_at = $2, invoice_id = $3, fee_amount = $4, sent_at = $5, level = $6, status = $7, dispatched_at = $8, updated_at = $9 WHERE id = $1`, notice.ID, notice.ResolvedAt, notice.InvoiceID, notice.FeeAmount, notice.SentAt, notice.Level, notice.Status, notice.DispatchedAt, notice.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("could not list notices: %w", err)
+		return fmt.Errorf("could not update notice: %w", err)
 	}
-	defer rows.Close()
 
-	var notices []*Notice
-	for rows.Next() {
-		var notice Notice
-		if err := rows.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("could not scan notice: %w", err)
-		}
-		notices = append(notices, &notice)
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
 	}
-	return notices, rows.Err()
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) InsertNotice(ctx context.Context, notice *Notice) error {

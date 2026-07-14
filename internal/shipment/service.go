@@ -150,6 +150,7 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	}
 
 	now := s.clock.Now()
+
 	updateShipmentStatus(now, shipment)
 	if err := s.store.UpdateShipment(ctx, shipment); err != nil {
 		return nil, fmt.Errorf("cannot update shipment: %w", err)
