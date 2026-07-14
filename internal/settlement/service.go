@@ -80,7 +80,7 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 
 // ListSettlements performs the list settlements step.
 func (s *Service) ListSettlements(ctx context.Context, limit int, offset int) ([]*Settlement, error) {
-	if limit <= 0 || limit > 100 {
+	if limit <= 0 || limit > 500 {
 		limit = 100
 	}
 
