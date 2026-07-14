@@ -10,6 +10,7 @@ import (
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
 	"git.tarven.internal/billing/ratingd/internal/platform/logging"
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
+	"git.tarven.internal/billing/ratingd/internal/shipment"
 )
 
 // Service implements the invoice use cases.
@@ -19,16 +20,18 @@ type Service struct {
 	audit     audit.Recorder
 	log       logging.Logger
 	customers CustomerService
+	shipments ShipmentService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, customerSvc CustomerService) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, customerSvc CustomerService, shipmentSvc ShipmentService) *Service {
 	return &Service{
 		store:     store,
 		clock:     clk,
 		audit:     rec,
 		log:       logger,
 		customers: customerSvc,
+		shipments: shipmentSvc,
 	}
 }
 
@@ -228,6 +231,14 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch invoice line %d: %w", id, err)
 	}
+	ship, err := s.shipments.GetShipment(ctx, line.ShipmentID)
+	if err != nil {
+		return nil, fmt.Errorf("load shipment %d: %w", line.ShipmentID, err)
+	}
+	if ship.Status == shipment.ShipmentStatusCancelled {
+		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
+	}
+
 	return line, nil
 }
 
@@ -410,4 +421,8 @@ func sumTotal(notes []*CreditNote) money.Amount {
 		total = total.Add(note.Amount)
 	}
 	return total
+}
+
+type ShipmentService interface {
+	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }

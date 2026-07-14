@@ -36,7 +36,7 @@ func distanceFactor(km float64) float64 {
 
 func weightFactor(kg float64) float64 {
 	switch {
-	case kg < 50:
+	case kg < 250:
 		return 1.88
 	case kg < 100:
 		return 1.74

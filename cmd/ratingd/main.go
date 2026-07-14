@@ -52,7 +52,7 @@ func main() {
 	ratingSvc := rating.NewService(rating.NewSQLStore(db), clk, rec, logger, shipmentSvc)
 	rating.NewHandler(ratingSvc).Routes(mux)
 
-	invoiceSvc := invoice.NewService(invoice.NewSQLStore(db), clk, rec, logger, customerSvc)
+	invoiceSvc := invoice.NewService(invoice.NewSQLStore(db), clk, rec, logger, customerSvc, shipmentSvc)
 	invoice.NewHandler(invoiceSvc).Routes(mux)
 
 	settlementSvc := settlement.NewService(settlement.NewSQLStore(db), clk, rec, logger, shipmentSvc, carrierSvc)
