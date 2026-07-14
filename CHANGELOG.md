@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.2
+
+- add purchase order to invoice
+- docs
+- update GetInvoiceLine to check shipment
+- update limit in SeasonFactor
+
 ## 1.6.1
 
 - OPS-1536 bump deps
