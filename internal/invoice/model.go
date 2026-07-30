@@ -25,6 +25,7 @@ type Invoice struct {
 	Status        InvoiceStatus `json:"status"`
 	PaidAt        *time.Time    `json:"paid_at"`
 	PurchaseOrder string        `json:"purchase_order"`
+	ExchangeRate  float64       `json:"exchange_rate"`
 	CreatedAt     time.Time     `json:"created_at"`
 	UpdatedAt     time.Time     `json:"updated_at"`
 }

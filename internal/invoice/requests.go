@@ -16,6 +16,7 @@ type CreateInvoiceRequest struct {
 	NetAmount     money.Amount `json:"net_amount"`
 	TaxAmount     money.Amount `json:"tax_amount"`
 	PurchaseOrder string       `json:"purchase_order"`
+	ExchangeRate  float64      `json:"exchange_rate"`
 }
 
 type InvoiceResponse struct {
@@ -34,6 +35,7 @@ type InvoiceResponse struct {
 	CreatedAt     time.Time     `json:"created_at"`
 	UpdatedAt     time.Time     `json:"updated_at"`
 	PurchaseOrder string        `json:"purchase_order"`
+	ExchangeRate  float64       `json:"exchange_rate"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -64,6 +66,7 @@ func toInvoiceResponse(invoice *Invoice) InvoiceResponse {
 		CreatedAt:     invoice.CreatedAt,
 		UpdatedAt:     invoice.UpdatedAt,
 		PurchaseOrder: invoice.PurchaseOrder,
+		ExchangeRate:  invoice.ExchangeRate,
 	}
 }
 
