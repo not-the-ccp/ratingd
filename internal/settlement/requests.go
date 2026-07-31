@@ -14,6 +14,7 @@ type CreateSettlementRequest struct {
 	GrossAmount      money.Amount `json:"gross_amount"`
 	Deductions       money.Amount `json:"deductions"`
 	RetentionPercent float64      `json:"retention_percent"`
+	Remark           string       `json:"remark"`
 }
 
 type SettlementResponse struct {
@@ -29,6 +30,7 @@ type SettlementResponse struct {
 	CreatedAt        time.Time        `json:"created_at"`
 	UpdatedAt        time.Time        `json:"updated_at"`
 	RetentionPercent float64          `json:"retention_percent"`
+	Remark           string           `json:"remark"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -59,6 +61,7 @@ func toSettlementResponse(settlement *Settlement) SettlementResponse {
 		CreatedAt:        settlement.CreatedAt,
 		UpdatedAt:        settlement.UpdatedAt,
 		RetentionPercent: settlement.RetentionPercent,
+		Remark:           settlement.Remark,
 	}
 }
 

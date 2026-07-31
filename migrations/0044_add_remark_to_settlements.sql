@@ -1,0 +1,1 @@
+ALTER TABLE settlements ADD COLUMN remark TEXT NOT NULL DEFAULT '';

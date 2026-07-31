@@ -18,6 +18,7 @@ type Settlement struct {
 	PeriodStart      time.Time        `json:"period_start"`
 	ReleasedAt       *time.Time       `json:"released_at"`
 	RetentionPercent float64          `json:"retention_percent"`
+	Remark           string           `json:"remark"`
 	CreatedAt        time.Time        `json:"created_at"`
 	UpdatedAt        time.Time        `json:"updated_at"`
 }

@@ -65,6 +65,7 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 		PeriodEnd:        req.PeriodEnd,
 		Deductions:       req.Deductions,
 		RetentionPercent: req.RetentionPercent,
+		Remark:           req.Remark,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}
