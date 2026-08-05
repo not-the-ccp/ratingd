@@ -237,6 +237,7 @@ func sumTotal(items []*SettlementItem) money.Amount {
 
 // ProcessOpenSettlements applies review to every open settlement and reports how many succeeded.
 func (s *Service) ProcessOpenSettlements(ctx context.Context) (int, error) {
+	// TODO(mw): Limit in die Config
 	pending, err := s.store.ListSettlementsByStatus(ctx, SettlementStatusOpen)
 	if err != nil {
 		return 0, fmt.Errorf("query open settlements: %w", err)
