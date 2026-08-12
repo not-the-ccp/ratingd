@@ -1,7 +1,9 @@
 package invoice
 
 import (
+	"fmt"
 	"sort"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -82,4 +84,21 @@ func sortInvoicesByDueAt(items []*Invoice) {
 	sort.Slice(items, func(i int, j int) bool {
 		return items[i].DueAt.Before(items[j].DueAt)
 	})
+}
+
+// ParseInvoiceStatus converts a raw status string, ignoring case and surrounding space.
+func ParseInvoiceStatus(s string) (InvoiceStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "draft":
+		return InvoiceStatusDraft, nil
+	case "issued":
+		return InvoiceStatusIssued, nil
+	case "paid":
+		return InvoiceStatusPaid, nil
+	case "voided":
+		return InvoiceStatusVoided, nil
+	default:
+		return "", fmt.Errorf("unknown invoice status %q", s)
+	}
 }
