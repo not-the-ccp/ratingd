@@ -3,7 +3,6 @@ package shipment
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/customer"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
@@ -163,12 +162,6 @@ func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, err
 	return shipment, nil
 }
 
-func updateShipmentStatus(now time.Time, shipment *Shipment) {
-	shipment.Status = ShipmentStatusDelivered
-	shipment.DeliveredAt = &now
-	shipment.UpdatedAt = now
-}
-
 // GetTrackingEvent performs the get tracking event step.
 func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
 	if id <= 0 {
@@ -220,47 +213,8 @@ func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int)
 	return trackingEvent, nil
 }
 
-// ProcessBookedShipments applies pickup to every booked shipment and reports how many succeeded.
-func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
-	open, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusBooked)
-	if err != nil {
-		return 0, fmt.Errorf("cannot list booked shipments: %w", err)
-	}
-
-	processed := 0
-	for _, shipment := range open {
-		_, err := s.PickupShipment(ctx, shipment.ID)
-		if err != nil {
-			s.log.Error("pickup shipment failed", "id", shipment.ID, "error", err)
-			continue
-		}
-		processed++
-	}
-	return processed, nil
-}
-
 type CustomerService interface {
 	GetCustomer(ctx context.Context, id int64) (*customer.Customer, error)
-}
-
-// ProcessPickedUpShipments applies deliver to every picked up shipment and reports how many succeeded.
-func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
-	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
-
-	if err != nil {
-		return 0, fmt.Errorf("cannot query picked up shipments: %w", err)
-	}
-
-	processed := 0
-	for _, shipment := range pending {
-		_, err := s.DeliverShipment(ctx, shipment.ID)
-		if err != nil {
-			s.log.Error("deliver shipment failed", "id", shipment.ID, "err", err)
-			continue
-		}
-		processed++
-	}
-	return processed, nil
 }
 
 // ProcessPickedUpShipmentsGross handles the process picked up shipments gross step.
