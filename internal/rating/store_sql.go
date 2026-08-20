@@ -122,27 +122,6 @@ func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([
 	return surcharges, rows.Err()
 }
 
-func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET code = $2, quote_id = $3, description = $4, amount = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.UpdatedAt)
-	if err != nil {
-		return err
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
-}
-
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
-}
-
 // ListSurchargesForQuote implements Store.
 func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([]*Surcharge, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, code, quote_id, description, amount, created_at, updated_at FROM surcharges WHERE quote_id = $1 ORDER BY id`, quoteID)
@@ -160,4 +139,25 @@ func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([
 		surcharges = append(surcharges, &surcharge)
 	}
 	return surcharges, rows.Err()
+}
+
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
+}
+
+func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE surcharges SET code = $2, quote_id = $3, description = $4, amount = $5, updated_at = $6 WHERE id = $1`, surcharge.ID, surcharge.ShortCode, surcharge.QuoteID, surcharge.Description, surcharge.Amount, surcharge.UpdatedAt)
+	if err != nil {
+		return err
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }

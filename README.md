@@ -29,3 +29,7 @@ Ask in #billing-dev if you need access to staging.
 ## Testing
 
 Run `make test`. Integration tests need a local Postgres.
+
+## Local setup
+
+Copy `.env.example` and start Postgres with `docker compose up -d`.
