@@ -59,6 +59,7 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 		Currency:     req.Currency,
 		ValidTo:      req.ValidTo,
 		BaseZone:     req.BaseZone,
+		Region:       req.Region,
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}

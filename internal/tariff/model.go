@@ -18,6 +18,7 @@ type Tariff struct {
 	RoundingMode string    `json:"rounding_mode"`
 	BaseZone     string    `json:"base_zone"`
 	ValidFrom    time.Time `json:"valid_from"`
+	Region       string    `json:"region"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
 }
