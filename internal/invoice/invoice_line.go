@@ -33,3 +33,11 @@ func (i *InvoiceLine) HasAmount() bool {
 func (i *InvoiceLine) HasDiscountAmount() bool {
 	return i.DiscountAmount > 0
 }
+
+func groupInvoiceLinesByInvoice(items []*InvoiceLine) map[int64][]*InvoiceLine {
+	out := make(map[int64][]*InvoiceLine, len(items))
+	for _, item := range items {
+		out[item.InvoiceID] = append(out[item.InvoiceID], item)
+	}
+	return out
+}

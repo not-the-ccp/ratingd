@@ -8,22 +8,22 @@ import (
 
 // Quote is a quote record.
 type Quote struct {
-	ID           int64        `json:"id"`
-	ShipmentID   int64        `json:"shipment_id"`
-	TollAmount   money.Amount `json:"toll_amount"`
-	AcceptedAt   *time.Time   `json:"accepted_at"`
-	SupersededAt *time.Time   `json:"superseded_at"`
-	ExpiresAt    time.Time    `json:"expires_at"`
-	// NetAmount is in minor units.
-	NetAmount  money.Amount `json:"net_amount"`
-	Status     QuoteStatus  `json:"status"`
-	FuelAmount money.Amount `json:"fuel_amount"`
-	// Currency is the currency.
-	Currency       string       `json:"currency"`
-	ContractID     int64        `json:"contract_id"`
+	ID             int64        `json:"id"`
+	ExpiresAt      time.Time    `json:"expires_at"`
+	AcceptedAt     *time.Time   `json:"accepted_at"`
 	DiscountAmount money.Amount `json:"discount_amount"`
-	CreatedAt      time.Time    `json:"created_at"`
-	UpdatedAt      time.Time    `json:"updated_at"`
+	// NetAmount is in minor units.
+	NetAmount    money.Amount `json:"net_amount"`
+	Status       QuoteStatus  `json:"status"`
+	SupersededAt *time.Time   `json:"superseded_at"`
+	TollAmount   money.Amount `json:"toll_amount"`
+	ShipmentID   int64        `json:"shipment_id"`
+	FuelAmount   money.Amount `json:"fuel_amount"`
+	ContractID   int64        `json:"contract_id"`
+	// Currency is the currency.
+	Currency  string    `json:"currency"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 type QuoteStatus string

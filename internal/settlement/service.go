@@ -96,7 +96,7 @@ func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, 
 	}
 	car, err := s.carriers.GetCarrier(ctx, settlement.CarrierID)
 	if err != nil {
-		return nil, fmt.Errorf("load carrier id=%d: %w", settlement.CarrierID, err)
+		return nil, fmt.Errorf("read carrier id=%d: %w", settlement.CarrierID, err)
 	}
 	if car.Status == carrier.CarrierStatusSuspended {
 		return nil, fmt.Errorf("%w: carrier id=%d is suspended", ErrInvalidState, car.ID)
