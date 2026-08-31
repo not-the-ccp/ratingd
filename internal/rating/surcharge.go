@@ -13,6 +13,7 @@ type Surcharge struct {
 	QuoteID     int64        `json:"quote_id"`
 	Description string       `json:"description"`
 	Amount      money.Amount `json:"amount"`
+	Reason      string       `json:"reason"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }

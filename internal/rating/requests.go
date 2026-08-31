@@ -79,6 +79,7 @@ type CreateSurchargeRequest struct {
 	Code        string       `json:"code"`
 	Description string       `json:"description"`
 	Amount      money.Amount `json:"amount"`
+	Reason      string       `json:"reason"`
 }
 
 type SurchargeResponse struct {
@@ -89,6 +90,7 @@ type SurchargeResponse struct {
 	Amount      money.Amount `json:"amount"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
+	Reason      string       `json:"reason"`
 }
 
 func (r *CreateSurchargeRequest) Validate() error {
@@ -116,5 +118,6 @@ func toSurchargeResponse(surcharge *Surcharge) SurchargeResponse {
 		Amount:      surcharge.Amount,
 		CreatedAt:   surcharge.CreatedAt,
 		UpdatedAt:   surcharge.UpdatedAt,
+		Reason:      surcharge.Reason,
 	}
 }

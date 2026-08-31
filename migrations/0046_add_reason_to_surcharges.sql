@@ -1,0 +1,1 @@
+ALTER TABLE surcharges ADD COLUMN reason TEXT NOT NULL DEFAULT '';

@@ -155,6 +155,7 @@ func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeReque
 		ShortCode:   req.Code,
 		Description: req.Description,
 		Amount:      req.Amount,
+		Reason:      req.Reason,
 		CreatedAt:   now,
 		UpdatedAt:   now,
 	}
