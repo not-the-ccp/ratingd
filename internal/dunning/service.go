@@ -41,6 +41,13 @@ func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not get notice: %w", err)
 	}
+	inv, err := s.invoices.GetInvoice(ctx, notice.InvoiceID)
+	if err != nil {
+		return nil, fmt.Errorf("load invoice %d: %w", notice.InvoiceID, err)
+	}
+	if inv.Status == invoice.InvoiceStatusVoided {
+		return nil, fmt.Errorf("%w: invoice %d is voided", ErrInvalidState, inv.ID)
+	}
 
 	return notice, nil
 }
