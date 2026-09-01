@@ -37,3 +37,7 @@ Copy `.env.example` and start Postgres with `docker compose up -d`.
 ## Local setup
 
 Copy `.env.example` and start Postgres with `docker compose up -d`.
+
+## Local setup
+
+Copy `.env.example` and start Postgres with `docker compose up -d`.

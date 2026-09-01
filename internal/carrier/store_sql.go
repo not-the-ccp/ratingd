@@ -23,22 +23,22 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET insurance_valid_until = $2, approved_at = $3, fleet_size = $4, payment_term_days = $5, code = $6, country = $7, vat_number = $8, status = $9, iban = $10, suspended_at = $11, name = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.InsuranceValidUntil, carrier.ApprovedAt, carrier.FleetSize, carrier.PaymentTermDays, carrier.ShortCode, carrier.Country, carrier.VATNumber, carrier.Status, carrier.IBAN, carrier.SuspendedAt, carrier.DisplayName, carrier.UpdatedAt)
+func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, insurance_valid_until, approved_at, fleet_size, payment_term_days, code, country, vat_number, status, iban, suspended_at, name, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
-		return fmt.Errorf("update carrier: %w", err)
+		return nil, fmt.Errorf("list carriers: %w", err)
 	}
+	defer rows.Close()
 
-	// rows affected, errors are passed up unchanged
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("rows affected: %w", err)
+	var carriers []*Carrier
+	for rows.Next() {
+		var carrier Carrier
+		if err := rows.Scan(&carrier.ID, &carrier.InsuranceValidUntil, &carrier.ApprovedAt, &carrier.FleetSize, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.Country, &carrier.VATNumber, &carrier.Status, &carrier.IBAN, &carrier.SuspendedAt, &carrier.DisplayName, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("scan carrier: %w", err)
+		}
+		carriers = append(carriers, &carrier)
 	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return carriers, rows.Err()
 }
 
 func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
@@ -59,22 +59,22 @@ func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*
 	return carriers, rows.Err()
 }
 
-func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, insurance_valid_until, approved_at, fleet_size, payment_term_days, code, country, vat_number, status, iban, suspended_at, name, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
+func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET insurance_valid_until = $2, approved_at = $3, fleet_size = $4, payment_term_days = $5, code = $6, country = $7, vat_number = $8, status = $9, iban = $10, suspended_at = $11, name = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.InsuranceValidUntil, carrier.ApprovedAt, carrier.FleetSize, carrier.PaymentTermDays, carrier.ShortCode, carrier.Country, carrier.VATNumber, carrier.Status, carrier.IBAN, carrier.SuspendedAt, carrier.DisplayName, carrier.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("list carriers: %w", err)
+		return fmt.Errorf("update carrier: %w", err)
 	}
-	defer rows.Close()
 
-	var carriers []*Carrier
-	for rows.Next() {
-		var carrier Carrier
-		if err := rows.Scan(&carrier.ID, &carrier.InsuranceValidUntil, &carrier.ApprovedAt, &carrier.FleetSize, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.Country, &carrier.VATNumber, &carrier.Status, &carrier.IBAN, &carrier.SuspendedAt, &carrier.DisplayName, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("scan carrier: %w", err)
-		}
-		carriers = append(carriers, &carrier)
+	// rows affected, errors are passed up unchanged
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("rows affected: %w", err)
 	}
-	return carriers, rows.Err()
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // FindCarrier implements Store.
