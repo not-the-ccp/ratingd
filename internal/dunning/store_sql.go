@@ -35,19 +35,6 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-// FindNotice implements Store.
-func (s *SQLStore) FindNotice(ctx context.Context, id int64) (*Notice, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE id = $1`, id)
-	var notice Notice
-	if err := row.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("could not query notice %d: %w", id, err)
-	}
-	return &notice, nil
-}
-
 func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*Notice, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
@@ -64,6 +51,19 @@ func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*N
 		notices = append(notices, &notice)
 	}
 	return notices, rows.Err()
+}
+
+// FindNotice implements Store.
+func (s *SQLStore) FindNotice(ctx context.Context, id int64) (*Notice, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE id = $1`, id)
+	var notice Notice
+	if err := row.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("could not query notice %d: %w", id, err)
+	}
+	return &notice, nil
 }
 
 // UpdateNotice implements Store.
