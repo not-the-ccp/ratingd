@@ -23,7 +23,6 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/quotes", h.listQuotes)
 	mux.HandleFunc("/api/v1/quote/accept", h.acceptQuote)
 	mux.HandleFunc("/api/v1/surcharge", h.getSurcharge)
-	mux.HandleFunc("/api/v1/surcharge/create", h.createSurcharge)
 }
 
 func writeError(w http.ResponseWriter, err error) {
@@ -111,20 +110,4 @@ func (h *Handler) getSurcharge(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	httpx.JSON(w, http.StatusOK, toSurchargeResponse(surcharge))
-}
-
-func (h *Handler) createSurcharge(w http.ResponseWriter, r *http.Request) {
-	var req CreateSurchargeRequest
-	if err := httpx.Decode(r, &req); err != nil {
-		httpx.Error(w, http.StatusBadRequest, err)
-		return
-	}
-
-	surcharge, err := h.svc.CreateSurcharge(r.Context(), &req)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-
-	httpx.JSON(w, http.StatusCreated, toSurchargeResponse(surcharge))
 }
