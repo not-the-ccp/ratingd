@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.7.0
+
+- update GetNotice to check invoice
+- store reason on surcharge
+- add setup notes
+- docs
+
 ## 1.6.2
 
 - add purchase order to invoice

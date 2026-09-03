@@ -224,22 +224,6 @@ func (s *SQLStore) LoadInvoiceLine(ctx context.Context, id int64) (*InvoiceLine,
 	return &line, nil
 }
 
-func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE invoices SET currency = $2, tax_amount = $3, due_at = $4, issued_at = $5, issued_on = $6, number = $7, net_amount = $8, voided_at = $9, customer_id = $10, status = $11, paid_at = $12, purchase_order = $13, exchange_rate = $14, updated_at = $15 WHERE id = $1`, invoice.ID, invoice.Currency, invoice.TaxAmount, invoice.DueAt, invoice.IssuedAt, invoice.IssuedOn, invoice.Number, invoice.NetAmount, invoice.VoidedAt, invoice.CustomerID, invoice.Status, invoice.PaidAt, invoice.PurchaseOrder, invoice.ExchangeRate, invoice.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("could not update invoice: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("could not rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
-}
-
 func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error {
 	res, err := s.db.ExecContext(ctx, `UPDATE credit_notes SET applied_at = $2, invoice_id = $3, amount = $4, number = $5, reason = $6, status = $7, updated_at = $8 WHERE id = $1`, note.ID, note.AppliedAt, note.InvoiceID, note.Amount, note.Number, note.Reason, note.Status, note.UpdatedAt)
 	if err != nil {
@@ -251,6 +235,22 @@ func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error
 		return fmt.Errorf("could not rows affected: %w", err)
 	}
 
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
+}
+
+func (s *SQLStore) UpdateInvoice(ctx context.Context, invoice *Invoice) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE invoices SET currency = $2, tax_amount = $3, due_at = $4, issued_at = $5, issued_on = $6, number = $7, net_amount = $8, voided_at = $9, customer_id = $10, status = $11, paid_at = $12, purchase_order = $13, exchange_rate = $14, updated_at = $15 WHERE id = $1`, invoice.ID, invoice.Currency, invoice.TaxAmount, invoice.DueAt, invoice.IssuedAt, invoice.IssuedOn, invoice.Number, invoice.NetAmount, invoice.VoidedAt, invoice.CustomerID, invoice.Status, invoice.PaidAt, invoice.PurchaseOrder, invoice.ExchangeRate, invoice.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("could not update invoice: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("could not rows affected: %w", err)
+	}
 	if rows == 0 {
 		return ErrNotFound
 	}
