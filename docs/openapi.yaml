@@ -682,22 +682,22 @@ components:
       properties:
         id:
           type: number
-        attention:
-          type: string
-        customer_id:
-          type: number
-        city:
-          type: string
-        zip:
-          type: string
         country:
           type: string
         region:
           type: string
-        primary:
-          type: number
         street:
           type: string
+        zip:
+          type: string
+        city:
+          type: string
+        primary:
+          type: number
+        attention:
+          type: string
+        customer_id:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -758,6 +758,8 @@ components:
           type: string
         valid_from:
           type: number
+        region:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -842,36 +844,36 @@ components:
       properties:
         id:
           type: number
-        origin_zip:
-          type: string
-        pallets:
+        loading_meters:
           type: number
-        pickup_at:
-          type: number
-        picked_up_at:
-          type: number
-        origin_country:
-          type: string
-        carrier_id:
-          type: number
-        weight_kg:
-          type: number
-        destination_zip:
+        hazard_class:
           type: string
         status:
           type: string
-        loading_meters:
+        weight_kg:
           type: number
-        cancelled_at:
+        pickup_at:
           type: number
-        delivered_at:
-          type: number
-        customer_id:
+        carrier_id:
           type: number
         reference:
           type: string
-        hazard_class:
+        destination_zip:
           type: string
+        pallets:
+          type: number
+        delivered_at:
+          type: number
+        origin_country:
+          type: string
+        customer_id:
+          type: number
+        cancelled_at:
+          type: number
+        origin_zip:
+          type: string
+        picked_up_at:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -883,10 +885,10 @@ components:
           type: number
         code:
           type: string
-        location:
-          type: string
         shipment_id:
           type: number
+        location:
+          type: string
         occurred_at:
           type: number
         source:
@@ -900,27 +902,27 @@ components:
       properties:
         id:
           type: number
-        shipment_id:
-          type: number
-        toll_amount:
-          type: number
-        accepted_at:
-          type: number
-        superseded_at:
+        discount_amount:
           type: number
         expires_at:
           type: number
-        net_amount:
-          type: number
-        status:
-          type: string
         fuel_amount:
+          type: number
+        superseded_at:
           type: number
         currency:
           type: string
+        status:
+          type: string
+        accepted_at:
+          type: number
         contract_id:
           type: number
-        discount_amount:
+        toll_amount:
+          type: number
+        shipment_id:
+          type: number
+        net_amount:
           type: number
         created_at:
           type: number
@@ -939,6 +941,8 @@ components:
           type: string
         amount:
           type: number
+        reason:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -972,6 +976,8 @@ components:
           type: number
         purchase_order:
           type: string
+        exchange_rate:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -981,19 +987,19 @@ components:
       properties:
         id:
           type: number
-        invoice_id:
-          type: number
-        description:
-          type: string
-        quantity:
-          type: number
-        amount:
-          type: number
         discount_amount:
           type: number
         unit_price:
           type: number
+        description:
+          type: string
+        invoice_id:
+          type: number
+        quantity:
+          type: number
         shipment_id:
+          type: number
+        amount:
           type: number
         created_at:
           type: number
@@ -1043,6 +1049,8 @@ components:
           type: number
         retention_percent:
           type: number
+        remark:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -1054,16 +1062,16 @@ components:
           type: number
         amount:
           type: number
-        note:
-          type: string
-        settlement_id:
+        shipment_id:
           type: number
         disputed:
           type: number
-        shipment_id:
-          type: number
+        note:
+          type: string
         category:
           type: string
+        settlement_id:
+          type: number
         created_at:
           type: number
         updated_at:

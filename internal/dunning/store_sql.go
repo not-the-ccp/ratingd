@@ -12,9 +12,8 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-// ListNoticesByStatus implements Store.
-func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
+func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*Notice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("could not list notices: %w", err)
 	}
@@ -35,8 +34,9 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*Notice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+// ListNoticesByStatus implements Store.
+func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("could not list notices: %w", err)
 	}

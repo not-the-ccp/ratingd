@@ -293,6 +293,7 @@ func sumTotal(surcharges []*FuelSurcharge) money.Amount {
 
 // CalculateTariffWeightBreakTotalNet is like CalculateTariffWeightBreakTotal but only considers records for the current period.
 func (s *Service) CalculateTariffWeightBreakTotalNet(ctx context.Context, tariffID int64) (money.Amount, error) {
+	// TODO(mw): nach der Migration entfernen
 	breakEntries, err := s.store.ListWeightBreaksForTariff(ctx, tariffID)
 
 	if err != nil {
