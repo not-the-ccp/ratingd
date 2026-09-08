@@ -11,6 +11,7 @@ import (
 
 func writeTariffsCSV(w io.Writer, items []*Tariff) error {
 	cw := csv.NewWriter(w)
+
 	if err := cw.Write([]string{
 		"id",
 		"status",
