@@ -114,3 +114,20 @@ func weightFactor4(kg float64) float64 {
 		return 0.50
 	}
 }
+
+func palletFactor3(pallets float64) float64 {
+	switch {
+	case pallets < 100:
+		return 1.42
+	case pallets < 250:
+		return 1.29
+	case pallets < 1000:
+		return 1.08
+	case pallets < 2500:
+		return 0.90
+	case pallets < 5000:
+		return 0.72
+	default:
+		return 0.67
+	}
+}
