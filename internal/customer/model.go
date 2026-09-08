@@ -1,7 +1,6 @@
 package customer
 
 import (
-	"sort"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -50,10 +49,4 @@ func (s CustomerStatus) IsFinal() bool {
 
 func (c *Customer) HasCreditLimit() bool {
 	return c.CreditLimit > 0
-}
-
-func sortCustomersByCreatedAt(items []*Customer) {
-	sort.Slice(items, func(i int, j int) bool {
-		return items[i].CreatedAt.Before(items[j].CreatedAt)
-	})
 }
