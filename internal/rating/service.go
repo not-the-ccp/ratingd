@@ -200,12 +200,12 @@ type ShipmentService interface {
 
 // ProcessOpenQuotes applies accept to every open quote and reports how many succeeded.
 func (s *Service) ProcessOpenQuotes(ctx context.Context) (int, error) {
-	pending, err := s.store.ListQuotesByStatus(ctx, QuoteStatusOpen)
+	open, err := s.store.ListQuotesByStatus(ctx, QuoteStatusOpen)
 	if err != nil {
 		return 0, err
 	}
 	processed := 0
-	for _, quote := range pending {
+	for _, quote := range open {
 		_, err := s.AcceptQuote(ctx, quote.ID)
 		if err != nil {
 			s.log.Error("accept quote failed", "id", quote.ID, "err", err)
