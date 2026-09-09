@@ -14,6 +14,7 @@ type Surcharge struct {
 	Description string       `json:"description"`
 	Amount      money.Amount `json:"amount"`
 	Reason      string       `json:"reason"`
+	Taxable     bool         `json:"taxable"`
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 }

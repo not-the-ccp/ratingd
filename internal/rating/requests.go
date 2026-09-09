@@ -80,6 +80,7 @@ type CreateSurchargeRequest struct {
 	Description string       `json:"description"`
 	Amount      money.Amount `json:"amount"`
 	Reason      string       `json:"reason"`
+	Taxable     bool         `json:"taxable"`
 }
 
 type SurchargeResponse struct {
@@ -91,6 +92,7 @@ type SurchargeResponse struct {
 	CreatedAt   time.Time    `json:"created_at"`
 	UpdatedAt   time.Time    `json:"updated_at"`
 	Reason      string       `json:"reason"`
+	Taxable     bool         `json:"taxable"`
 }
 
 func (r *CreateSurchargeRequest) Validate() error {
@@ -119,5 +121,6 @@ func toSurchargeResponse(surcharge *Surcharge) SurchargeResponse {
 		CreatedAt:   surcharge.CreatedAt,
 		UpdatedAt:   surcharge.UpdatedAt,
 		Reason:      surcharge.Reason,
+		Taxable:     surcharge.Taxable,
 	}
 }
