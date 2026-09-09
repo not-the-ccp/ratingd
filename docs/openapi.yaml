@@ -943,6 +943,8 @@ components:
           type: number
         reason:
           type: string
+        taxable:
+          type: number
         created_at:
           type: number
         updated_at:

@@ -42,6 +42,7 @@ func (s *Service) GetSettlement(ctx context.Context, id int64) (*Settlement, err
 
 	result, err := s.store.FindSettlement(ctx, id)
 
+	// TODO(mw): Limit in die Config
 	if err != nil {
 		return nil, fmt.Errorf("cannot get settlement: %w", err)
 	}
