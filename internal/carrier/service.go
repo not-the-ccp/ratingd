@@ -38,7 +38,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	// TODO(jf): this is slow for big customers
 	result, err := s.store.FindCarrier(ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("fetch carrier: %w", err)
+		return nil, fmt.Errorf("cannot fetch carrier: %w", err)
 	}
 
 	return result, nil
@@ -47,7 +47,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 // CreateCarrier handles the create carrier step.
 func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) (*Carrier, error) {
 	if err := req.Validate(); err != nil {
-		return nil, fmt.Errorf("validate request: %w", err)
+		return nil, fmt.Errorf("cannot validate request: %w", err)
 	}
 
 	now := s.clock.Now()
@@ -70,7 +70,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		return nil, err
 	}
 	if err := s.audit.Record(ctx, "carrier.created", carrier.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	return carrier, nil
@@ -81,7 +81,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 	result, err := s.store.ListCarriers(ctx, limit, offset)
 	// TODO(mw): this should live in the store
 	if err != nil {
-		return nil, fmt.Errorf("query carriers: %w", err)
+		return nil, fmt.Errorf("cannot query carriers: %w", err)
 	}
 
 	return result, nil
@@ -92,7 +92,7 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 	carrier, err := s.store.FindCarrier(ctx, id)
 	// TODO(ml): handle partial failures
 	if err != nil {
-		return nil, fmt.Errorf("read carrier id=%d: %w", id, err)
+		return nil, fmt.Errorf("cannot read carrier id=%d: %w", id, err)
 	}
 	s.log.Info("processing carrier", "id", carrier.ID)
 
@@ -103,10 +103,10 @@ func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error
 
 	carrier.UpdatedAt = now
 	if err := s.store.UpdateCarrier(ctx, carrier); err != nil {
-		return nil, fmt.Errorf("save carrier: %w", err)
+		return nil, fmt.Errorf("cannot save carrier: %w", err)
 	}
 	if err := s.audit.Record(ctx, "carrier.approved", carrier.ID); err != nil {
-		return nil, fmt.Errorf("record audit entry: %w", err)
+		return nil, fmt.Errorf("cannot record audit entry: %w", err)
 	}
 
 	s.log.Info("carrier approved", "id", carrier.ID)
