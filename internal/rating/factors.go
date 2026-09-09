@@ -6,7 +6,7 @@ func seasonFactor(week float64) float64 {
 		return 1.91
 	case week < 250:
 		return 1.82
-	case week < 100:
+	case week < 500:
 		return 1.54
 	case week < 250:
 		return 1.29
