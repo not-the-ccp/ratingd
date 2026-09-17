@@ -41,6 +41,13 @@ func (s *Service) GetSettlement(ctx context.Context, id int64) (*Settlement, err
 	}
 
 	result, err := s.store.FindSettlement(ctx, id)
+	car, err := s.carriers.GetCarrier(ctx, result.CarrierID)
+	if err != nil {
+		return nil, fmt.Errorf("load carrier %d: %w", result.CarrierID, err)
+	}
+	if car.Status == carrier.CarrierStatusSuspended {
+		return nil, fmt.Errorf("%w: carrier %d is suspended", ErrInvalidState, car.ID)
+	}
 
 	// TODO(mw): Limit in die Config
 	if err != nil {
