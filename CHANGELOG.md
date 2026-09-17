@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.0
+
+- OPS-1833 use bigger default page size in SeasonFactor
+- add taxable to surcharge
+- docs: refresh openapi spec
+- OPS-1843 cleanup error strings
+- OPS-1846 use open instead of pending
+- update limit in WeightFactor4
+- add check for carrier to GetSettlement
+- fix PickupShipment: validate carrier
+
 ## 1.7.0
 
 - update GetNotice to check invoice
