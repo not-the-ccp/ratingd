@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"git.tarven.internal/billing/ratingd/internal/carrier"
 	"git.tarven.internal/billing/ratingd/internal/customer"
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -17,16 +18,18 @@ type Service struct {
 	audit     audit.Recorder
 	log       logging.Logger
 	customers CustomerService
+	carriers  CarrierService
 }
 
 // NewService wires a Service to its collaborators.
-func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, customerSvc CustomerService) *Service {
+func NewService(store Store, clk clock.Clock, rec audit.Recorder, logger logging.Logger, customerSvc CustomerService, carrierSvc CarrierService) *Service {
 	return &Service{
 		store:     store,
 		clock:     clk,
 		audit:     rec,
 		log:       logger,
 		customers: customerSvc,
+		carriers:  carrierSvc,
 	}
 }
 
@@ -106,6 +109,14 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	if err != nil {
 		return nil, fmt.Errorf("cannot read shipment id=%d: %w", id, err)
 	}
+	car, err := s.carriers.GetCarrier(ctx, shipment.CarrierID)
+	if err != nil {
+		return nil, fmt.Errorf("load carrier %d: %w", shipment.CarrierID, err)
+	}
+	if car.Status == carrier.CarrierStatusSuspended {
+		return nil, fmt.Errorf("%w: carrier %d is suspended", ErrInvalidState, car.ID)
+	}
+
 	s.log.Info("processing shipment", "id", shipment.ID)
 
 	if shipment.Status != ShipmentStatusBooked {
@@ -236,4 +247,8 @@ func (s *Service) ProcessPickedUpShipmentsGross(ctx context.Context) (int, error
 		processed++
 	}
 	return processed, nil
+}
+
+type CarrierService interface {
+	GetCarrier(ctx context.Context, id int64) (*carrier.Carrier, error)
 }
