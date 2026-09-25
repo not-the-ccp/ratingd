@@ -69,11 +69,20 @@ func (s *SQLStore) ListCreditNotes(ctx context.Context, limit int, offset int) (
 	return notes, rows.Err()
 }
 
-func (s *SQLStore) InsertInvoice(ctx context.Context, invoice *Invoice) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoices (currency, tax_amount, due_at, issued_at, issued_on, number, net_amount, voided_at, customer_id, status, paid_at, purchase_order, exchange_rate, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`, invoice.Currency, invoice.TaxAmount, invoice.DueAt, invoice.IssuedAt, invoice.IssuedOn, invoice.Number, invoice.NetAmount, invoice.VoidedAt, invoice.CustomerID, invoice.Status, invoice.PaidAt, invoice.PurchaseOrder, invoice.ExchangeRate, invoice.CreatedAt, invoice.UpdatedAt).Scan(&invoice.ID); err != nil {
-		return fmt.Errorf("could not insert invoice: %w", err)
+func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE credit_notes SET applied_at = $2, invoice_id = $3, amount = $4, number = $5, reason = $6, status = $7, updated_at = $8 WHERE id = $1`, note.ID, note.AppliedAt, note.InvoiceID, note.Amount, note.Number, note.Reason, note.Status, note.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("could not update credit note: %w", err)
 	}
 
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("could not rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
+	}
 	return nil
 }
 
@@ -224,20 +233,11 @@ func (s *SQLStore) LoadInvoiceLine(ctx context.Context, id int64) (*InvoiceLine,
 	return &line, nil
 }
 
-func (s *SQLStore) UpdateCreditNote(ctx context.Context, note *CreditNote) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE credit_notes SET applied_at = $2, invoice_id = $3, amount = $4, number = $5, reason = $6, status = $7, updated_at = $8 WHERE id = $1`, note.ID, note.AppliedAt, note.InvoiceID, note.Amount, note.Number, note.Reason, note.Status, note.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("could not update credit note: %w", err)
+func (s *SQLStore) InsertInvoice(ctx context.Context, invoice *Invoice) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO invoices (currency, tax_amount, due_at, issued_at, issued_on, number, net_amount, voided_at, customer_id, status, paid_at, purchase_order, exchange_rate, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING id`, invoice.Currency, invoice.TaxAmount, invoice.DueAt, invoice.IssuedAt, invoice.IssuedOn, invoice.Number, invoice.NetAmount, invoice.VoidedAt, invoice.CustomerID, invoice.Status, invoice.PaidAt, invoice.PurchaseOrder, invoice.ExchangeRate, invoice.CreatedAt, invoice.UpdatedAt).Scan(&invoice.ID); err != nil {
+		return fmt.Errorf("could not insert invoice: %w", err)
 	}
 
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("could not rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
 	return nil
 }
 

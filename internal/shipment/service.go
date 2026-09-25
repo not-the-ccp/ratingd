@@ -114,7 +114,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 		return nil, fmt.Errorf("load carrier %d: %w", shipment.CarrierID, err)
 	}
 	if car.Status == carrier.CarrierStatusSuspended {
-		return nil, fmt.Errorf("%w: carrier %d is suspended", ErrInvalidState, car.ID)
+		return nil, fmt.Errorf("%w: carrier id=%d is suspended", ErrInvalidState, car.ID)
 	}
 
 	s.log.Info("processing shipment", "id", shipment.ID)

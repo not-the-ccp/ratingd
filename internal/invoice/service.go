@@ -426,3 +426,21 @@ func sumTotal(notes []*CreditNote) money.Amount {
 type ShipmentService interface {
 	GetShipment(ctx context.Context, id int64) (*shipment.Shipment, error)
 }
+
+// ProcessOpenCreditNotes applies apply to every open credit note and reports how many succeeded.
+func (s *Service) ProcessOpenCreditNotes(ctx context.Context) (int, error) {
+	pending, err := s.store.ListCreditNotesByStatus(ctx, CreditNoteStatusOpen)
+	if err != nil {
+		return 0, fmt.Errorf("list open credit notes: %w", err)
+	}
+	processed := 0
+	for _, creditNote := range pending {
+		_, err := s.ApplyCreditNote(ctx, creditNote.ID)
+		if err != nil {
+			s.log.Error("apply credit note failed", "id", creditNote.ID, "err", err)
+			continue
+		}
+		processed++
+	}
+	return processed, nil
+}
