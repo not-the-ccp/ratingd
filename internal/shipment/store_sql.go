@@ -16,9 +16,20 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) InsertShipment(ctx context.Context, shipment *Shipment) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO shipments (loading_meters, hazard_class, status, weight_kg, pickup_at, carrier_id, reference, destination_zip, pallets, delivered_at, origin_country, customer_id, cancelled_at, origin_zip, picked_up_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`, shipment.LoadingMeters, shipment.HazardClass, shipment.Status, shipment.WeightKg, shipment.PickupAt, shipment.CarrierID, shipment.Reference, shipment.DestinationZip, shipment.Pallets, shipment.DeliveredAt, shipment.OriginCountry, shipment.CustomerID, shipment.CancelledAt, shipment.OriginZip, shipment.PickedUpAt, shipment.CreatedAt, shipment.UpdatedAt).Scan(&shipment.ID); err != nil {
-		return fmt.Errorf("cannot insert shipment: %w", err)
+// UpdateTrackingEvent implements Store.
+func (s *SQLStore) UpdateTrackingEvent(ctx context.Context, event *TrackingEvent) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE tracking_events SET occurred_at = $2, code = $3, source = $4, shipment_id = $5, location = $6, updated_at = $7 WHERE id = $1`, event.ID, event.OccurredAt, event.Code, event.Source, event.ShipmentID, event.Location, event.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("cannot update tracking event: %w", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot rows affected: %w", err)
+	}
+
+	if rows == 0 {
+		return ErrNotFound
 	}
 	return nil
 }
@@ -131,20 +142,9 @@ func (s *SQLStore) ListTrackingEvents(ctx context.Context, limit int, offset int
 	return events, rows.Err()
 }
 
-// UpdateTrackingEvent implements Store.
-func (s *SQLStore) UpdateTrackingEvent(ctx context.Context, event *TrackingEvent) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE tracking_events SET occurred_at = $2, code = $3, source = $4, shipment_id = $5, location = $6, updated_at = $7 WHERE id = $1`, event.ID, event.OccurredAt, event.Code, event.Source, event.ShipmentID, event.Location, event.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("cannot update tracking event: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("cannot rows affected: %w", err)
-	}
-
-	if rows == 0 {
-		return ErrNotFound
+func (s *SQLStore) InsertShipment(ctx context.Context, shipment *Shipment) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO shipments (loading_meters, hazard_class, status, weight_kg, pickup_at, carrier_id, reference, destination_zip, pallets, delivered_at, origin_country, customer_id, cancelled_at, origin_zip, picked_up_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING id`, shipment.LoadingMeters, shipment.HazardClass, shipment.Status, shipment.WeightKg, shipment.PickupAt, shipment.CarrierID, shipment.Reference, shipment.DestinationZip, shipment.Pallets, shipment.DeliveredAt, shipment.OriginCountry, shipment.CustomerID, shipment.CancelledAt, shipment.OriginZip, shipment.PickedUpAt, shipment.CreatedAt, shipment.UpdatedAt).Scan(&shipment.ID); err != nil {
+		return fmt.Errorf("cannot insert shipment: %w", err)
 	}
 	return nil
 }

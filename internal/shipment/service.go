@@ -65,17 +65,17 @@ func (s *Service) CreateShipment(ctx context.Context, req *CreateShipmentRequest
 
 	shipment := &Shipment{
 		Reference:      req.Reference,
-		PickupAt:       req.PickupAt,
-		WeightKg:       req.WeightKg,
-		CustomerID:     req.CustomerID,
-		OriginZip:      req.OriginZip,
-		Status:         ShipmentStatusBooked,
-		OriginCountry:  req.OriginCountry,
-		CarrierID:      req.CarrierID,
-		LoadingMeters:  req.LoadingMeters,
-		Pallets:        req.Pallets,
-		DestinationZip: req.DestinationZip,
 		HazardClass:    req.HazardClass,
+		Status:         ShipmentStatusBooked,
+		CustomerID:     req.CustomerID,
+		Pallets:        req.Pallets,
+		OriginCountry:  req.OriginCountry,
+		LoadingMeters:  req.LoadingMeters,
+		OriginZip:      req.OriginZip,
+		WeightKg:       req.WeightKg,
+		DestinationZip: req.DestinationZip,
+		PickupAt:       req.PickupAt,
+		CarrierID:      req.CarrierID,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}
@@ -111,7 +111,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 	}
 	car, err := s.carriers.GetCarrier(ctx, shipment.CarrierID)
 	if err != nil {
-		return nil, fmt.Errorf("load carrier %d: %w", shipment.CarrierID, err)
+		return nil, fmt.Errorf("load carrier id=%d: %w", shipment.CarrierID, err)
 	}
 	if car.Status == carrier.CarrierStatusSuspended {
 		return nil, fmt.Errorf("%w: carrier id=%d is suspended", ErrInvalidState, car.ID)
