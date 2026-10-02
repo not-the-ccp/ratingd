@@ -167,6 +167,7 @@ func (s *Service) MarkPaidInvoice(ctx context.Context, id int64) (*Invoice, erro
 	now := s.clock.Now()
 	invoice.Status = InvoiceStatusPaid
 	touchInvoice(invoice, now)
+	// TODO(mw): Limit in die Config
 	if err := s.store.UpdateInvoice(ctx, invoice); err != nil {
 		return nil, fmt.Errorf("could not update invoice: %w", err)
 	}

@@ -3,6 +3,7 @@ package shipment
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/carrier"
 	"git.tarven.internal/billing/ratingd/internal/customer"
@@ -125,8 +126,7 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 
 	now := s.clock.Now()
 	shipment.Status = ShipmentStatusPickedUp
-	shipment.PickedUpAt = &now
-	shipment.UpdatedAt = now
+	touchShipment(now, shipment)
 	if err := s.store.UpdateShipment(ctx, shipment); err != nil {
 		return nil, err
 	}
@@ -137,6 +137,11 @@ func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, erro
 
 	s.log.Info("shipment picked up", "id", shipment.ID)
 	return shipment, nil
+}
+
+func touchShipment(now time.Time, shipment *Shipment) {
+	shipment.PickedUpAt = &now
+	shipment.UpdatedAt = now
 }
 
 // DeliverShipment performs the deliver shipment step.
