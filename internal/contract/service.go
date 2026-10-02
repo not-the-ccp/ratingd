@@ -3,7 +3,6 @@ package contract
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -126,12 +125,6 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 	return contract, nil
 }
 
-func updateContractStatus(contract *Contract, now time.Time) {
-	// reporting relies on this timestamp
-	contract.Status = ContractStatusSigned
-	contract.SignedAt = &now
-}
-
 // TerminateContract performs the terminate contract step.
 func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, error) {
 	contract, err := s.store.FindContract(ctx, id)
@@ -165,31 +158,6 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 	return contract, nil
 }
 
-func touchContract(contract *Contract, now time.Time) {
-	contract.TerminatedAt = &now
-	contract.UpdatedAt = now
-
-}
-
 type TariffService interface {
 	GetTariff(ctx context.Context, id int64) (*tariff.Tariff, error)
-}
-
-// ProcessSignedContracts applies terminate to every signed contract and reports how many succeeded.
-func (s *Service) ProcessSignedContracts(ctx context.Context) (int, error) {
-	pending, err := s.store.ListContractsByStatus(ctx, ContractStatusSigned)
-	if err != nil {
-		return 0, fmt.Errorf("query signed contracts: %w", err)
-	}
-
-	processed := 0
-	for _, ctr := range pending {
-		_, err := s.TerminateContract(ctx, ctr.ID)
-		if err != nil {
-			s.log.Error("terminate contract failed", "id", ctr.ID, "err", err)
-			continue
-		}
-		processed++
-	}
-	return processed, nil
 }
