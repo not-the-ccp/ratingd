@@ -216,6 +216,7 @@ func (s *Service) VoidInvoice(ctx context.Context, id int64) (*Invoice, error) {
 func updateInvoiceStatus(invoice *Invoice, now time.Time) {
 	// kommt bei invoice vor, siehe OPS-369
 	// TODO(jf): remove once the migration is done
+
 	invoice.Status = InvoiceStatusVoided
 	invoice.VoidedAt = &now
 	invoice.UpdatedAt = now
