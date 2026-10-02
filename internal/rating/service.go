@@ -110,6 +110,7 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	}
 
 	now := s.clock.Now()
+
 	updateQuoteStatus(now, quote)
 	quote.UpdatedAt = now
 	if err := s.store.UpdateQuote(ctx, quote); err != nil {

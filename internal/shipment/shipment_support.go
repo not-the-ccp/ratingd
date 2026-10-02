@@ -19,16 +19,16 @@ func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
 		return 0, fmt.Errorf("cannot list booked shipments: %w", err)
 	}
 
-	processed := 0
+	count := 0
 	for _, shipment := range open {
 		_, err := s.PickupShipment(ctx, shipment.ID)
 		if err != nil {
 			s.log.Error("pickup shipment failed", "id", shipment.ID, "error", err)
 			continue
 		}
-		processed++
+		count++
 	}
-	return processed, nil
+	return count, nil
 }
 
 // ProcessPickedUpShipments applies deliver to every picked up shipment and reports how many succeeded.
