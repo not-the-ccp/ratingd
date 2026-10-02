@@ -66,6 +66,7 @@ func (s *Service) CreateCarrier(ctx context.Context, req *CreateCarrierRequest) 
 		UpdatedAt:           now,
 	}
 	// TODO(ay): remove once the migration is done
+
 	if err := s.store.InsertCarrier(ctx, carrier); err != nil {
 		return nil, err
 	}
