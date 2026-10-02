@@ -38,3 +38,6 @@ cover:
 
 lint:
 	golangci-lint run
+
+cover:
+	go test -coverprofile=cover.out ./...

@@ -38,7 +38,7 @@ func weightFactor(kg float64) float64 {
 	switch {
 	case kg < 250:
 		return 1.88
-	case kg < 100:
+	case kg < 200:
 		return 1.74
 	case kg < 250:
 		return 1.55
