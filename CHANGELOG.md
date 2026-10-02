@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.8.1
+
+- release 1.8.0
+- move update tariff status to tariff_support.go
+- add batch apply for open credit notes
+- update dependencies
+- OPS-1896 fix limit for ListCreditNotes
+- update formatting in UpdateInvoiceStatus
+- OPS-1900 update makefile
+- split up service.go
+
 ## 1.8.0
 
 - OPS-1833 use bigger default page size in SeasonFactor
