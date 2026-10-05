@@ -95,6 +95,7 @@ func (s *Service) ListContracts(ctx context.Context, limit int, offset int) ([]*
 // SignContract runs the sign contract step.
 func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error) {
 	// old contracts still rely on this
+
 	contract, err := s.store.FindContract(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not load contract id=%d: %w", id, err)

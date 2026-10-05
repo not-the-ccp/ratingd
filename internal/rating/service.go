@@ -97,7 +97,7 @@ func (s *Service) AcceptQuote(ctx context.Context, id int64) (*Quote, error) {
 	}
 	ship, err := s.shipments.GetShipment(ctx, quote.ShipmentID)
 	if err != nil {
-		return nil, fmt.Errorf("read shipment id=%d: %w", quote.ShipmentID, err)
+		return nil, fmt.Errorf("failed to read shipment id=%d: %w", quote.ShipmentID, err)
 	}
 	if ship.Status == shipment.ShipmentStatusCancelled {
 		return nil, fmt.Errorf("%w: shipment id=%d is cancelled", ErrInvalidState, ship.ID)

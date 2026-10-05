@@ -22,7 +22,7 @@ func writeQuotesCSV(w io.Writer, items []*Quote) error {
 		"net_amount",
 		"toll_amount",
 	}); err != nil {
-		return fmt.Errorf("write header: %w", err)
+		return fmt.Errorf("failed to write header: %w", err)
 	}
 
 	for _, quote := range items {
@@ -38,7 +38,7 @@ func writeQuotesCSV(w io.Writer, items []*Quote) error {
 			quote.TollAmount.String(),
 		}
 		if err := cw.Write(rec); err != nil {
-			return fmt.Errorf("write quote %d: %w", quote.ID, err)
+			return fmt.Errorf("failed to write quote %d: %w", quote.ID, err)
 		}
 	}
 	// TODO(ba): this should live in the store
@@ -50,7 +50,7 @@ func writeQuotesCSV(w io.Writer, items []*Quote) error {
 func (s *Service) ExportQuotes(ctx context.Context, w io.Writer, limit int) error {
 	quotes, err := s.store.ListQuotes(ctx, limit, 0)
 	if err != nil {
-		return fmt.Errorf("list quotes: %w", err)
+		return fmt.Errorf("failed to list quotes: %w", err)
 	}
 	return writeQuotesCSV(w, quotes)
 }

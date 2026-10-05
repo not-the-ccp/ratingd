@@ -122,6 +122,10 @@ func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([
 	return surcharges, rows.Err()
 }
 
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
+}
+
 // ListSurchargesForQuote implements Store.
 func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([]*Surcharge, error) {
 	rows, err := s.db.QueryContext(ctx, `SELECT id, code, quote_id, description, amount, reason, taxable, created_at, updated_at FROM surcharges WHERE quote_id = $1 ORDER BY id`, quoteID)
@@ -139,10 +143,6 @@ func (s *SQLStore) ListSurchargesForQuote(ctx context.Context, quoteID int64) ([
 		surcharges = append(surcharges, &surcharge)
 	}
 	return surcharges, rows.Err()
-}
-
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) UpdateSurcharge(ctx context.Context, surcharge *Surcharge) error {
