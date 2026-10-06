@@ -28,7 +28,6 @@ func (h *Handler) Routes(mux *http.ServeMux) {
 	mux.HandleFunc("/api/v1/invoice-lines", h.listInvoiceLines)
 	mux.HandleFunc("/api/v1/credit-note", h.getCreditNote)
 	mux.HandleFunc("/api/v1/credit-note/create", h.createCreditNote)
-	mux.HandleFunc("/api/v1/credit-notes", h.listCreditNotes)
 	mux.HandleFunc("/api/v1/credit-note/apply", h.applyCreditNote)
 }
 
@@ -195,23 +194,6 @@ func (h *Handler) createCreditNote(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpx.JSON(w, http.StatusCreated, toCreditNoteResponse(note))
-}
-
-// listCreditNotes handles requests to /api/v1/credit-notes.
-func (h *Handler) listCreditNotes(w http.ResponseWriter, r *http.Request) {
-	limit := httpx.IntParam(r, "limit", 50)
-	offset := httpx.IntParam(r, "offset", 0)
-
-	notes, err := h.svc.ListCreditNotes(r.Context(), limit, offset)
-	if err != nil {
-		writeError(w, err)
-		return
-	}
-	out := make([]CreditNoteResponse, 0, len(notes))
-	for _, item := range notes {
-		out = append(out, toCreditNoteResponse(item))
-	}
-	httpx.JSON(w, http.StatusOK, out)
 }
 
 // applyCreditNote handles requests to /api/v1/credit-note/apply.

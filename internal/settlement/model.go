@@ -7,20 +7,20 @@ import (
 )
 
 type Settlement struct {
-	ID          int64        `json:"id"`
-	GrossAmount money.Amount `json:"gross_amount"`
-	Deductions  money.Amount `json:"deductions"`
-	ReviewedAt  *time.Time   `json:"reviewed_at"`
+	ID         int64            `json:"id"`
+	Status     SettlementStatus `json:"status"`
+	Deductions money.Amount     `json:"deductions"`
 	// CarrierID references the owning carrier.
-	CarrierID        int64            `json:"carrier_id"`
-	Status           SettlementStatus `json:"status"`
-	PeriodEnd        time.Time        `json:"period_end"`
-	PeriodStart      time.Time        `json:"period_start"`
-	ReleasedAt       *time.Time       `json:"released_at"`
-	RetentionPercent float64          `json:"retention_percent"`
-	Remark           string           `json:"remark"`
-	CreatedAt        time.Time        `json:"created_at"`
-	UpdatedAt        time.Time        `json:"updated_at"`
+	CarrierID        int64        `json:"carrier_id"`
+	ReviewedAt       *time.Time   `json:"reviewed_at"`
+	ReleasedAt       *time.Time   `json:"released_at"`
+	PeriodEnd        time.Time    `json:"period_end"`
+	GrossAmount      money.Amount `json:"gross_amount"`
+	Remark           string       `json:"remark"`
+	RetentionPercent float64      `json:"retention_percent"`
+	PeriodStart      time.Time    `json:"period_start"`
+	CreatedAt        time.Time    `json:"created_at"`
+	UpdatedAt        time.Time    `json:"updated_at"`
 }
 
 type SettlementStatus string
