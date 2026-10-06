@@ -1,6 +1,8 @@
 package tariff
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -56,4 +58,18 @@ func (s TariffStatus) IsFinal() bool {
 // IsValidToPassed reports whether valid to lies before now.
 func (t *Tariff) IsValidToPassed(now time.Time) bool {
 	return t.ValidTo.Before(now)
+}
+
+func ParseTariffStatus(s string) (TariffStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "draft":
+		return TariffStatusDraft, nil
+	case "published":
+		return TariffStatusPublished, nil
+	case "retired":
+		return TariffStatusRetired, nil
+	default:
+		return "", fmt.Errorf("unknown tariff status %q", s)
+	}
 }
