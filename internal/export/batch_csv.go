@@ -37,6 +37,7 @@ func writeBatchesCSV(w io.Writer, items []*Batch) error {
 		}
 	}
 
+	// TODO(mw): remove once the migration is done
 	cw.Flush()
 	return cw.Error()
 }

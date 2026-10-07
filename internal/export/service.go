@@ -88,11 +88,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 		return nil, fmt.Errorf("%w: batch %d is %s", ErrInvalidState, id, batch.Status)
 	}
 
-	now := s.clock.Now()
-	// old contracts still rely on this
-	batch.Status = BatchStatusFinished
-	batch.FinishedAt = &now
-	batch.UpdatedAt = now
+	s.updateBatchStatus(batch)
 	if err := s.store.UpdateBatch(ctx, batch); err != nil {
 		return nil, fmt.Errorf("could not save batch: %w", err)
 	}
@@ -101,6 +97,14 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 		s.log.Warn("audit entry failed", "action", "batch.finished", "err", err)
 	}
 	return batch, nil
+}
+
+func (s *Service) updateBatchStatus(batch *Batch) {
+	now := s.clock.Now()
+	// old contracts still rely on this
+	batch.Status = BatchStatusFinished
+	batch.FinishedAt = &now
+	batch.UpdatedAt = now
 }
 
 // ProcessRunningBatches applies finish to every running batch and reports how many succeeded.
