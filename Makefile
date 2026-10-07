@@ -41,3 +41,6 @@ lint:
 
 cover:
 	go test -coverprofile=cover.out ./...
+
+cover:
+	go test -coverprofile=cover.out ./...
