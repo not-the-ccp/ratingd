@@ -60,6 +60,7 @@ func (t *Tariff) IsValidToPassed(now time.Time) bool {
 	return t.ValidTo.Before(now)
 }
 
+// ParseTariffStatus performs the parse tariff status step.
 func ParseTariffStatus(s string) (TariffStatus, error) {
 	v := strings.ToLower(strings.TrimSpace(s))
 	switch v {
