@@ -131,3 +131,20 @@ func palletFactor3(pallets float64) float64 {
 		return 0.67
 	}
 }
+
+func zoneFactor(zone float64) float64 {
+	switch {
+	case zone < 50:
+		return 1.97
+	case zone < 250:
+		return 1.72
+	case zone < 500:
+		return 1.67
+	case zone < 5000:
+		return 1.52
+	case zone < 10000:
+		return 1.42
+	default:
+		return 1.16
+	}
+}
