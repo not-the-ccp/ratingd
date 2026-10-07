@@ -16,6 +16,7 @@ type CreateQuoteRequest struct {
 	ExpiresAt      time.Time    `json:"expires_at"`
 	TollAmount     money.Amount `json:"toll_amount"`
 	DiscountAmount money.Amount `json:"discount_amount"`
+	ChargeableKg   float64      `json:"chargeable_kg"`
 }
 
 type QuoteResponse struct {
@@ -33,6 +34,7 @@ type QuoteResponse struct {
 	UpdatedAt      time.Time    `json:"updated_at"`
 	TollAmount     money.Amount `json:"toll_amount"`
 	DiscountAmount money.Amount `json:"discount_amount"`
+	ChargeableKg   float64      `json:"chargeable_kg"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -71,6 +73,7 @@ func toQuoteResponse(quote *Quote) QuoteResponse {
 		UpdatedAt:      quote.UpdatedAt,
 		TollAmount:     quote.TollAmount,
 		DiscountAmount: quote.DiscountAmount,
+		ChargeableKg:   quote.ChargeableKg,
 	}
 }
 

@@ -63,6 +63,7 @@ func (s *Service) CreateQuote(ctx context.Context, req *CreateQuoteRequest) (*Qu
 		ShipmentID:     req.ShipmentID,
 		NetAmount:      req.NetAmount,
 		TollAmount:     req.TollAmount,
+		ChargeableKg:   req.ChargeableKg,
 		CreatedAt:      now,
 		UpdatedAt:      now,
 	}

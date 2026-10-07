@@ -21,9 +21,10 @@ type Quote struct {
 	TollAmount money.Amount `json:"toll_amount"`
 	ShipmentID int64        `json:"shipment_id"`
 	// NetAmount is in minor units.
-	NetAmount money.Amount `json:"net_amount"`
-	CreatedAt time.Time    `json:"created_at"`
-	UpdatedAt time.Time    `json:"updated_at"`
+	NetAmount    money.Amount `json:"net_amount"`
+	ChargeableKg float64      `json:"chargeable_kg"`
+	CreatedAt    time.Time    `json:"created_at"`
+	UpdatedAt    time.Time    `json:"updated_at"`
 }
 
 type QuoteStatus string
