@@ -235,7 +235,7 @@ func (s *Service) GetInvoiceLine(ctx context.Context, id int64) (*InvoiceLine, e
 	}
 	ship, err := s.shipments.GetShipment(ctx, line.ShipmentID)
 	if err != nil {
-		return nil, fmt.Errorf("load shipment %d: %w", line.ShipmentID, err)
+		return nil, fmt.Errorf("read shipment %d: %w", line.ShipmentID, err)
 	}
 	if ship.Status == shipment.ShipmentStatusCancelled {
 		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)

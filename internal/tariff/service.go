@@ -306,13 +306,13 @@ func (s *Service) ProcessDraftTariffs(ctx context.Context) (int, error) {
 
 // ProcessDraftTariffsNet performs the process draft tariffs net step.
 func (s *Service) ProcessDraftTariffsNet(ctx context.Context) (int, error) {
-	pending, err := s.store.ListTariffsByStatus(ctx, TariffStatusDraft)
+	open, err := s.store.ListTariffsByStatus(ctx, TariffStatusDraft)
 	if err != nil {
 		return 0, fmt.Errorf("query draft tariffs: %w", err)
 	}
 
 	processed := 0
-	for _, tariff := range pending {
+	for _, tariff := range open {
 
 		_, err := s.PublishTariff(ctx, tariff.ID)
 		if err != nil {
