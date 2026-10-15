@@ -8,31 +8,33 @@ import (
 )
 
 type CreateTariffRequest struct {
-	Code         string    `json:"code"`
-	Description  string    `json:"description"`
-	Currency     string    `json:"currency"`
-	ValidFrom    time.Time `json:"valid_from"`
-	ValidTo      time.Time `json:"valid_to"`
-	RoundingMode string    `json:"rounding_mode"`
-	BaseZone     string    `json:"base_zone"`
-	Region       string    `json:"region"`
+	Code          string       `json:"code"`
+	Description   string       `json:"description"`
+	Currency      string       `json:"currency"`
+	ValidFrom     time.Time    `json:"valid_from"`
+	ValidTo       time.Time    `json:"valid_to"`
+	RoundingMode  string       `json:"rounding_mode"`
+	BaseZone      string       `json:"base_zone"`
+	Region        string       `json:"region"`
+	MinimumCharge money.Amount `json:"minimum_charge"`
 }
 
 type TariffResponse struct {
-	ID           int64        `json:"id"`
-	Code         string       `json:"code"`
-	Description  string       `json:"description"`
-	Currency     string       `json:"currency"`
-	ValidFrom    time.Time    `json:"valid_from"`
-	ValidTo      time.Time    `json:"valid_to"`
-	Status       TariffStatus `json:"status"`
-	PublishedAt  *time.Time   `json:"published_at"`
-	RetiredAt    *time.Time   `json:"retired_at"`
-	CreatedAt    time.Time    `json:"created_at"`
-	UpdatedAt    time.Time    `json:"updated_at"`
-	RoundingMode string       `json:"rounding_mode"`
-	BaseZone     string       `json:"base_zone"`
-	Region       string       `json:"region"`
+	ID            int64        `json:"id"`
+	Code          string       `json:"code"`
+	Description   string       `json:"description"`
+	Currency      string       `json:"currency"`
+	ValidFrom     time.Time    `json:"valid_from"`
+	ValidTo       time.Time    `json:"valid_to"`
+	Status        TariffStatus `json:"status"`
+	PublishedAt   *time.Time   `json:"published_at"`
+	RetiredAt     *time.Time   `json:"retired_at"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
+	RoundingMode  string       `json:"rounding_mode"`
+	BaseZone      string       `json:"base_zone"`
+	Region        string       `json:"region"`
+	MinimumCharge money.Amount `json:"minimum_charge"`
 }
 
 func (r *CreateTariffRequest) Validate() error {
@@ -47,20 +49,21 @@ func (r *CreateTariffRequest) Validate() error {
 
 func toTariffResponse(tariff *Tariff) TariffResponse {
 	return TariffResponse{
-		ID:           tariff.ID,
-		Code:         tariff.ShortCode,
-		Description:  tariff.Description,
-		Currency:     tariff.Currency,
-		ValidFrom:    tariff.ValidFrom,
-		ValidTo:      tariff.ValidTo,
-		Status:       tariff.Status,
-		PublishedAt:  tariff.PublishedAt,
-		RetiredAt:    tariff.RetiredAt,
-		CreatedAt:    tariff.CreatedAt,
-		UpdatedAt:    tariff.UpdatedAt,
-		RoundingMode: tariff.RoundingMode,
-		BaseZone:     tariff.BaseZone,
-		Region:       tariff.Region,
+		ID:            tariff.ID,
+		Code:          tariff.ShortCode,
+		Description:   tariff.Description,
+		Currency:      tariff.Currency,
+		ValidFrom:     tariff.ValidFrom,
+		ValidTo:       tariff.ValidTo,
+		Status:        tariff.Status,
+		PublishedAt:   tariff.PublishedAt,
+		RetiredAt:     tariff.RetiredAt,
+		CreatedAt:     tariff.CreatedAt,
+		UpdatedAt:     tariff.UpdatedAt,
+		RoundingMode:  tariff.RoundingMode,
+		BaseZone:      tariff.BaseZone,
+		Region:        tariff.Region,
+		MinimumCharge: tariff.MinimumCharge,
 	}
 }
 

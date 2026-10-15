@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"git.tarven.internal/billing/ratingd/internal/platform/money"
 )
 
 // Tariff holds the persisted state of a tariff.
@@ -16,13 +18,14 @@ type Tariff struct {
 	ValidTo     time.Time    `json:"valid_to"`
 	Status      TariffStatus `json:"status"`
 	// Code is the code.
-	ShortCode    string    `json:"code"`
-	RoundingMode string    `json:"rounding_mode"`
-	BaseZone     string    `json:"base_zone"`
-	ValidFrom    time.Time `json:"valid_from"`
-	Region       string    `json:"region"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ShortCode     string       `json:"code"`
+	RoundingMode  string       `json:"rounding_mode"`
+	BaseZone      string       `json:"base_zone"`
+	ValidFrom     time.Time    `json:"valid_from"`
+	Region        string       `json:"region"`
+	MinimumCharge money.Amount `json:"minimum_charge"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
 }
 
 type TariffStatus string

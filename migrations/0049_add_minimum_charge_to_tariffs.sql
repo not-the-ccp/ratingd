@@ -1,0 +1,1 @@
+ALTER TABLE tariffs ADD COLUMN minimum_charge BIGINT NOT NULL;

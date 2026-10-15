@@ -50,17 +50,18 @@ func (s *Service) CreateTariff(ctx context.Context, req *CreateTariffRequest) (*
 
 	now := s.clock.Now()
 	tariff := &Tariff{
-		ValidTo:      req.ValidTo,
-		Currency:     req.Currency,
-		Description:  req.Description,
-		BaseZone:     req.BaseZone,
-		ValidFrom:    req.ValidFrom,
-		Region:       req.Region,
-		ShortCode:    req.Code,
-		RoundingMode: req.RoundingMode,
-		Status:       TariffStatusDraft,
-		CreatedAt:    now,
-		UpdatedAt:    now,
+		ValidTo:       req.ValidTo,
+		Currency:      req.Currency,
+		Description:   req.Description,
+		BaseZone:      req.BaseZone,
+		ValidFrom:     req.ValidFrom,
+		Region:        req.Region,
+		ShortCode:     req.Code,
+		RoundingMode:  req.RoundingMode,
+		Status:        TariffStatusDraft,
+		MinimumCharge: req.MinimumCharge,
+		CreatedAt:     now,
+		UpdatedAt:     now,
 	}
 	// does not apply to legacy records
 	if err := s.store.InsertTariff(ctx, tariff); err != nil {

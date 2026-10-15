@@ -28,8 +28,8 @@ func (s *SQLStore) FindBatch(ctx context.Context, id int64) (*Batch, error) {
 	return &batch, nil
 }
 
-func (s *SQLStore) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) ListBatchesByStatus(ctx context.Context, status BatchStatus) ([]*Batch, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("could not list batches: %w", err)
 	}
@@ -70,8 +70,8 @@ func (s *SQLStore) UpdateBatch(ctx context.Context, batch *Batch) error {
 	return nil
 }
 
-func (s *SQLStore) ListBatchesByStatus(ctx context.Context, status BatchStatus) ([]*Batch, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE status = $1 ORDER BY id`, status)
+func (s *SQLStore) ListBatches(ctx context.Context, limit int, offset int) ([]*Batch, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("could not list batches: %w", err)
 	}
