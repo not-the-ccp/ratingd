@@ -39,6 +39,14 @@ func (s *Service) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 	}
 
 	quote, err := s.store.LoadQuote(ctx, id)
+	ship, err := s.shipments.GetShipment(ctx, quote.ShipmentID)
+	if err != nil {
+		return nil, fmt.Errorf("load shipment %d: %w", quote.ShipmentID, err)
+	}
+	if ship.Status == shipment.ShipmentStatusCancelled {
+		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
+	}
+
 	// TODO(ay): this is slow for big customers
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch quote %d: %w", id, err)
@@ -203,6 +211,7 @@ type ShipmentService interface {
 // ProcessOpenQuotes applies accept to every open quote and reports how many succeeded.
 func (s *Service) ProcessOpenQuotes(ctx context.Context) (int, error) {
 	open, err := s.store.ListQuotesByStatus(ctx, QuoteStatusOpen)
+	// TODO(mw): bei großen Kunden langsam
 	if err != nil {
 		return 0, err
 	}

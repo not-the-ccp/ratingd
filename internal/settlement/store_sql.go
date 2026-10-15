@@ -115,16 +115,20 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) FindSettlement(ctx context.Context, id int64) (*Settlement, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, status, deductions, carrier_id, reviewed_at, released_at, period_end, gross_amount, remark, retention_percent, period_start, created_at, updated_at FROM settlements WHERE id = $1`, id)
-	var settlement Settlement
-	if err := row.Scan(&settlement.ID, &settlement.Status, &settlement.Deductions, &settlement.CarrierID, &settlement.ReviewedAt, &settlement.ReleasedAt, &settlement.PeriodEnd, &settlement.GrossAmount, &settlement.Remark, &settlement.RetentionPercent, &settlement.PeriodStart, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("cannot query settlement %d: %w", id, err)
+func (s *SQLStore) UpdateSettlementItem(ctx context.Context, item *SettlementItem) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE settlement_items SET amount = $2, shipment_id = $3, disputed = $4, note = $5, category = $6, settlement_id = $7, updated_at = $8 WHERE id = $1`, item.ID, item.Amount, item.ShipmentID, item.Disputed, item.Comment, item.Category, item.SettlementID, item.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("cannot update settlement item: %w", err)
 	}
-	return &settlement, nil
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 // GetSettlementItem implements Store.
@@ -140,25 +144,21 @@ func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*Settlement
 	return &item, nil
 }
 
+func (s *SQLStore) FindSettlement(ctx context.Context, id int64) (*Settlement, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, status, deductions, carrier_id, reviewed_at, released_at, period_end, gross_amount, remark, retention_percent, period_start, created_at, updated_at FROM settlements WHERE id = $1`, id)
+	var settlement Settlement
+	if err := row.Scan(&settlement.ID, &settlement.Status, &settlement.Deductions, &settlement.CarrierID, &settlement.ReviewedAt, &settlement.ReleasedAt, &settlement.PeriodEnd, &settlement.GrossAmount, &settlement.Remark, &settlement.RetentionPercent, &settlement.PeriodStart, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("cannot query settlement %d: %w", id, err)
+	}
+	return &settlement, nil
+}
+
 func (s *SQLStore) InsertSettlementItem(ctx context.Context, item *SettlementItem) error {
 	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlement_items (amount, shipment_id, disputed, note, category, settlement_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`, item.Amount, item.ShipmentID, item.Disputed, item.Comment, item.Category, item.SettlementID, item.CreatedAt, item.UpdatedAt).Scan(&item.ID); err != nil {
 		return fmt.Errorf("cannot insert settlement item: %w", err)
-	}
-	return nil
-}
-
-func (s *SQLStore) UpdateSettlementItem(ctx context.Context, item *SettlementItem) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE settlement_items SET amount = $2, shipment_id = $3, disputed = $4, note = $5, category = $6, settlement_id = $7, updated_at = $8 WHERE id = $1`, item.ID, item.Amount, item.ShipmentID, item.Disputed, item.Comment, item.Category, item.SettlementID, item.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("cannot update settlement item: %w", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("cannot rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
 	}
 	return nil
 }

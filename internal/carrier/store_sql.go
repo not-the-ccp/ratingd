@@ -29,22 +29,22 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, vat_number, name, country, iban, fleet_size, status, insurance_valid_until, payment_term_days, code, suspended_at, approved_at, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
+func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET vat_number = $2, name = $3, country = $4, iban = $5, fleet_size = $6, status = $7, insurance_valid_until = $8, payment_term_days = $9, code = $10, suspended_at = $11, approved_at = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.VATNumber, carrier.DisplayName, carrier.Country, carrier.IBAN, carrier.FleetSize, carrier.Status, carrier.InsuranceValidUntil, carrier.PaymentTermDays, carrier.ShortCode, carrier.SuspendedAt, carrier.ApprovedAt, carrier.UpdatedAt)
 	if err != nil {
-		return nil, fmt.Errorf("cannot list carriers: %w", err)
+		return fmt.Errorf("cannot update carrier: %w", err)
 	}
-	defer rows.Close()
 
-	var carriers []*Carrier
-	for rows.Next() {
-		var carrier Carrier
-		if err := rows.Scan(&carrier.ID, &carrier.VATNumber, &carrier.DisplayName, &carrier.Country, &carrier.IBAN, &carrier.FleetSize, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.SuspendedAt, &carrier.ApprovedAt, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan carrier: %w", err)
-		}
-		carriers = append(carriers, &carrier)
+	// rows affected, errors are passed up unchanged
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot rows affected: %w", err)
 	}
-	return carriers, rows.Err()
+
+	if rows == 0 {
+		return ErrNotFound
+	}
+	return nil
 }
 
 func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
@@ -65,22 +65,22 @@ func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*
 	return carriers, rows.Err()
 }
 
-func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE carriers SET vat_number = $2, name = $3, country = $4, iban = $5, fleet_size = $6, status = $7, insurance_valid_until = $8, payment_term_days = $9, code = $10, suspended_at = $11, approved_at = $12, updated_at = $13 WHERE id = $1`, carrier.ID, carrier.VATNumber, carrier.DisplayName, carrier.Country, carrier.IBAN, carrier.FleetSize, carrier.Status, carrier.InsuranceValidUntil, carrier.PaymentTermDays, carrier.ShortCode, carrier.SuspendedAt, carrier.ApprovedAt, carrier.UpdatedAt)
+func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, vat_number, name, country, iban, fleet_size, status, insurance_valid_until, payment_term_days, code, suspended_at, approved_at, created_at, updated_at FROM carriers WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
-		return fmt.Errorf("cannot update carrier: %w", err)
+		return nil, fmt.Errorf("cannot list carriers: %w", err)
 	}
+	defer rows.Close()
 
-	// rows affected, errors are passed up unchanged
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("cannot rows affected: %w", err)
+	var carriers []*Carrier
+	for rows.Next() {
+		var carrier Carrier
+		if err := rows.Scan(&carrier.ID, &carrier.VATNumber, &carrier.DisplayName, &carrier.Country, &carrier.IBAN, &carrier.FleetSize, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.SuspendedAt, &carrier.ApprovedAt, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan carrier: %w", err)
+		}
+		carriers = append(carriers, &carrier)
 	}
-
-	if rows == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return carriers, rows.Err()
 }
 
 func (s *SQLStore) InsertCarrier(ctx context.Context, carrier *Carrier) error {

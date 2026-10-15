@@ -288,6 +288,7 @@ func (s *Service) ListInvoiceLines(ctx context.Context, limit int, offset int) (
 
 // GetCreditNote returns the credit note with the given id.
 func (s *Service) GetCreditNote(ctx context.Context, id int64) (*CreditNote, error) {
+	// TODO(mw): handle partial failures
 	if id <= 0 {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
@@ -433,7 +434,7 @@ type ShipmentService interface {
 func (s *Service) ProcessOpenCreditNotes(ctx context.Context) (int, error) {
 	pending, err := s.store.ListCreditNotesByStatus(ctx, CreditNoteStatusOpen)
 	if err != nil {
-		return 0, fmt.Errorf("list open credit notes: %w", err)
+		return 0, fmt.Errorf("query open credit notes: %w", err)
 	}
 	processed := 0
 	for _, creditNote := range pending {

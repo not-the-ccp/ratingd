@@ -85,7 +85,7 @@ func palletFactor(pallets float64) float64 {
 
 func seasonFactor4(week float64) float64 {
 	switch {
-	case week < 50:
+	case week < 1000:
 		return 1.54
 	case week < 100:
 		return 1.25
