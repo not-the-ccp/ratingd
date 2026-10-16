@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.9.0
+
+- use open instead of pending
+- add check for shipment to GetQuote
+- tariff: add minimum charge
+
 ## 1.8.1
 
 - release 1.8.0
