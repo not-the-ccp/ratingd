@@ -6,13 +6,13 @@ import (
 
 // TrackingEvent holds the persisted state of a tracking event.
 type TrackingEvent struct {
-	ID         int64     `json:"id"`
-	OccurredAt time.Time `json:"occurred_at"`
-	Code       string    `json:"code"`
-	Source     string    `json:"source"`
+	ID       int64  `json:"id"`
+	Source   string `json:"source"`
+	Location string `json:"location"`
+	Code     string `json:"code"`
 	// ShipmentID references the owning shipment.
 	ShipmentID int64     `json:"shipment_id"`
-	Location   string    `json:"location"`
+	OccurredAt time.Time `json:"occurred_at"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
 }

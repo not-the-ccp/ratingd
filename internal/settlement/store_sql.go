@@ -12,23 +12,17 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlementID int64) ([]*SettlementItem, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, amount, shipment_id, disputed, note, category, settlement_id, created_at, updated_at FROM settlement_items WHERE settlement_id = $1 ORDER BY id`, settlementID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list settlement items: %w", err)
-	}
-
-	defer rows.Close()
-
-	var items []*SettlementItem
-	for rows.Next() {
-		var item SettlementItem
-		if err := rows.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.Comment, &item.Category, &item.SettlementID, &item.CreatedAt, &item.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan settlement item: %w", err)
+// GetSettlementItem implements Store.
+func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, amount, shipment_id, disputed, note, category, settlement_id, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
+	var item SettlementItem
+	if err := row.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.Comment, &item.Category, &item.SettlementID, &item.CreatedAt, &item.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
 		}
-		items = append(items, &item)
+		return nil, fmt.Errorf("cannot query settlement item %d: %w", id, err)
 	}
-	return items, rows.Err()
+	return &item, nil
 }
 
 // UpdateSettlement implements Store.
@@ -131,17 +125,23 @@ func (s *SQLStore) UpdateSettlementItem(ctx context.Context, item *SettlementIte
 	return nil
 }
 
-// GetSettlementItem implements Store.
-func (s *SQLStore) GetSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, amount, shipment_id, disputed, note, category, settlement_id, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
-	var item SettlementItem
-	if err := row.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.Comment, &item.Category, &item.SettlementID, &item.CreatedAt, &item.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("cannot query settlement item %d: %w", id, err)
+func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlementID int64) ([]*SettlementItem, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, amount, shipment_id, disputed, note, category, settlement_id, created_at, updated_at FROM settlement_items WHERE settlement_id = $1 ORDER BY id`, settlementID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list settlement items: %w", err)
 	}
-	return &item, nil
+
+	defer rows.Close()
+
+	var items []*SettlementItem
+	for rows.Next() {
+		var item SettlementItem
+		if err := rows.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.Comment, &item.Category, &item.SettlementID, &item.CreatedAt, &item.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan settlement item: %w", err)
+		}
+		items = append(items, &item)
+	}
+	return items, rows.Err()
 }
 
 func (s *SQLStore) FindSettlement(ctx context.Context, id int64) (*Settlement, error) {

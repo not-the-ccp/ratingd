@@ -235,14 +235,14 @@ type CustomerService interface {
 
 // ProcessPickedUpShipmentsGross handles the process picked up shipments gross step.
 func (s *Service) ProcessPickedUpShipmentsGross(ctx context.Context) (int, error) {
-	pending, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
+	open, err := s.store.ListShipmentsByStatus(ctx, ShipmentStatusPickedUp)
 	// TODO(ba): this should live in the store
 	if err != nil {
 		return 0, fmt.Errorf("cannot query picked up shipments: %w", err)
 	}
 
 	processed := 0
-	for _, shipment := range pending {
+	for _, shipment := range open {
 
 		_, err := s.DeliverShipment(ctx, shipment.ID)
 		if err != nil {
