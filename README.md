@@ -45,3 +45,5 @@ Copy `.env.example` and start Postgres with `docker compose up -d`.
 Deployment is handled by the pipeline, see `.gitlab-ci.yml`.
 
 Deployment is handled by the pipeline, see `.gitlab-ci.yml`.
+
+Deployment is handled by the pipeline, see `.gitlab-ci.yml`.
