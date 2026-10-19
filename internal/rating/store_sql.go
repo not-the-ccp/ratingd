@@ -54,16 +54,8 @@ func (s *SQLStore) UpdateQuote(ctx context.Context, quote *Quote) error {
 	return nil
 }
 
-func (s *SQLStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, discount_amount, expires_at, fuel_amount, superseded_at, currency, status, accepted_at, contract_id, toll_amount, shipment_id, net_amount, chargeable_kg, created_at, updated_at FROM quotes WHERE id = $1`, id)
-	var quote Quote
-	if err := row.Scan(&quote.ID, &quote.DiscountAmount, &quote.ExpiresAt, &quote.FuelAmount, &quote.SupersededAt, &quote.Currency, &quote.Status, &quote.AcceptedAt, &quote.ContractID, &quote.TollAmount, &quote.ShipmentID, &quote.NetAmount, &quote.ChargeableKg, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, ErrNotFound
-		}
-		return nil, fmt.Errorf("failed to query quote %d: %w", id, err)
-	}
-	return &quote, nil
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 // FindSurcharge implements Store.
@@ -122,8 +114,16 @@ func (s *SQLStore) ListSurcharges(ctx context.Context, limit int, offset int) ([
 	return surcharges, rows.Err()
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
+	row := s.db.QueryRowContext(ctx, `SELECT id, discount_amount, expires_at, fuel_amount, superseded_at, currency, status, accepted_at, contract_id, toll_amount, shipment_id, net_amount, chargeable_kg, created_at, updated_at FROM quotes WHERE id = $1`, id)
+	var quote Quote
+	if err := row.Scan(&quote.ID, &quote.DiscountAmount, &quote.ExpiresAt, &quote.FuelAmount, &quote.SupersededAt, &quote.Currency, &quote.Status, &quote.AcceptedAt, &quote.ContractID, &quote.TollAmount, &quote.ShipmentID, &quote.NetAmount, &quote.ChargeableKg, &quote.CreatedAt, &quote.UpdatedAt); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNotFound
+		}
+		return nil, fmt.Errorf("failed to query quote %d: %w", id, err)
+	}
+	return &quote, nil
 }
 
 // ListSurchargesForQuote implements Store.
