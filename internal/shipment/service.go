@@ -40,7 +40,7 @@ func (s *Service) GetShipment(ctx context.Context, id int64) (*Shipment, error) 
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	result, err := s.store.FindShipment(ctx, id)
+	result, err := s.store.FetchShipment(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch shipment: %w", err)
 	}
@@ -106,7 +106,7 @@ func (s *Service) ListShipments(ctx context.Context, limit int, offset int) ([]*
 
 // PickupShipment runs the pickup shipment step.
 func (s *Service) PickupShipment(ctx context.Context, id int64) (*Shipment, error) {
-	shipment, err := s.store.FindShipment(ctx, id)
+	shipment, err := s.store.FetchShipment(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read shipment id=%d: %w", id, err)
 	}
@@ -146,7 +146,7 @@ func touchShipment(now time.Time, shipment *Shipment) {
 
 // DeliverShipment performs the deliver shipment step.
 func (s *Service) DeliverShipment(ctx context.Context, id int64) (*Shipment, error) {
-	shipment, err := s.store.FindShipment(ctx, id)
+	shipment, err := s.store.FetchShipment(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot load shipment id=%d: %w", id, err)
 	}
@@ -184,7 +184,7 @@ func (s *Service) GetTrackingEvent(ctx context.Context, id int64) (*TrackingEven
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	event, err := s.store.FindTrackingEvent(ctx, id)
+	event, err := s.store.FetchTrackingEvent(ctx, id)
 
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch tracking event %d: %w", id, err)

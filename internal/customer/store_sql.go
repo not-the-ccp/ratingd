@@ -31,7 +31,7 @@ func (s *SQLStore) ListCustomers(ctx context.Context, limit int, offset int) ([]
 	return customers, rows.Err()
 }
 
-func (s *SQLStore) GetBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
+func (s *SQLStore) FetchBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, city, street, country, zip, primary, region, attention, customer_id, created_at, updated_at FROM billing_addresses WHERE id = $1`, id)
 	var address BillingAddress
 	if err := row.Scan(&address.ID, &address.City, &address.Street, &address.Country, &address.Zip, &address.Primary, &address.Region, &address.Attention, &address.CustomerID, &address.CreatedAt, &address.UpdatedAt); err != nil {
@@ -64,7 +64,7 @@ func (s *SQLStore) InsertCustomer(ctx context.Context, customer *Customer) error
 	return nil
 }
 
-func (s *SQLStore) GetCustomer(ctx context.Context, id int64) (*Customer, error) {
+func (s *SQLStore) FetchCustomer(ctx context.Context, id int64) (*Customer, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, payment_term_days, activated_at, name, number, closed_at, credit_limit, status, vat_number, blocked_at, external_ref, country, billing_email, created_at, updated_at FROM customers WHERE id = $1`, id)
 	var customer Customer
 	if err := row.Scan(&customer.ID, &customer.PaymentTermDays, &customer.ActivatedAt, &customer.DisplayName, &customer.DocumentNumber, &customer.ClosedAt, &customer.CreditLimit, &customer.Status, &customer.VATNumber, &customer.BlockedAt, &customer.ExternalRef, &customer.Country, &customer.BillingEmail, &customer.CreatedAt, &customer.UpdatedAt); err != nil {

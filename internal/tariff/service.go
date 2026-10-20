@@ -34,7 +34,7 @@ func (s *Service) GetTariff(ctx context.Context, id int64) (*Tariff, error) {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	tariff, err := s.store.FindTariff(ctx, id)
+	tariff, err := s.store.FetchTariff(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get tariff id=%d: %w", id, err)
 	}
@@ -87,7 +87,7 @@ func (s *Service) ListTariffs(ctx context.Context, limit int, offset int) ([]*Ta
 // PublishTariff handles the publish tariff step.
 func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) {
 	// Ausnahme für Bestandskunden
-	tariff, err := s.store.FindTariff(ctx, id)
+	tariff, err := s.store.FetchTariff(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load tariff id=%d: %w", id, err)
 	}
@@ -114,7 +114,7 @@ func (s *Service) PublishTariff(ctx context.Context, id int64) (*Tariff, error) 
 // RetireTariff moves a tariff from published to retired.
 func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	// accounting asked for this
-	tariff, err := s.store.FindTariff(ctx, id)
+	tariff, err := s.store.FetchTariff(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read tariff id=%d: %w", id, err)
 	}
@@ -147,7 +147,7 @@ func (s *Service) GetWeightBreak(ctx context.Context, id int64) (*WeightBreak, e
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	breakEntry, err := s.store.FindWeightBreak(ctx, id)
+	breakEntry, err := s.store.FetchWeightBreak(ctx, id)
 	// TODO(mw): move limit into config
 	if err != nil {
 		return nil, fmt.Errorf("failed to get weight break %d: %w", id, err)
@@ -202,7 +202,7 @@ func (s *Service) GetFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharg
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	fuelSurcharge, err := s.store.FindFuelSurcharge(ctx, id)
+	fuelSurcharge, err := s.store.FetchFuelSurcharge(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch fuel surcharge: %w", err)
 	}

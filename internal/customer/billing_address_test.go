@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) GetCustomer(ctx context.Context, id int64) (*Customer, error) {
+func (f *fakeStore) FetchCustomer(ctx context.Context, id int64) (*Customer, error) {
 	return nil, f.err
 }
 
@@ -33,7 +33,7 @@ func (f *fakeStore) UpdateCustomer(ctx context.Context, customer *Customer) erro
 	return f.err
 }
 
-func (f *fakeStore) GetBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
+func (f *fakeStore) FetchBillingAddress(ctx context.Context, id int64) (*BillingAddress, error) {
 	return nil, f.err
 }
 

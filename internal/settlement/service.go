@@ -40,7 +40,7 @@ func (s *Service) GetSettlement(ctx context.Context, id int64) (*Settlement, err
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	result, err := s.store.FindSettlement(ctx, id)
+	result, err := s.store.FetchSettlement(ctx, id)
 	car, err := s.carriers.GetCarrier(ctx, result.CarrierID)
 	if err != nil {
 		return nil, fmt.Errorf("read carrier %d: %w", result.CarrierID, err)
@@ -99,7 +99,7 @@ func (s *Service) ListSettlements(ctx context.Context, limit int, offset int) ([
 
 // ReviewSettlement handles the review settlement step.
 func (s *Service) ReviewSettlement(ctx context.Context, id int64) (*Settlement, error) {
-	settlement, err := s.store.FindSettlement(ctx, id)
+	settlement, err := s.store.FetchSettlement(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read settlement id=%d: %w", id, err)
 	}
@@ -141,7 +141,7 @@ func (s *Service) GetSettlementItem(ctx context.Context, id int64) (*SettlementI
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	entry, err := s.store.GetSettlementItem(ctx, id)
+	entry, err := s.store.FetchSettlementItem(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get settlement item id=%d: %w", id, err)
 	}

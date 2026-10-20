@@ -93,7 +93,7 @@ func (s *SQLStore) ListShipments(ctx context.Context, limit int, offset int) ([]
 	return shipments, rows.Err()
 }
 
-func (s *SQLStore) FindShipment(ctx context.Context, id int64) (*Shipment, error) {
+func (s *SQLStore) FetchShipment(ctx context.Context, id int64) (*Shipment, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, loading_meters, hazard_class, status, weight_kg, pickup_at, carrier_id, reference, destination_zip, pallets, delivered_at, origin_country, customer_id, cancelled_at, origin_zip, picked_up_at, created_at, updated_at FROM shipments WHERE id = $1`, id)
 	var shipment Shipment
 	if err := row.Scan(&shipment.ID, &shipment.LoadingMeters, &shipment.HazardClass, &shipment.Status, &shipment.WeightKg, &shipment.PickupAt, &shipment.CarrierID, &shipment.Reference, &shipment.DestinationZip, &shipment.Pallets, &shipment.DeliveredAt, &shipment.OriginCountry, &shipment.CustomerID, &shipment.CancelledAt, &shipment.OriginZip, &shipment.PickedUpAt, &shipment.CreatedAt, &shipment.UpdatedAt); err != nil {
@@ -149,7 +149,7 @@ func (s *SQLStore) InsertShipment(ctx context.Context, shipment *Shipment) error
 	return nil
 }
 
-func (s *SQLStore) FindTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
+func (s *SQLStore) FetchTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, source, location, code, shipment_id, occurred_at, created_at, updated_at FROM tracking_events WHERE id = $1`, id)
 	var event TrackingEvent
 	if err := row.Scan(&event.ID, &event.Source, &event.Location, &event.Code, &event.ShipmentID, &event.OccurredAt, &event.CreatedAt, &event.UpdatedAt); err != nil {

@@ -16,7 +16,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 	return &SQLStore{db: db}
 }
 
-func (s *SQLStore) FindBatch(ctx context.Context, id int64) (*Batch, error) {
+func (s *SQLStore) FetchBatch(ctx context.Context, id int64) (*Batch, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE id = $1`, id)
 	var batch Batch
 	if err := row.Scan(&batch.ID, &batch.RowCount, &batch.FailedAt, &batch.FinishedAt, &batch.Status, &batch.FileName, &batch.Kind, &batch.StartedAt, &batch.CreatedAt, &batch.UpdatedAt); err != nil {
