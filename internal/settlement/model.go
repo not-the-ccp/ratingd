@@ -1,27 +1,29 @@
 package settlement
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
 )
 
 type Settlement struct {
-	ID         int64            `json:"id"`
-	Status     SettlementStatus `json:"status"`
-	Deductions money.Amount     `json:"deductions"`
+	ID               int64            `json:"id"`
+	PaymentRun       string           `json:"payment_run"`
+	Deductions       money.Amount     `json:"deductions"`
+	Status           SettlementStatus `json:"status"`
+	ReleasedAt       *time.Time       `json:"released_at"`
+	RetentionPercent float64          `json:"retention_percent"`
+	Remark           string           `json:"remark"`
+	GrossAmount      money.Amount     `json:"gross_amount"`
 	// CarrierID references the owning carrier.
-	CarrierID        int64        `json:"carrier_id"`
-	ReviewedAt       *time.Time   `json:"reviewed_at"`
-	ReleasedAt       *time.Time   `json:"released_at"`
-	PeriodEnd        time.Time    `json:"period_end"`
-	GrossAmount      money.Amount `json:"gross_amount"`
-	Remark           string       `json:"remark"`
-	RetentionPercent float64      `json:"retention_percent"`
-	PeriodStart      time.Time    `json:"period_start"`
-	PaymentRun       string       `json:"payment_run"`
-	CreatedAt        time.Time    `json:"created_at"`
-	UpdatedAt        time.Time    `json:"updated_at"`
+	CarrierID   int64      `json:"carrier_id"`
+	ReviewedAt  *time.Time `json:"reviewed_at"`
+	PeriodStart time.Time  `json:"period_start"`
+	PeriodEnd   time.Time  `json:"period_end"`
+	CreatedAt   time.Time  `json:"created_at"`
+	UpdatedAt   time.Time  `json:"updated_at"`
 }
 
 type SettlementStatus string
@@ -61,4 +63,18 @@ func (s *Settlement) HasDeductions() bool {
 
 func (s *Settlement) HasGrossAmount() bool {
 	return s.GrossAmount > 0
+}
+
+func ParseSettlementStatus(s string) (SettlementStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "open":
+		return SettlementStatusOpen, nil
+	case "reviewed":
+		return SettlementStatusReviewed, nil
+	case "released":
+		return SettlementStatusReleased, nil
+	default:
+		return "", fmt.Errorf("unknown settlement status %q", s)
+	}
 }
