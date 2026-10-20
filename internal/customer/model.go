@@ -20,6 +20,7 @@ type Customer struct {
 	ExternalRef     string         `json:"external_ref"`
 	Country         string         `json:"country"`
 	BillingEmail    string         `json:"billing_email"`
+	IBAN            string         `json:"iban"`
 	CreatedAt       time.Time      `json:"created_at"`
 	UpdatedAt       time.Time      `json:"updated_at"`
 }

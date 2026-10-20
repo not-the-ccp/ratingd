@@ -16,6 +16,7 @@ type CreateCustomerRequest struct {
 	CreditLimit     money.Amount `json:"credit_limit"`
 	ExternalRef     string       `json:"external_ref"`
 	BillingEmail    string       `json:"billing_email"`
+	IBAN            string       `json:"iban"`
 }
 
 type CustomerResponse struct {
@@ -34,6 +35,7 @@ type CustomerResponse struct {
 	UpdatedAt       time.Time      `json:"updated_at"`
 	ExternalRef     string         `json:"external_ref"`
 	BillingEmail    string         `json:"billing_email"`
+	IBAN            string         `json:"iban"`
 }
 
 // Validate checks the request before it reaches the service.
@@ -70,6 +72,7 @@ func toCustomerResponse(customer *Customer) CustomerResponse {
 		UpdatedAt:       customer.UpdatedAt,
 		ExternalRef:     customer.ExternalRef,
 		BillingEmail:    customer.BillingEmail,
+		IBAN:            customer.IBAN,
 	}
 }
 
