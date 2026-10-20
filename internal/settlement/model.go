@@ -2,6 +2,7 @@ package settlement
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 	"time"
 
@@ -77,4 +78,10 @@ func ParseSettlementStatus(s string) (SettlementStatus, error) {
 	default:
 		return "", fmt.Errorf("unknown settlement status %q", s)
 	}
+}
+
+func sortSettlementsByPeriodEnd(items []*Settlement) {
+	sort.Slice(items, func(i int, j int) bool {
+		return items[i].PeriodEnd.Before(items[j].PeriodEnd)
+	})
 }
