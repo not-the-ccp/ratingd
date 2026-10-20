@@ -673,6 +673,8 @@ components:
           type: string
         billing_email:
           type: string
+        iban:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -682,22 +684,22 @@ components:
       properties:
         id:
           type: number
-        city:
-          type: string
+        primary:
+          type: number
         street:
           type: string
-        country:
-          type: string
-        zip:
-          type: string
-        primary:
+        customer_id:
           type: number
         region:
           type: string
         attention:
           type: string
-        customer_id:
-          type: number
+        country:
+          type: string
+        zip:
+          type: string
+        city:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -815,27 +817,27 @@ components:
       properties:
         id:
           type: number
-        valid_from:
-          type: number
-        customer_id:
-          type: number
-        status:
-          type: string
         valid_to:
-          type: number
-        discount_percent:
           type: number
         reference:
           type: string
         terminated_at:
           type: number
-        signed_by:
+        customer_id:
+          type: number
+        status:
           type: string
         signed_at:
           type: number
-        tariff_id:
+        discount_percent:
           type: number
         minimum_charge:
+          type: number
+        signed_by:
+          type: string
+        valid_from:
+          type: number
+        tariff_id:
           type: number
         created_at:
           type: number
@@ -885,16 +887,16 @@ components:
       properties:
         id:
           type: number
-        occurred_at:
-          type: number
-        code:
-          type: string
         source:
+          type: string
+        location:
+          type: string
+        code:
           type: string
         shipment_id:
           type: number
-        location:
-          type: string
+        occurred_at:
+          type: number
         created_at:
           type: number
         updated_at:
@@ -1037,25 +1039,27 @@ components:
       properties:
         id:
           type: number
-        status:
+        payment_run:
           type: string
         deductions:
+          type: number
+        status:
+          type: string
+        released_at:
+          type: number
+        retention_percent:
+          type: number
+        remark:
+          type: string
+        gross_amount:
           type: number
         carrier_id:
           type: number
         reviewed_at:
           type: number
-        released_at:
+        period_start:
           type: number
         period_end:
-          type: number
-        gross_amount:
-          type: number
-        remark:
-          type: string
-        retention_percent:
-          type: number
-        period_start:
           type: number
         created_at:
           type: number

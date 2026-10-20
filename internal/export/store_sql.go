@@ -46,14 +46,6 @@ func (s *SQLStore) ListBatchesByStatus(ctx context.Context, status BatchStatus) 
 	return batches, rows.Err()
 }
 
-func (s *SQLStore) InsertBatch(ctx context.Context, batch *Batch) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO batches (row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, batch.RowCount, batch.FailedAt, batch.FinishedAt, batch.Status, batch.FileName, batch.Kind, batch.StartedAt, batch.CreatedAt, batch.UpdatedAt).Scan(&batch.ID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (s *SQLStore) UpdateBatch(ctx context.Context, batch *Batch) error {
 	res, err := s.db.ExecContext(ctx, `UPDATE batches SET row_count = $2, failed_at = $3, finished_at = $4, status = $5, file_name = $6, kind = $7, started_at = $8, updated_at = $9 WHERE id = $1`, batch.ID, batch.RowCount, batch.FailedAt, batch.FinishedAt, batch.Status, batch.FileName, batch.Kind, batch.StartedAt, batch.UpdatedAt)
 	if err != nil {
@@ -67,6 +59,14 @@ func (s *SQLStore) UpdateBatch(ctx context.Context, batch *Batch) error {
 	if rows == 0 {
 		return ErrNotFound
 	}
+	return nil
+}
+
+func (s *SQLStore) InsertBatch(ctx context.Context, batch *Batch) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO batches (row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, batch.RowCount, batch.FailedAt, batch.FinishedAt, batch.Status, batch.FileName, batch.Kind, batch.StartedAt, batch.CreatedAt, batch.UpdatedAt).Scan(&batch.ID); err != nil {
+		return err
+	}
+
 	return nil
 }
 

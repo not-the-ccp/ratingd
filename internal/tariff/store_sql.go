@@ -12,19 +12,9 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE tariffs SET retired_at = $2, published_at = $3, currency = $4, description = $5, valid_to = $6, status = $7, code = $8, rounding_mode = $9, base_zone = $10, valid_from = $11, region = $12, minimum_charge = $13, updated_at = $14 WHERE id = $1`, tariff.ID, tariff.RetiredAt, tariff.PublishedAt, tariff.Currency, tariff.Description, tariff.ValidTo, tariff.Status, tariff.ShortCode, tariff.RoundingMode, tariff.BaseZone, tariff.ValidFrom, tariff.Region, tariff.MinimumCharge, tariff.UpdatedAt)
-	if err != nil {
+func (s *SQLStore) InsertWeightBreak(ctx context.Context, breakVal *WeightBreak) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO weight_breaks (minimum_amount, from_kg, zone, rate_per_kg, tariff_id, to_kg, loading_meter_rate, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, breakVal.MinimumAmount, breakVal.FromKg, breakVal.Zone, breakVal.RatePerKg, breakVal.TariffID, breakVal.ToKg, breakVal.LoadingMeterRate, breakVal.CreatedAt, breakVal.UpdatedAt).Scan(&breakVal.ID); err != nil {
 		return err
-	}
-
-	// we need this for the checks below: rows affected
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if rows == 0 {
-		return ErrNotFound
 	}
 	return nil
 }
@@ -193,9 +183,19 @@ func (s *SQLStore) ListTariffsByStatus(ctx context.Context, status TariffStatus)
 	return tariffs, rows.Err()
 }
 
-func (s *SQLStore) InsertWeightBreak(ctx context.Context, breakVal *WeightBreak) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO weight_breaks (minimum_amount, from_kg, zone, rate_per_kg, tariff_id, to_kg, loading_meter_rate, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`, breakVal.MinimumAmount, breakVal.FromKg, breakVal.Zone, breakVal.RatePerKg, breakVal.TariffID, breakVal.ToKg, breakVal.LoadingMeterRate, breakVal.CreatedAt, breakVal.UpdatedAt).Scan(&breakVal.ID); err != nil {
+func (s *SQLStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE tariffs SET retired_at = $2, published_at = $3, currency = $4, description = $5, valid_to = $6, status = $7, code = $8, rounding_mode = $9, base_zone = $10, valid_from = $11, region = $12, minimum_charge = $13, updated_at = $14 WHERE id = $1`, tariff.ID, tariff.RetiredAt, tariff.PublishedAt, tariff.Currency, tariff.Description, tariff.ValidTo, tariff.Status, tariff.ShortCode, tariff.RoundingMode, tariff.BaseZone, tariff.ValidFrom, tariff.Region, tariff.MinimumCharge, tariff.UpdatedAt)
+	if err != nil {
 		return err
+	}
+
+	// we need this for the checks below: rows affected
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return ErrNotFound
 	}
 	return nil
 }
