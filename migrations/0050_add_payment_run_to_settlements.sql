@@ -1,0 +1,1 @@
+ALTER TABLE settlements ADD COLUMN payment_run TEXT NOT NULL DEFAULT '';

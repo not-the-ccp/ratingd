@@ -74,6 +74,7 @@ func (s *Service) CreateSettlement(ctx context.Context, req *CreateSettlementReq
 		Deductions:       req.Deductions,
 		RetentionPercent: req.RetentionPercent,
 		Remark:           req.Remark,
+		PaymentRun:       req.PaymentRun,
 		CreatedAt:        now,
 		UpdatedAt:        now,
 	}
