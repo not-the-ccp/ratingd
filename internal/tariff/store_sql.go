@@ -36,7 +36,7 @@ func (s *SQLStore) InsertFuelSurcharge(ctx context.Context, surcharge *FuelSurch
 	return nil
 }
 
-func (s *SQLStore) FetchWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
+func (s *SQLStore) LoadWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, minimum_amount, from_kg, zone, rate_per_kg, tariff_id, to_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks WHERE id = $1`, id)
 	var breakEntry WeightBreak
 	if err := row.Scan(&breakEntry.ID, &breakEntry.MinimumAmount, &breakEntry.FromKg, &breakEntry.Zone, &breakEntry.RatePerKg, &breakEntry.TariffID, &breakEntry.ToKg, &breakEntry.LoadingMeterRate, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
@@ -120,7 +120,7 @@ func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64
 }
 
 // FindTariff implements Store.
-func (s *SQLStore) FetchTariff(ctx context.Context, id int64) (*Tariff, error) {
+func (s *SQLStore) LoadTariff(ctx context.Context, id int64) (*Tariff, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, retired_at, published_at, currency, description, valid_to, status, code, rounding_mode, base_zone, valid_from, region, minimum_charge, created_at, updated_at FROM tariffs WHERE id = $1`, id)
 	var tariff Tariff
 	if err := row.Scan(&tariff.ID, &tariff.RetiredAt, &tariff.PublishedAt, &tariff.Currency, &tariff.Description, &tariff.ValidTo, &tariff.Status, &tariff.ShortCode, &tariff.RoundingMode, &tariff.BaseZone, &tariff.ValidFrom, &tariff.Region, &tariff.MinimumCharge, &tariff.CreatedAt, &tariff.UpdatedAt); err != nil {
@@ -223,7 +223,7 @@ func (s *SQLStore) ListFuelSurcharges(ctx context.Context, limit int, offset int
 	return fuelSurcharges, rows.Err()
 }
 
-func (s *SQLStore) FetchFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+func (s *SQLStore) LoadFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, valid_from, diesel_price, floor, tariff_id, source, percent, created_at, updated_at FROM fuel_surcharges WHERE id = $1`, id)
 	var surcharge FuelSurcharge
 	if err := row.Scan(&surcharge.ID, &surcharge.ValidFrom, &surcharge.DieselPrice, &surcharge.Floor, &surcharge.TariffID, &surcharge.Source, &surcharge.Percent, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {

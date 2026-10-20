@@ -6,12 +6,12 @@ import (
 
 // Store persists shipment data.
 type Store interface {
-	FetchShipment(ctx context.Context, id int64) (*Shipment, error)
+	LoadShipment(ctx context.Context, id int64) (*Shipment, error)
 	ListShipments(ctx context.Context, limit int, offset int) ([]*Shipment, error)
 	ListShipmentsByStatus(ctx context.Context, status ShipmentStatus) ([]*Shipment, error)
 	InsertShipment(ctx context.Context, shipment *Shipment) error
 	UpdateShipment(ctx context.Context, shipment *Shipment) error
-	FetchTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error)
+	LoadTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error)
 	ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error)
 	ListTrackingEventsForShipment(ctx context.Context, shipmentID int64) ([]*TrackingEvent, error)
 	InsertTrackingEvent(ctx context.Context, event *TrackingEvent) error

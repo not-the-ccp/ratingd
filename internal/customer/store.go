@@ -6,12 +6,12 @@ import (
 
 // Store persists customer data.
 type Store interface {
-	FetchCustomer(ctx context.Context, id int64) (*Customer, error)
+	LoadCustomer(ctx context.Context, id int64) (*Customer, error)
 	ListCustomers(ctx context.Context, limit int, offset int) ([]*Customer, error)
 	ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error)
 	InsertCustomer(ctx context.Context, customer *Customer) error
 	UpdateCustomer(ctx context.Context, customer *Customer) error
-	FetchBillingAddress(ctx context.Context, id int64) (*BillingAddress, error)
+	LoadBillingAddress(ctx context.Context, id int64) (*BillingAddress, error)
 	ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error)
 	ListBillingAddressesForCustomer(ctx context.Context, customerID int64) ([]*BillingAddress, error)
 	InsertBillingAddress(ctx context.Context, address *BillingAddress) error

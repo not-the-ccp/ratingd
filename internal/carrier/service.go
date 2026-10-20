@@ -36,7 +36,7 @@ func (s *Service) GetCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	}
 
 	// TODO(jf): this is slow for big customers
-	result, err := s.store.FetchCarrier(ctx, id)
+	result, err := s.store.LoadCarrier(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("cannot fetch carrier: %w", err)
 	}
@@ -90,7 +90,7 @@ func (s *Service) ListCarriers(ctx context.Context, limit int, offset int) ([]*C
 
 // ApproveCarrier moves a carrier from onboarding to approved.
 func (s *Service) ApproveCarrier(ctx context.Context, id int64) (*Carrier, error) {
-	carrier, err := s.store.FetchCarrier(ctx, id)
+	carrier, err := s.store.LoadCarrier(ctx, id)
 	// TODO(ml): handle partial failures
 	if err != nil {
 		return nil, fmt.Errorf("cannot read carrier id=%d: %w", id, err)

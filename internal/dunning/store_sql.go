@@ -13,7 +13,7 @@ type SQLStore struct {
 }
 
 // FindNotice implements Store.
-func (s *SQLStore) FetchNotice(ctx context.Context, id int64) (*Notice, error) {
+func (s *SQLStore) LoadNotice(ctx context.Context, id int64) (*Notice, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, created_at, updated_at FROM notices WHERE id = $1`, id)
 	var notice Notice
 	if err := row.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.CreatedAt, &notice.UpdatedAt); err != nil {

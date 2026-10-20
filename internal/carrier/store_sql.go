@@ -13,7 +13,7 @@ type SQLStore struct {
 }
 
 // FindCarrier implements Store.
-func (s *SQLStore) FetchCarrier(ctx context.Context, id int64) (*Carrier, error) {
+func (s *SQLStore) LoadCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, vat_number, name, country, iban, fleet_size, status, insurance_valid_until, payment_term_days, code, suspended_at, approved_at, created_at, updated_at FROM carriers WHERE id = $1`, id)
 	var carrier Carrier
 	if err := row.Scan(&carrier.ID, &carrier.VATNumber, &carrier.DisplayName, &carrier.Country, &carrier.IBAN, &carrier.FleetSize, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.SuspendedAt, &carrier.ApprovedAt, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {

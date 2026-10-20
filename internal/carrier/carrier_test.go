@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchCarrier(ctx context.Context, id int64) (*Carrier, error) {
+func (f *fakeStore) LoadCarrier(ctx context.Context, id int64) (*Carrier, error) {
 	return nil, f.err
 }
 

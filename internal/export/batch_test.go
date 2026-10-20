@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchBatch(ctx context.Context, id int64) (*Batch, error) {
+func (f *fakeStore) LoadBatch(ctx context.Context, id int64) (*Batch, error) {
 	return nil, f.err
 }
 

@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchSettlement(ctx context.Context, id int64) (*Settlement, error) {
+func (f *fakeStore) LoadSettlement(ctx context.Context, id int64) (*Settlement, error) {
 	return nil, f.err
 }
 
@@ -33,7 +33,7 @@ func (f *fakeStore) UpdateSettlement(ctx context.Context, settlement *Settlement
 	return f.err
 }
 
-func (f *fakeStore) FetchSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
+func (f *fakeStore) LoadSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
 	return nil, f.err
 }
 

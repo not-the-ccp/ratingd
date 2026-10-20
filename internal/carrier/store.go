@@ -6,7 +6,7 @@ import (
 
 // Store persists carrier data.
 type Store interface {
-	FetchCarrier(ctx context.Context, id int64) (*Carrier, error)
+	LoadCarrier(ctx context.Context, id int64) (*Carrier, error)
 	ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error)
 	ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error)
 	InsertCarrier(ctx context.Context, carrier *Carrier) error

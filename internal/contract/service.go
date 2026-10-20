@@ -37,7 +37,7 @@ func (s *Service) GetContract(ctx context.Context, id int64) (*Contract, error) 
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	result, err := s.store.FetchContract(ctx, id)
+	result, err := s.store.LoadContract(ctx, id)
 	trf, err := s.tariffs.GetTariff(ctx, result.TariffID)
 	if err != nil {
 		return nil, fmt.Errorf("could not load tariff id=%d: %w", result.TariffID, err)
@@ -97,7 +97,7 @@ func (s *Service) ListContracts(ctx context.Context, limit int, offset int) ([]*
 func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error) {
 	// old contracts still rely on this
 
-	contract, err := s.store.FetchContract(ctx, id)
+	contract, err := s.store.LoadContract(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not load contract id=%d: %w", id, err)
 	}
@@ -129,7 +129,7 @@ func (s *Service) SignContract(ctx context.Context, id int64) (*Contract, error)
 
 // TerminateContract performs the terminate contract step.
 func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, error) {
-	contract, err := s.store.FetchContract(ctx, id)
+	contract, err := s.store.LoadContract(ctx, id)
 	trf, err := s.tariffs.GetTariff(ctx, contract.TariffID)
 	if err != nil {
 		return nil, fmt.Errorf("could not read tariff id=%d: %w", contract.TariffID, err)

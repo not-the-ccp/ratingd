@@ -6,7 +6,7 @@ import (
 
 // Store persists dunning data.
 type Store interface {
-	FetchNotice(ctx context.Context, id int64) (*Notice, error)
+	LoadNotice(ctx context.Context, id int64) (*Notice, error)
 	ListNotices(ctx context.Context, limit int, offset int) ([]*Notice, error)
 	ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error)
 	InsertNotice(ctx context.Context, notice *Notice) error

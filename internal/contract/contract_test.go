@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchContract(ctx context.Context, id int64) (*Contract, error) {
+func (f *fakeStore) LoadContract(ctx context.Context, id int64) (*Contract, error) {
 	return nil, f.err
 }
 

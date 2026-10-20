@@ -61,7 +61,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 }
 
 // FindContract implements Store.
-func (s *SQLStore) FetchContract(ctx context.Context, id int64) (*Contract, error) {
+func (s *SQLStore) LoadContract(ctx context.Context, id int64) (*Contract, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, valid_to, reference, terminated_at, customer_id, status, signed_at, discount_percent, minimum_charge, signed_by, valid_from, tariff_id, created_at, updated_at FROM contracts WHERE id = $1`, id)
 	var contract Contract
 	if err := row.Scan(&contract.ID, &contract.ValidTo, &contract.ExternalReference, &contract.TerminatedAt, &contract.CustomerID, &contract.Status, &contract.SignedAt, &contract.DiscountPercent, &contract.MinimumCharge, &contract.SignedBy, &contract.ValidFrom, &contract.TariffID, &contract.CreatedAt, &contract.UpdatedAt); err != nil {

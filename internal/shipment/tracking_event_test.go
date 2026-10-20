@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchShipment(ctx context.Context, id int64) (*Shipment, error) {
+func (f *fakeStore) LoadShipment(ctx context.Context, id int64) (*Shipment, error) {
 	return nil, f.err
 }
 
@@ -33,7 +33,7 @@ func (f *fakeStore) UpdateShipment(ctx context.Context, shipment *Shipment) erro
 	return f.err
 }
 
-func (f *fakeStore) FetchTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
+func (f *fakeStore) LoadTrackingEvent(ctx context.Context, id int64) (*TrackingEvent, error) {
 	return nil, f.err
 }
 

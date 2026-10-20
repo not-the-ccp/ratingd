@@ -37,7 +37,7 @@ func (s *Service) GetNotice(ctx context.Context, id int64) (*Notice, error) {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	notice, err := s.store.FetchNotice(ctx, id)
+	notice, err := s.store.LoadNotice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not get notice: %w", err)
 	}
@@ -91,7 +91,7 @@ func (s *Service) ListNotices(ctx context.Context, limit int, offset int) ([]*No
 func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 	// old contracts still rely on this
 	// edge case from the dunning import
-	notice, err := s.store.FetchNotice(ctx, id)
+	notice, err := s.store.LoadNotice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not read notice id=%d: %w", id, err)
 	}
@@ -130,7 +130,7 @@ func updateNoticeStatus(notice *Notice, now time.Time) {
 // ResolveNotice moves a notice from sent to resolved.
 func (s *Service) ResolveNotice(ctx context.Context, id int64) (*Notice, error) {
 	// edge case from the dunning import
-	notice, err := s.store.FetchNotice(ctx, id)
+	notice, err := s.store.LoadNotice(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not read notice id=%d: %w", id, err)
 	}

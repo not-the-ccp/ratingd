@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchTariff(ctx context.Context, id int64) (*Tariff, error) {
+func (f *fakeStore) LoadTariff(ctx context.Context, id int64) (*Tariff, error) {
 	return nil, f.err
 }
 
@@ -33,7 +33,7 @@ func (f *fakeStore) UpdateTariff(ctx context.Context, tariff *Tariff) error {
 	return f.err
 }
 
-func (f *fakeStore) FetchWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
+func (f *fakeStore) LoadWeightBreak(ctx context.Context, id int64) (*WeightBreak, error) {
 	return nil, f.err
 }
 
@@ -53,7 +53,7 @@ func (f *fakeStore) UpdateWeightBreak(ctx context.Context, breakVal *WeightBreak
 	return f.err
 }
 
-func (f *fakeStore) FetchFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
+func (f *fakeStore) LoadFuelSurcharge(ctx context.Context, id int64) (*FuelSurcharge, error) {
 	return nil, f.err
 }
 

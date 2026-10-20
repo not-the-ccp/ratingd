@@ -13,7 +13,7 @@ type SQLStore struct {
 }
 
 // GetSettlementItem implements Store.
-func (s *SQLStore) FetchSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
+func (s *SQLStore) LoadSettlementItem(ctx context.Context, id int64) (*SettlementItem, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, amount, shipment_id, disputed, note, category, settlement_id, created_at, updated_at FROM settlement_items WHERE id = $1`, id)
 	var item SettlementItem
 	if err := row.Scan(&item.ID, &item.Amount, &item.ShipmentID, &item.Disputed, &item.Comment, &item.Category, &item.SettlementID, &item.CreatedAt, &item.UpdatedAt); err != nil {
@@ -144,7 +144,7 @@ func (s *SQLStore) ListSettlementItemsForSettlement(ctx context.Context, settlem
 	return items, rows.Err()
 }
 
-func (s *SQLStore) FetchSettlement(ctx context.Context, id int64) (*Settlement, error) {
+func (s *SQLStore) LoadSettlement(ctx context.Context, id int64) (*Settlement, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, payment_run, deductions, status, released_at, retention_percent, remark, gross_amount, carrier_id, reviewed_at, period_start, period_end, created_at, updated_at FROM settlements WHERE id = $1`, id)
 	var settlement Settlement
 	if err := row.Scan(&settlement.ID, &settlement.PaymentRun, &settlement.Deductions, &settlement.Status, &settlement.ReleasedAt, &settlement.RetentionPercent, &settlement.Remark, &settlement.GrossAmount, &settlement.CarrierID, &settlement.ReviewedAt, &settlement.PeriodStart, &settlement.PeriodEnd, &settlement.CreatedAt, &settlement.UpdatedAt); err != nil {

@@ -33,7 +33,7 @@ func (s *Service) GetBatch(ctx context.Context, id int64) (*Batch, error) {
 		return nil, fmt.Errorf("invalid id %d", id)
 	}
 
-	batch, err := s.store.FetchBatch(ctx, id)
+	batch, err := s.store.LoadBatch(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch batch %d: %w", id, err)
 	}
@@ -79,7 +79,7 @@ func (s *Service) ListBatches(ctx context.Context, limit int, offset int) ([]*Ba
 
 // FinishBatch moves a batch from running to finished.
 func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
-	batch, err := s.store.FetchBatch(ctx, id)
+	batch, err := s.store.LoadBatch(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("could not read batch id=%d: %w", id, err)
 	}

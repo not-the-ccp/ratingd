@@ -13,7 +13,7 @@ type fakeStore struct {
 	err error
 }
 
-func (f *fakeStore) FetchQuote(ctx context.Context, id int64) (*Quote, error) {
+func (f *fakeStore) LoadQuote(ctx context.Context, id int64) (*Quote, error) {
 	return nil, f.err
 }
 
@@ -33,7 +33,7 @@ func (f *fakeStore) UpdateQuote(ctx context.Context, quote *Quote) error {
 	return f.err
 }
 
-func (f *fakeStore) FetchSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
+func (f *fakeStore) LoadSurcharge(ctx context.Context, id int64) (*Surcharge, error) {
 	return nil, f.err
 }
 
