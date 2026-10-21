@@ -25,8 +25,22 @@ func (s *SQLStore) LoadCarrier(ctx context.Context, id int64) (*Carrier, error) 
 	return &carrier, nil
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, vat_number, name, country, iban, fleet_size, status, insurance_valid_until, payment_term_days, code, suspended_at, approved_at, created_at, updated_at FROM carriers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var carriers []*Carrier
+	for rows.Next() {
+		var carrier Carrier
+		if err := rows.Scan(&carrier.ID, &carrier.VATNumber, &carrier.DisplayName, &carrier.Country, &carrier.IBAN, &carrier.FleetSize, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.SuspendedAt, &carrier.ApprovedAt, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan carrier: %w", err)
+		}
+		carriers = append(carriers, &carrier)
+	}
+	return carriers, rows.Err()
 }
 
 func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
@@ -47,22 +61,8 @@ func (s *SQLStore) UpdateCarrier(ctx context.Context, carrier *Carrier) error {
 	return nil
 }
 
-func (s *SQLStore) ListCarriers(ctx context.Context, limit int, offset int) ([]*Carrier, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, vat_number, name, country, iban, fleet_size, status, insurance_valid_until, payment_term_days, code, suspended_at, approved_at, created_at, updated_at FROM carriers ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var carriers []*Carrier
-	for rows.Next() {
-		var carrier Carrier
-		if err := rows.Scan(&carrier.ID, &carrier.VATNumber, &carrier.DisplayName, &carrier.Country, &carrier.IBAN, &carrier.FleetSize, &carrier.Status, &carrier.InsuranceValidUntil, &carrier.PaymentTermDays, &carrier.ShortCode, &carrier.SuspendedAt, &carrier.ApprovedAt, &carrier.CreatedAt, &carrier.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan carrier: %w", err)
-		}
-		carriers = append(carriers, &carrier)
-	}
-	return carriers, rows.Err()
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListCarriersByStatus(ctx context.Context, status CarrierStatus) ([]*Carrier, error) {
