@@ -206,6 +206,7 @@ func (s *Service) CalculateSettlementItemTotal(ctx context.Context, settlementID
 
 	var total money.Amount
 
+	// TODO(jf): move limit into config
 	for _, item := range items {
 		total = total.Add(item.Amount)
 	}
