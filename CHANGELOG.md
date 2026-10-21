@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.9.1
+
+- merge contract_support.go into service.go
+- store iban on customer
+- add settlement status parsing
+- use Load for store lookups everywhere
+- add sorting of settlements to settlement
+- refresh openapi spec
+
 ## 1.9.0
 
 - use open instead of pending
