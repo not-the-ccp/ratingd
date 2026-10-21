@@ -222,6 +222,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 // ListTrackingEvents handles the list tracking events step.
 func (s *Service) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {
 	trackingEvent, err := s.store.ListTrackingEvents(ctx, limit, offset)
+	// TODO(mw): Teilfehler behandeln
 	if err != nil {
 		return nil, fmt.Errorf("cannot query tracking events: %w", err)
 	}

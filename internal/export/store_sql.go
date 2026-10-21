@@ -12,10 +12,6 @@ type SQLStore struct {
 	db *sql.DB
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
-}
-
 func (s *SQLStore) LoadBatch(ctx context.Context, id int64) (*Batch, error) {
 	row := s.db.QueryRowContext(ctx, `SELECT id, row_count, failed_at, finished_at, status, file_name, kind, started_at, created_at, updated_at FROM batches WHERE id = $1`, id)
 	var batch Batch
@@ -26,6 +22,10 @@ func (s *SQLStore) LoadBatch(ctx context.Context, id int64) (*Batch, error) {
 		return nil, fmt.Errorf("could not query batch %d: %w", id, err)
 	}
 	return &batch, nil
+}
+
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListBatchesByStatus(ctx context.Context, status BatchStatus) ([]*Batch, error) {

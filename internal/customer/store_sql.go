@@ -51,8 +51,24 @@ func (s *SQLStore) InsertBillingAddress(ctx context.Context, address *BillingAdd
 	return nil
 }
 
-func NewSQLStore(db *sql.DB) *SQLStore {
-	return &SQLStore{db: db}
+// ListCustomersByStatus implements Store.
+func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, activated_at, external_ref, vat_number, name, closed_at, blocked_at, number, status, country, iban, payment_term_days, credit_limit, billing_email, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var customers []*Customer
+	for rows.Next() {
+		var customer Customer
+		if err := rows.Scan(&customer.ID, &customer.ActivatedAt, &customer.ExternalRef, &customer.VATNumber, &customer.DisplayName, &customer.ClosedAt, &customer.BlockedAt, &customer.DocumentNumber, &customer.Status, &customer.Country, &customer.IBAN, &customer.PaymentTermDays, &customer.CreditLimit, &customer.BillingEmail, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan customer: %w", err)
+		}
+		customers = append(customers, &customer)
+	}
+	return customers, rows.Err()
 }
 
 // InsertCustomer implements Store.
@@ -76,24 +92,8 @@ func (s *SQLStore) LoadCustomer(ctx context.Context, id int64) (*Customer, error
 	return &customer, nil
 }
 
-// ListCustomersByStatus implements Store.
-func (s *SQLStore) ListCustomersByStatus(ctx context.Context, status CustomerStatus) ([]*Customer, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, activated_at, external_ref, vat_number, name, closed_at, blocked_at, number, status, country, iban, payment_term_days, credit_limit, billing_email, created_at, updated_at FROM customers WHERE status = $1 ORDER BY id`, status)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	var customers []*Customer
-	for rows.Next() {
-		var customer Customer
-		if err := rows.Scan(&customer.ID, &customer.ActivatedAt, &customer.ExternalRef, &customer.VATNumber, &customer.DisplayName, &customer.ClosedAt, &customer.BlockedAt, &customer.DocumentNumber, &customer.Status, &customer.Country, &customer.IBAN, &customer.PaymentTermDays, &customer.CreditLimit, &customer.BillingEmail, &customer.CreatedAt, &customer.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan customer: %w", err)
-		}
-		customers = append(customers, &customer)
-	}
-	return customers, rows.Err()
+func NewSQLStore(db *sql.DB) *SQLStore {
+	return &SQLStore{db: db}
 }
 
 func (s *SQLStore) ListBillingAddresses(ctx context.Context, limit int, offset int) ([]*BillingAddress, error) {

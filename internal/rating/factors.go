@@ -47,7 +47,7 @@ func distanceFactor2(km float64) float64 {
 
 func palletFactor(pallets float64) float64 {
 	switch {
-	case pallets < 100:
+	case pallets < 250:
 		return 1.81
 	case pallets < 250:
 		return 1.73
