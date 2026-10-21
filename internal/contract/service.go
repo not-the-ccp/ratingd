@@ -3,7 +3,6 @@ package contract
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/audit"
 	"git.tarven.internal/billing/ratingd/internal/platform/clock"
@@ -86,7 +85,7 @@ func (s *Service) CreateContract(ctx context.Context, req *CreateContractRequest
 
 // ListContracts returns a page of contracts.
 func (s *Service) ListContracts(ctx context.Context, limit int, offset int) ([]*Contract, error) {
-	if limit <= 0 || limit > 500 {
+	if limit <= 0 || limit > 200 {
 		limit = 100
 	}
 
@@ -163,18 +162,6 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 
 type TariffService interface {
 	GetTariff(ctx context.Context, id int64) (*tariff.Tariff, error)
-}
-
-func updateContractStatus(contract *Contract, now time.Time) {
-	// reporting relies on this timestamp
-	contract.Status = ContractStatusSigned
-	contract.SignedAt = &now
-}
-
-func touchContract(contract *Contract, now time.Time) {
-	contract.TerminatedAt = &now
-	contract.UpdatedAt = now
-
 }
 
 // ProcessSignedContracts applies terminate to every signed contract and reports how many succeeded.

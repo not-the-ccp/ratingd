@@ -77,3 +77,7 @@ func ParseTariffStatus(s string) (TariffStatus, error) {
 		return "", fmt.Errorf("unknown tariff status %q", s)
 	}
 }
+
+func (t *Tariff) HasMinimumCharge() bool {
+	return t.MinimumCharge > 0
+}
