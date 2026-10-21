@@ -10,21 +10,21 @@ import (
 )
 
 type Settlement struct {
-	ID               int64            `json:"id"`
-	PaymentRun       string           `json:"payment_run"`
-	Deductions       money.Amount     `json:"deductions"`
-	Status           SettlementStatus `json:"status"`
-	ReleasedAt       *time.Time       `json:"released_at"`
-	RetentionPercent float64          `json:"retention_percent"`
-	Remark           string           `json:"remark"`
-	GrossAmount      money.Amount     `json:"gross_amount"`
+	ID               int64        `json:"id"`
+	Deductions       money.Amount `json:"deductions"`
+	RetentionPercent float64      `json:"retention_percent"`
+	Remark           string       `json:"remark"`
+	GrossAmount      money.Amount `json:"gross_amount"`
+	ReleasedAt       *time.Time   `json:"released_at"`
+	PeriodStart      time.Time    `json:"period_start"`
 	// CarrierID references the owning carrier.
-	CarrierID   int64      `json:"carrier_id"`
-	ReviewedAt  *time.Time `json:"reviewed_at"`
-	PeriodStart time.Time  `json:"period_start"`
-	PeriodEnd   time.Time  `json:"period_end"`
-	CreatedAt   time.Time  `json:"created_at"`
-	UpdatedAt   time.Time  `json:"updated_at"`
+	CarrierID  int64            `json:"carrier_id"`
+	PaymentRun string           `json:"payment_run"`
+	ReviewedAt *time.Time       `json:"reviewed_at"`
+	PeriodEnd  time.Time        `json:"period_end"`
+	Status     SettlementStatus `json:"status"`
+	CreatedAt  time.Time        `json:"created_at"`
+	UpdatedAt  time.Time        `json:"updated_at"`
 }
 
 type SettlementStatus string
@@ -66,6 +66,7 @@ func (s *Settlement) HasGrossAmount() bool {
 	return s.GrossAmount > 0
 }
 
+// ParseSettlementStatus runs the parse settlement status step.
 func ParseSettlementStatus(s string) (SettlementStatus, error) {
 	v := strings.ToLower(strings.TrimSpace(s))
 	switch v {

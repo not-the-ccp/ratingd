@@ -38,23 +38,22 @@ func (s *SQLStore) LoadWeightBreak(ctx context.Context, id int64) (*WeightBreak,
 	return &breakEntry, nil
 }
 
-func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, minimum_amount, from_kg, zone, rate_per_kg, tariff_id, to_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, valid_from, diesel_price, floor, tariff_id, source, percent, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to list weight breaks: %w", err)
+		return nil, err
 	}
-
 	defer rows.Close()
 
-	var breakEntries []*WeightBreak
+	var surcharges []*FuelSurcharge
 	for rows.Next() {
-		var breakEntry WeightBreak
-		if err := rows.Scan(&breakEntry.ID, &breakEntry.MinimumAmount, &breakEntry.FromKg, &breakEntry.Zone, &breakEntry.RatePerKg, &breakEntry.TariffID, &breakEntry.ToKg, &breakEntry.LoadingMeterRate, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan weight break: %w", err)
+		var surcharge FuelSurcharge
+		if err := rows.Scan(&surcharge.ID, &surcharge.ValidFrom, &surcharge.DieselPrice, &surcharge.Floor, &surcharge.TariffID, &surcharge.Source, &surcharge.Percent, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan fuel surcharge: %w", err)
 		}
-		breakEntries = append(breakEntries, &breakEntry)
+		surcharges = append(surcharges, &surcharge)
 	}
-	return breakEntries, rows.Err()
+	return surcharges, rows.Err()
 }
 
 func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurcharge) error {
@@ -73,22 +72,23 @@ func (s *SQLStore) UpdateFuelSurcharge(ctx context.Context, surcharge *FuelSurch
 	return nil
 }
 
-func (s *SQLStore) ListFuelSurchargesForTariff(ctx context.Context, tariffID int64) ([]*FuelSurcharge, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, valid_from, diesel_price, floor, tariff_id, source, percent, created_at, updated_at FROM fuel_surcharges WHERE tariff_id = $1 ORDER BY id`, tariffID)
+func (s *SQLStore) ListWeightBreaks(ctx context.Context, limit int, offset int) ([]*WeightBreak, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, minimum_amount, from_kg, zone, rate_per_kg, tariff_id, to_kg, loading_meter_rate, created_at, updated_at FROM weight_breaks ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to list weight breaks: %w", err)
 	}
+
 	defer rows.Close()
 
-	var surcharges []*FuelSurcharge
+	var breakEntries []*WeightBreak
 	for rows.Next() {
-		var surcharge FuelSurcharge
-		if err := rows.Scan(&surcharge.ID, &surcharge.ValidFrom, &surcharge.DieselPrice, &surcharge.Floor, &surcharge.TariffID, &surcharge.Source, &surcharge.Percent, &surcharge.CreatedAt, &surcharge.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("failed to scan fuel surcharge: %w", err)
+		var breakEntry WeightBreak
+		if err := rows.Scan(&breakEntry.ID, &breakEntry.MinimumAmount, &breakEntry.FromKg, &breakEntry.Zone, &breakEntry.RatePerKg, &breakEntry.TariffID, &breakEntry.ToKg, &breakEntry.LoadingMeterRate, &breakEntry.CreatedAt, &breakEntry.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("failed to scan weight break: %w", err)
 		}
-		surcharges = append(surcharges, &surcharge)
+		breakEntries = append(breakEntries, &breakEntry)
 	}
-	return surcharges, rows.Err()
+	return breakEntries, rows.Err()
 }
 
 func (s *SQLStore) ListWeightBreaksForTariff(ctx context.Context, tariffID int64) ([]*WeightBreak, error) {
