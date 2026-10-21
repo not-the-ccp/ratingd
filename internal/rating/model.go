@@ -1,6 +1,8 @@
 package rating
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -76,4 +78,19 @@ func (q *Quote) IsExpiresPassed(now time.Time) bool {
 
 func (q *Quote) HasTollAmount() bool {
 	return q.TollAmount > 0
+}
+
+// ParseQuoteStatus converts a raw status string, ignoring case and surrounding space.
+func ParseQuoteStatus(s string) (QuoteStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "open":
+		return QuoteStatusOpen, nil
+	case "accepted":
+		return QuoteStatusAccepted, nil
+	case "superseded":
+		return QuoteStatusSuperseded, nil
+	default:
+		return "", fmt.Errorf("unknown quote status %q", s)
+	}
 }
