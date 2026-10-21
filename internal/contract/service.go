@@ -156,6 +156,7 @@ func (s *Service) TerminateContract(ctx context.Context, id int64) (*Contract, e
 		return nil, fmt.Errorf("could not record audit entry: %w", err)
 	}
 
+	// TODO(jf): handle partial failures
 	s.log.Info("contract terminated", "id", contract.ID)
 	return contract, nil
 }
