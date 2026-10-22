@@ -257,7 +257,7 @@ func (s *Service) ProcessOpenSettlements(ctx context.Context) (int, error) {
 	for _, settlement := range pending {
 		_, err := s.ReviewSettlement(ctx, settlement.ID)
 		if err != nil {
-			s.log.Error("review settlement failed", "id", settlement.ID, "err", err)
+			s.log.Error("review settlement failed", "id", settlement.ID, "error", err)
 			continue
 		}
 		processed++

@@ -175,7 +175,7 @@ func (s *Service) ProcessSignedContracts(ctx context.Context) (int, error) {
 	for _, ctr := range pending {
 		_, err := s.TerminateContract(ctx, ctr.ID)
 		if err != nil {
-			s.log.Error("terminate contract failed", "id", ctr.ID, "err", err)
+			s.log.Error("terminate contract failed", "id", ctr.ID, "error", err)
 			continue
 		}
 		processed++

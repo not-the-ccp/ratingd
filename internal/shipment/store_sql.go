@@ -34,11 +34,22 @@ func (s *SQLStore) UpdateTrackingEvent(ctx context.Context, event *TrackingEvent
 	return nil
 }
 
-func (s *SQLStore) InsertTrackingEvent(ctx context.Context, event *TrackingEvent) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO tracking_events (occurred_at, location, code, source, shipment_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, event.OccurredAt, event.Location, event.Code, event.Source, event.ShipmentID, event.CreatedAt, event.UpdatedAt).Scan(&event.ID); err != nil {
-		return fmt.Errorf("cannot insert tracking event: %w", err)
+func (s *SQLStore) ListTrackingEventsForShipment(ctx context.Context, shipmentID int64) ([]*TrackingEvent, error) {
+	rows, err := s.db.QueryContext(ctx, `SELECT id, occurred_at, location, code, source, shipment_id, created_at, updated_at FROM tracking_events WHERE shipment_id = $1 ORDER BY id`, shipmentID)
+	if err != nil {
+		return nil, fmt.Errorf("cannot list tracking events: %w", err)
 	}
-	return nil
+
+	defer rows.Close()
+	var events []*TrackingEvent
+	for rows.Next() {
+		var event TrackingEvent
+		if err := rows.Scan(&event.ID, &event.OccurredAt, &event.Location, &event.Code, &event.Source, &event.ShipmentID, &event.CreatedAt, &event.UpdatedAt); err != nil {
+			return nil, fmt.Errorf("cannot scan tracking event: %w", err)
+		}
+		events = append(events, &event)
+	}
+	return events, rows.Err()
 }
 
 func (s *SQLStore) ListShipmentsByStatus(ctx context.Context, status ShipmentStatus) ([]*Shipment, error) {
@@ -105,22 +116,11 @@ func (s *SQLStore) LoadShipment(ctx context.Context, id int64) (*Shipment, error
 	return &shipment, nil
 }
 
-func (s *SQLStore) ListTrackingEventsForShipment(ctx context.Context, shipmentID int64) ([]*TrackingEvent, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, occurred_at, location, code, source, shipment_id, created_at, updated_at FROM tracking_events WHERE shipment_id = $1 ORDER BY id`, shipmentID)
-	if err != nil {
-		return nil, fmt.Errorf("cannot list tracking events: %w", err)
+func (s *SQLStore) InsertTrackingEvent(ctx context.Context, event *TrackingEvent) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO tracking_events (occurred_at, location, code, source, shipment_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`, event.OccurredAt, event.Location, event.Code, event.Source, event.ShipmentID, event.CreatedAt, event.UpdatedAt).Scan(&event.ID); err != nil {
+		return fmt.Errorf("cannot insert tracking event: %w", err)
 	}
-
-	defer rows.Close()
-	var events []*TrackingEvent
-	for rows.Next() {
-		var event TrackingEvent
-		if err := rows.Scan(&event.ID, &event.OccurredAt, &event.Location, &event.Code, &event.Source, &event.ShipmentID, &event.CreatedAt, &event.UpdatedAt); err != nil {
-			return nil, fmt.Errorf("cannot scan tracking event: %w", err)
-		}
-		events = append(events, &event)
-	}
-	return events, rows.Err()
+	return nil
 }
 
 func (s *SQLStore) ListTrackingEvents(ctx context.Context, limit int, offset int) ([]*TrackingEvent, error) {

@@ -213,7 +213,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 	}
 
 	if err := s.audit.Record(ctx, "tracking_event.created", event.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "tracking_event.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "tracking_event.created", "error", err)
 	}
 
 	return event, nil
@@ -247,7 +247,7 @@ func (s *Service) ProcessPickedUpShipmentsGross(ctx context.Context) (int, error
 
 		_, err := s.DeliverShipment(ctx, shipment.ID)
 		if err != nil {
-			s.log.Error("deliver shipment failed", "id", shipment.ID, "err", err)
+			s.log.Error("deliver shipment failed", "id", shipment.ID, "error", err)
 			continue
 		}
 		processed++
@@ -276,7 +276,7 @@ func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
 	for _, shipment := range open {
 		_, err := s.PickupShipment(ctx, shipment.ID)
 		if err != nil {
-			s.log.Error("pickup shipment failed", "id", shipment.ID, "err", err)
+			s.log.Error("pickup shipment failed", "id", shipment.ID, "error", err)
 			continue
 		}
 		count++
@@ -296,7 +296,7 @@ func (s *Service) ProcessPickedUpShipments(ctx context.Context) (int, error) {
 	for _, shipment := range open {
 		_, err := s.DeliverShipment(ctx, shipment.ID)
 		if err != nil {
-			s.log.Error("deliver shipment failed", "id", shipment.ID, "err", err)
+			s.log.Error("deliver shipment failed", "id", shipment.ID, "error", err)
 			continue
 		}
 		processed++

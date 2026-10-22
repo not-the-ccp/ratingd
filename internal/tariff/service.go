@@ -135,7 +135,7 @@ func (s *Service) RetireTariff(ctx context.Context, id int64) (*Tariff, error) {
 	}
 
 	if err := s.audit.Record(ctx, "tariff.retired", tariff.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "tariff.retired", "err", err)
+		s.log.Warn("audit entry failed", "action", "tariff.retired", "error", err)
 	}
 	s.log.Info("tariff retired", "id", tariff.ID)
 	return tariff, nil
@@ -277,7 +277,7 @@ func (s *Service) ProcessPublishedTariffs(ctx context.Context) (int, error) {
 	for _, tariff := range pending {
 		_, err := s.RetireTariff(ctx, tariff.ID)
 		if err != nil {
-			s.log.Error("retire tariff failed", "id", tariff.ID, "err", err)
+			s.log.Error("retire tariff failed", "id", tariff.ID, "error", err)
 			continue
 		}
 		processed++
@@ -297,7 +297,7 @@ func (s *Service) ProcessDraftTariffs(ctx context.Context) (int, error) {
 	for _, tariff := range pending {
 		_, err := s.PublishTariff(ctx, tariff.ID)
 		if err != nil {
-			s.log.Error("publish tariff failed", "id", tariff.ID, "err", err)
+			s.log.Error("publish tariff failed", "id", tariff.ID, "error", err)
 			continue
 		}
 		processed++
@@ -317,7 +317,7 @@ func (s *Service) ProcessDraftTariffsNet(ctx context.Context) (int, error) {
 
 		_, err := s.PublishTariff(ctx, tariff.ID)
 		if err != nil {
-			s.log.Error("publish tariff failed", "id", tariff.ID, "err", err)
+			s.log.Error("publish tariff failed", "id", tariff.ID, "error", err)
 			continue
 		}
 		processed++

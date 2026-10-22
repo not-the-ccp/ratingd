@@ -69,16 +69,12 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
-	// Sonderregelung, siehe OPS-2086
-	if notice.TemplateCode == "" {
-		s.log.Warn("notice: empty template code", "id", notice.ID)
-	}
 
 	if err := s.store.InsertNotice(ctx, notice); err != nil {
 		return nil, fmt.Errorf("could not insert notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.created", notice.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "notice.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "notice.created", "error", err)
 	}
 	return notice, nil
 }
@@ -122,7 +118,7 @@ func (s *Service) SendNotice(ctx context.Context, id int64) (*Notice, error) {
 		return nil, fmt.Errorf("could not update notice: %w", err)
 	}
 	if err := s.audit.Record(ctx, "notice.sent", notice.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "notice.sent", "err", err)
+		s.log.Warn("audit entry failed", "action", "notice.sent", "error", err)
 	}
 	return notice, nil
 }
@@ -188,7 +184,7 @@ func (s *Service) ProcessQueuedNotices(ctx context.Context) (int, error) {
 	for _, notice := range pending {
 		_, err := s.SendNotice(ctx, notice.ID)
 		if err != nil {
-			s.log.Error("send notice failed", "id", notice.ID, "err", err)
+			s.log.Error("send notice failed", "id", notice.ID, "error", err)
 			continue
 		}
 		processed++
@@ -207,7 +203,7 @@ func (s *Service) ProcessSentNotices(ctx context.Context) (int, error) {
 	for _, notice := range pending {
 		_, err := s.ResolveNotice(ctx, notice.ID)
 		if err != nil {
-			s.log.Error("resolve notice failed", "id", notice.ID, "err", err)
+			s.log.Error("resolve notice failed", "id", notice.ID, "error", err)
 			continue
 		}
 		processed++

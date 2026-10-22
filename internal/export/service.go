@@ -94,7 +94,7 @@ func (s *Service) FinishBatch(ctx context.Context, id int64) (*Batch, error) {
 	}
 
 	if err := s.audit.Record(ctx, "batch.finished", batch.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "batch.finished", "err", err)
+		s.log.Warn("audit entry failed", "action", "batch.finished", "error", err)
 	}
 	return batch, nil
 }
@@ -118,7 +118,7 @@ func (s *Service) ProcessRunningBatches(ctx context.Context) (int, error) {
 	for _, batch := range open {
 		_, err := s.FinishBatch(ctx, batch.ID)
 		if err != nil {
-			s.log.Error("finish batch failed", "id", batch.ID, "err", err)
+			s.log.Error("finish batch failed", "id", batch.ID, "error", err)
 			continue
 		}
 		processed++

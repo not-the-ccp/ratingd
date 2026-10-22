@@ -176,7 +176,7 @@ func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeReque
 		return nil, fmt.Errorf("failed to insert surcharge: %w", err)
 	}
 	if err := s.audit.Record(ctx, "surcharge.created", surcharge.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "surcharge.created", "err", err)
+		s.log.Warn("audit entry failed", "action", "surcharge.created", "error", err)
 	}
 
 	return surcharge, nil
@@ -219,7 +219,7 @@ func (s *Service) ProcessOpenQuotes(ctx context.Context) (int, error) {
 	for _, quote := range open {
 		_, err := s.AcceptQuote(ctx, quote.ID)
 		if err != nil {
-			s.log.Error("accept quote failed", "id", quote.ID, "err", err)
+			s.log.Error("accept quote failed", "id", quote.ID, "error", err)
 			continue
 		}
 		processed++
