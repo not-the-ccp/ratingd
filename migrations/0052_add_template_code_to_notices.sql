@@ -1,0 +1,1 @@
+ALTER TABLE notices ADD COLUMN template_code TEXT NOT NULL DEFAULT '';

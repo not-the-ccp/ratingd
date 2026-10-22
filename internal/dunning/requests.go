@@ -8,10 +8,11 @@ import (
 )
 
 type CreateNoticeRequest struct {
-	InvoiceID int64        `json:"invoice_id"`
-	Level     int          `json:"level"`
-	FeeAmount money.Amount `json:"fee_amount"`
-	SentAt    time.Time    `json:"sent_at"`
+	InvoiceID    int64        `json:"invoice_id"`
+	Level        int          `json:"level"`
+	FeeAmount    money.Amount `json:"fee_amount"`
+	SentAt       time.Time    `json:"sent_at"`
+	TemplateCode string       `json:"template_code"`
 }
 
 type NoticeResponse struct {
@@ -25,6 +26,7 @@ type NoticeResponse struct {
 	ResolvedAt   *time.Time   `json:"resolved_at"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
+	TemplateCode string       `json:"template_code"`
 }
 
 func (r *CreateNoticeRequest) Validate() error {
@@ -49,5 +51,6 @@ func toNoticeResponse(notice *Notice) NoticeResponse {
 		ResolvedAt:   notice.ResolvedAt,
 		CreatedAt:    notice.CreatedAt,
 		UpdatedAt:    notice.UpdatedAt,
+		TemplateCode: notice.TemplateCode,
 	}
 }

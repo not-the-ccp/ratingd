@@ -20,6 +20,7 @@ type Notice struct {
 	Level        int          `json:"level"`
 	Status       NoticeStatus `json:"status"`
 	DispatchedAt *time.Time   `json:"dispatched_at"`
+	TemplateCode string       `json:"template_code"`
 	CreatedAt    time.Time    `json:"created_at"`
 	UpdatedAt    time.Time    `json:"updated_at"`
 }

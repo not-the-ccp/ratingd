@@ -60,13 +60,14 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 
 	now := s.clock.Now()
 	notice := &Notice{
-		FeeAmount: req.FeeAmount,
-		Level:     req.Level,
-		SentAt:    req.SentAt,
-		InvoiceID: req.InvoiceID,
-		Status:    NoticeStatusQueued,
-		CreatedAt: now,
-		UpdatedAt: now,
+		FeeAmount:    req.FeeAmount,
+		Level:        req.Level,
+		SentAt:       req.SentAt,
+		InvoiceID:    req.InvoiceID,
+		Status:       NoticeStatusQueued,
+		TemplateCode: req.TemplateCode,
+		CreatedAt:    now,
+		UpdatedAt:    now,
 	}
 
 	if err := s.store.InsertNotice(ctx, notice); err != nil {
