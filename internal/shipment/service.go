@@ -213,7 +213,7 @@ func (s *Service) CreateTrackingEvent(ctx context.Context, req *CreateTrackingEv
 	}
 
 	if err := s.audit.Record(ctx, "tracking_event.created", event.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "tracking_event.created", "error", err)
+		s.log.Warn("audit entry failed", "action", "tracking_event.created", "err", err)
 	}
 
 	return event, nil

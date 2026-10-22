@@ -176,7 +176,7 @@ func (s *Service) CreateSurcharge(ctx context.Context, req *CreateSurchargeReque
 		return nil, fmt.Errorf("failed to insert surcharge: %w", err)
 	}
 	if err := s.audit.Record(ctx, "surcharge.created", surcharge.ID); err != nil {
-		s.log.Warn("audit entry failed", "action", "surcharge.created", "error", err)
+		s.log.Warn("audit entry failed", "action", "surcharge.created", "err", err)
 	}
 
 	return surcharge, nil

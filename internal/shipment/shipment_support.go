@@ -23,7 +23,7 @@ func (s *Service) ProcessBookedShipments(ctx context.Context) (int, error) {
 	for _, shipment := range open {
 		_, err := s.PickupShipment(ctx, shipment.ID)
 		if err != nil {
-			s.log.Error("pickup shipment failed", "id", shipment.ID, "error", err)
+			s.log.Error("pickup shipment failed", "id", shipment.ID, "err", err)
 			continue
 		}
 		count++
