@@ -649,31 +649,31 @@ components:
       properties:
         id:
           type: number
-        payment_term_days:
-          type: number
         activated_at:
-          type: number
-        name:
-          type: string
-        number:
-          type: string
-        closed_at:
-          type: number
-        credit_limit:
-          type: number
-        status:
-          type: string
-        vat_number:
-          type: string
-        blocked_at:
           type: number
         external_ref:
           type: string
+        vat_number:
+          type: string
+        name:
+          type: string
+        closed_at:
+          type: number
+        blocked_at:
+          type: number
+        number:
+          type: string
+        status:
+          type: string
         country:
           type: string
-        billing_email:
-          type: string
         iban:
+          type: string
+        payment_term_days:
+          type: number
+        credit_limit:
+          type: number
+        billing_email:
           type: string
         created_at:
           type: number
@@ -887,15 +887,15 @@ components:
       properties:
         id:
           type: number
-        source:
-          type: string
+        occurred_at:
+          type: number
         location:
           type: string
         code:
           type: string
+        source:
+          type: string
         shipment_id:
-          type: number
-        occurred_at:
           type: number
         created_at:
           type: number
@@ -939,17 +939,17 @@ components:
       properties:
         id:
           type: number
-        code:
-          type: string
-        quote_id:
-          type: number
         description:
           type: string
-        amount:
-          type: number
         reason:
           type: string
         taxable:
+          type: number
+        quote_id:
+          type: number
+        code:
+          type: string
+        amount:
           type: number
         created_at:
           type: number
@@ -1039,13 +1039,7 @@ components:
       properties:
         id:
           type: number
-        payment_run:
-          type: string
         deductions:
-          type: number
-        status:
-          type: string
-        released_at:
           type: number
         retention_percent:
           type: number
@@ -1053,14 +1047,20 @@ components:
           type: string
         gross_amount:
           type: number
-        carrier_id:
-          type: number
-        reviewed_at:
+        released_at:
           type: number
         period_start:
           type: number
+        carrier_id:
+          type: number
+        payment_run:
+          type: string
+        reviewed_at:
+          type: number
         period_end:
           type: number
+        status:
+          type: string
         created_at:
           type: number
         updated_at:
@@ -1105,6 +1105,8 @@ components:
           type: string
         dispatched_at:
           type: number
+        template_code:
+          type: string
         created_at:
           type: number
         updated_at:
