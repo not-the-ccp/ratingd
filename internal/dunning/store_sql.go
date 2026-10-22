@@ -14,9 +14,9 @@ type SQLStore struct {
 
 // FindNotice implements Store.
 func (s *SQLStore) LoadNotice(ctx context.Context, id int64) (*Notice, error) {
-	row := s.db.QueryRowContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, template_code, created_at, updated_at FROM notices WHERE id = $1`, id)
+	row := s.db.QueryRowContext(ctx, `SELECT id, sent_at, dispatched_at, template_code, fee_amount, level, status, resolved_at, invoice_id, created_at, updated_at FROM notices WHERE id = $1`, id)
 	var notice Notice
-	if err := row.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.TemplateCode, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
+	if err := row.Scan(&notice.ID, &notice.SentAt, &notice.DispatchedAt, &notice.TemplateCode, &notice.FeeAmount, &notice.Level, &notice.Status, &notice.ResolvedAt, &notice.InvoiceID, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, ErrNotFound
 		}
@@ -31,7 +31,7 @@ func NewSQLStore(db *sql.DB) *SQLStore {
 
 // UpdateNotice implements Store.
 func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE notices SET resolved_at = $2, invoice_id = $3, fee_amount = $4, sent_at = $5, level = $6, status = $7, dispatched_at = $8, template_code = $9, updated_at = $10 WHERE id = $1`, notice.ID, notice.ResolvedAt, notice.InvoiceID, notice.FeeAmount, notice.SentAt, notice.Level, notice.Status, notice.DispatchedAt, notice.TemplateCode, notice.UpdatedAt)
+	res, err := s.db.ExecContext(ctx, `UPDATE notices SET sent_at = $2, dispatched_at = $3, template_code = $4, fee_amount = $5, level = $6, status = $7, resolved_at = $8, invoice_id = $9, updated_at = $10 WHERE id = $1`, notice.ID, notice.SentAt, notice.DispatchedAt, notice.TemplateCode, notice.FeeAmount, notice.Level, notice.Status, notice.ResolvedAt, notice.InvoiceID, notice.UpdatedAt)
 	if err != nil {
 		return fmt.Errorf("could not update notice: %w", err)
 	}
@@ -48,7 +48,7 @@ func (s *SQLStore) UpdateNotice(ctx context.Context, notice *Notice) error {
 }
 
 func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*Notice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, template_code, created_at, updated_at FROM notices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, sent_at, dispatched_at, template_code, fee_amount, level, status, resolved_at, invoice_id, created_at, updated_at FROM notices ORDER BY id DESC LIMIT $1 OFFSET $2`, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("could not list notices: %w", err)
 	}
@@ -57,7 +57,7 @@ func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*N
 	var notices []*Notice
 	for rows.Next() {
 		var notice Notice
-		if err := rows.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.TemplateCode, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
+		if err := rows.Scan(&notice.ID, &notice.SentAt, &notice.DispatchedAt, &notice.TemplateCode, &notice.FeeAmount, &notice.Level, &notice.Status, &notice.ResolvedAt, &notice.InvoiceID, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("could not scan notice: %w", err)
 		}
 		notices = append(notices, &notice)
@@ -67,7 +67,7 @@ func (s *SQLStore) ListNotices(ctx context.Context, limit int, offset int) ([]*N
 
 // ListNoticesByStatus implements Store.
 func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus) ([]*Notice, error) {
-	rows, err := s.db.QueryContext(ctx, `SELECT id, resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, template_code, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
+	rows, err := s.db.QueryContext(ctx, `SELECT id, sent_at, dispatched_at, template_code, fee_amount, level, status, resolved_at, invoice_id, created_at, updated_at FROM notices WHERE status = $1 ORDER BY id`, status)
 	if err != nil {
 		return nil, fmt.Errorf("could not list notices: %w", err)
 	}
@@ -76,7 +76,7 @@ func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus)
 	var notices []*Notice
 	for rows.Next() {
 		var notice Notice
-		if err := rows.Scan(&notice.ID, &notice.ResolvedAt, &notice.InvoiceID, &notice.FeeAmount, &notice.SentAt, &notice.Level, &notice.Status, &notice.DispatchedAt, &notice.TemplateCode, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
+		if err := rows.Scan(&notice.ID, &notice.SentAt, &notice.DispatchedAt, &notice.TemplateCode, &notice.FeeAmount, &notice.Level, &notice.Status, &notice.ResolvedAt, &notice.InvoiceID, &notice.CreatedAt, &notice.UpdatedAt); err != nil {
 			return nil, fmt.Errorf("could not scan notice: %w", err)
 		}
 		notices = append(notices, &notice)
@@ -85,7 +85,7 @@ func (s *SQLStore) ListNoticesByStatus(ctx context.Context, status NoticeStatus)
 }
 
 func (s *SQLStore) InsertNotice(ctx context.Context, notice *Notice) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO notices (resolved_at, invoice_id, fee_amount, sent_at, level, status, dispatched_at, template_code, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, notice.ResolvedAt, notice.InvoiceID, notice.FeeAmount, notice.SentAt, notice.Level, notice.Status, notice.DispatchedAt, notice.TemplateCode, notice.CreatedAt, notice.UpdatedAt).Scan(&notice.ID); err != nil {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO notices (sent_at, dispatched_at, template_code, fee_amount, level, status, resolved_at, invoice_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`, notice.SentAt, notice.DispatchedAt, notice.TemplateCode, notice.FeeAmount, notice.Level, notice.Status, notice.ResolvedAt, notice.InvoiceID, notice.CreatedAt, notice.UpdatedAt).Scan(&notice.ID); err != nil {
 		return fmt.Errorf("could not insert notice: %w", err)
 	}
 	return nil

@@ -25,20 +25,11 @@ func (s *SQLStore) LoadSettlementItem(ctx context.Context, id int64) (*Settlemen
 	return &item, nil
 }
 
-// UpdateSettlement implements Store.
-func (s *SQLStore) UpdateSettlement(ctx context.Context, settlement *Settlement) error {
-	res, err := s.db.ExecContext(ctx, `UPDATE settlements SET deductions = $2, retention_percent = $3, remark = $4, gross_amount = $5, released_at = $6, period_start = $7, carrier_id = $8, payment_run = $9, reviewed_at = $10, period_end = $11, status = $12, updated_at = $13 WHERE id = $1`, settlement.ID, settlement.Deductions, settlement.RetentionPercent, settlement.Remark, settlement.GrossAmount, settlement.ReleasedAt, settlement.PeriodStart, settlement.CarrierID, settlement.PaymentRun, settlement.ReviewedAt, settlement.PeriodEnd, settlement.Status, settlement.UpdatedAt)
-	if err != nil {
-		return fmt.Errorf("cannot update settlement: %w", err)
+func (s *SQLStore) InsertSettlement(ctx context.Context, settlement *Settlement) error {
+	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlements (deductions, retention_percent, remark, gross_amount, released_at, period_start, carrier_id, payment_run, reviewed_at, period_end, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, settlement.Deductions, settlement.RetentionPercent, settlement.Remark, settlement.GrossAmount, settlement.ReleasedAt, settlement.PeriodStart, settlement.CarrierID, settlement.PaymentRun, settlement.ReviewedAt, settlement.PeriodEnd, settlement.Status, settlement.CreatedAt, settlement.UpdatedAt).Scan(&settlement.ID); err != nil {
+		return fmt.Errorf("cannot insert settlement: %w", err)
 	}
 
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("cannot rows affected: %w", err)
-	}
-	if rows == 0 {
-		return ErrNotFound
-	}
 	return nil
 }
 
@@ -61,11 +52,20 @@ func (s *SQLStore) ListSettlementsByStatus(ctx context.Context, status Settlemen
 	return settlements, rows.Err()
 }
 
-func (s *SQLStore) InsertSettlement(ctx context.Context, settlement *Settlement) error {
-	if err := s.db.QueryRowContext(ctx, `INSERT INTO settlements (deductions, retention_percent, remark, gross_amount, released_at, period_start, carrier_id, payment_run, reviewed_at, period_end, status, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING id`, settlement.Deductions, settlement.RetentionPercent, settlement.Remark, settlement.GrossAmount, settlement.ReleasedAt, settlement.PeriodStart, settlement.CarrierID, settlement.PaymentRun, settlement.ReviewedAt, settlement.PeriodEnd, settlement.Status, settlement.CreatedAt, settlement.UpdatedAt).Scan(&settlement.ID); err != nil {
-		return fmt.Errorf("cannot insert settlement: %w", err)
+// UpdateSettlement implements Store.
+func (s *SQLStore) UpdateSettlement(ctx context.Context, settlement *Settlement) error {
+	res, err := s.db.ExecContext(ctx, `UPDATE settlements SET deductions = $2, retention_percent = $3, remark = $4, gross_amount = $5, released_at = $6, period_start = $7, carrier_id = $8, payment_run = $9, reviewed_at = $10, period_end = $11, status = $12, updated_at = $13 WHERE id = $1`, settlement.ID, settlement.Deductions, settlement.RetentionPercent, settlement.Remark, settlement.GrossAmount, settlement.ReleasedAt, settlement.PeriodStart, settlement.CarrierID, settlement.PaymentRun, settlement.ReviewedAt, settlement.PeriodEnd, settlement.Status, settlement.UpdatedAt)
+	if err != nil {
+		return fmt.Errorf("cannot update settlement: %w", err)
 	}
 
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("cannot rows affected: %w", err)
+	}
+	if rows == 0 {
+		return ErrNotFound
+	}
 	return nil
 }
 

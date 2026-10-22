@@ -41,7 +41,7 @@ func (s *Service) GetQuote(ctx context.Context, id int64) (*Quote, error) {
 	quote, err := s.store.LoadQuote(ctx, id)
 	ship, err := s.shipments.GetShipment(ctx, quote.ShipmentID)
 	if err != nil {
-		return nil, fmt.Errorf("load shipment %d: %w", quote.ShipmentID, err)
+		return nil, fmt.Errorf("read shipment %d: %w", quote.ShipmentID, err)
 	}
 	if ship.Status == shipment.ShipmentStatusCancelled {
 		return nil, fmt.Errorf("%w: shipment %d is cancelled", ErrInvalidState, ship.ID)
