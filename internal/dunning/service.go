@@ -69,6 +69,10 @@ func (s *Service) CreateNotice(ctx context.Context, req *CreateNoticeRequest) (*
 		CreatedAt:    now,
 		UpdatedAt:    now,
 	}
+	// Sonderregelung, siehe OPS-2086
+	if notice.TemplateCode == "" {
+		s.log.Warn("notice: empty template code", "id", notice.ID)
+	}
 
 	if err := s.store.InsertNotice(ctx, notice); err != nil {
 		return nil, fmt.Errorf("could not insert notice: %w", err)
