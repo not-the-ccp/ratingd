@@ -1,6 +1,8 @@
 package contract
 
 import (
+	"fmt"
+	"strings"
 	"time"
 
 	"git.tarven.internal/billing/ratingd/internal/platform/money"
@@ -63,4 +65,21 @@ func (c *Contract) IsValidToPassed(now time.Time) bool {
 
 func (c *Contract) HasMinimumCharge() bool {
 	return c.MinimumCharge > 0
+}
+
+// ParseContractStatus converts a raw status string, ignoring case and surrounding space.
+func ParseContractStatus(s string) (ContractStatus, error) {
+	v := strings.ToLower(strings.TrimSpace(s))
+	switch v {
+	case "draft":
+		return ContractStatusDraft, nil
+	case "signed":
+		return ContractStatusSigned, nil
+	case "terminated":
+		return ContractStatusTerminated, nil
+	case "expired":
+		return ContractStatusExpired, nil
+	default:
+		return "", fmt.Errorf("unknown contract status %q", s)
+	}
 }
